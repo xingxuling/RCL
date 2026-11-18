@@ -18,7 +18,8 @@ const run = args => {
 const object = path.join(output, 'sha256.o');
 const vm = path.join(output, 'rclvm'), compiler = path.join(output, 'rclc'), daemon = path.join(output, 'rclvmd');
 run(['build-obj', 'native/wasi-sha256.zig', '-target', RCL_LINUX_BUILD_TARGET, '-O', 'ReleaseSmall', '-femit-bin=' + object]);
-const common = ['cc', '-target', RCL_LINUX_BUILD_TARGET, '-std=c11', '-O2', '-I', 'native/wasi-compat'];
+// Published binaries omit compiler debug metadata and its host-specific paths.
+const common = ['cc', '-target', RCL_LINUX_BUILD_TARGET, '-std=c11', '-O2', '-s', '-I', 'native/wasi-compat'];
 run([...common, 'native/rclvm.c', object, '-lm', '-o', vm]);
 run([...common, '-DRCLVM_EMBEDDED_ONLY', 'native/rclvm.c', 'native/rclc.c', object, '-lm', '-o', compiler]);
 run([...common, '-DRCLVM_EMBEDDED_ONLY', 'native/rclvm.c', 'native/rclvmd.c', object, '-lm', '-o', daemon]);

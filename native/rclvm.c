@@ -3452,16 +3452,20 @@ int rclvm_instance_session_initialize(RclVmInstance *instance, char **result_jso
   return ok;
 }
 
-static int session_scalar_text_valid(const RclVmInputV1 *input) {
-  if (!input->text || input->text_length > 1024u * 1024u || memchr(input->text, 0, input->text_length)) return 0;
+static int session_text_valid(const char *text, size_t length) {
+  if (!text || length > 1024u * 1024u || memchr(text, 0, length)) return 0;
   size_t offset = 0;
-  while (offset < input->text_length) {
+  while (offset < length) {
     uint32_t cp; int valid;
-    size_t width = utf8_decode_at(input->text, input->text_length, offset, &cp, &valid);
+    size_t width = utf8_decode_at(text, length, offset, &cp, &valid);
     if (!width || !valid) return 0;
     offset += width;
   }
   return 1;
+}
+
+static int session_scalar_text_valid(const RclVmInputV1 *input) {
+  return session_text_valid(input->text, input->text_length);
 }
 
 static Value session_scalar_value(const RclVmInputV1 *input) {
@@ -3517,47 +3521,34 @@ int rclvm_instance_session_scalar_evidence(RclVmInstance *instance, char **resul
   return 1;
 }
 
-int rclvm_instance_session_restore_scalars(RclVmInstance *instance, const char *expected_root,
-  const RclVmInputV1 *facets, size_t facet_count, char **result_json, char *error, size_t error_capacity) {
-  if (result_json) *result_json = NULL;
-  if (!instance || !instance->loaded || !instance->session_initialized || !instance->session_before_first_step
-      || !expected_root || strlen(expected_root) != 64 || (facet_count && !facets)) {
-    if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID");
-    return 0;
+static int checkpoint_error(char *error, size_t capacity, const char *code) {
+  if (error && capacity) snprintf(error, capacity, "%s", code);
+  return 0;
+}
+
+static int checkpoint_phase(const RclVmInstance *instance, const char *expected_root,
+  char *error, size_t capacity) {
+  if (!instance || !instance->loaded || !instance->session_initialized
+      || (expected_root && (!instance->session_before_first_step || strlen(expected_root) != 64))) {
+    return checkpoint_error(error, capacity, "RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID");
   }
-  VM *vm = &instance->vm;
   const char *algorithm = native_state_root_algorithm();
-  if (!algorithm || !vm->state_root_algorithm || strcmp(algorithm, vm->state_root_algorithm) != 0) {
-    if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_STATE_ROOT_ALGORITHM_CHANGED");
-    return 0;
+  if (!algorithm || !instance->vm.state_root_algorithm || strcmp(algorithm, instance->vm.state_root_algorithm) != 0) {
+    return checkpoint_error(error, capacity, "RCL_SESSION_STATE_ROOT_ALGORITHM_CHANGED");
   }
-  const char *failure = "RCL_SESSION_CHECKPOINT_STATE_INVALID";
-  if (facet_count != vm->state.count) {
-    if (error && error_capacity) snprintf(error, error_capacity, "%s", failure);
-    return 0;
-  }
-  State *staged = (State *)calloc(1, sizeof(State));
-  if (!staged) {
-    if (error && error_capacity) snprintf(error, error_capacity, "RCL_NATIVE_OOM");
-    return 0;
-  }
-  for (size_t i = 0; i < facet_count; i++) {
-    const RclVmInputV1 *input = &facets[i];
-    const StateEntry *current = input->path ? state_find_const(&vm->state, input->path) : NULL;
-    if (!current || (uint32_t)current->value.type != input->type || state_find(staged, input->path)
-        || input->type < VALUE_NUMBER || input->type > VALUE_STRING
-        || (input->type == VALUE_NUMBER && !isfinite(input->number))
-        || (input->type == VALUE_BOOL && input->truth != 0 && input->truth != 1)
-        || (input->type == VALUE_STRING && !session_scalar_text_valid(input))) goto rejected;
-    Value value = input->type == VALUE_NUMBER ? value_number(input->number) : session_scalar_value(input);
-    int stored = state_set(staged, input->path, &value);
-    value_free(&value);
-    if (!stored) goto rejected;
-  }
+  return 1;
+}
+
+static int checkpoint_install(RclVmInstance *instance, State *staged, const char *expected_root,
+  char **result_json, char *error, size_t error_capacity) {
+  VM *vm = &instance->vm;
   char staged_root[65];
   vm_clear_transient(vm, 0);
-  failure = "RCL_SESSION_CHECKPOINT_STATE_ROOT_MISMATCH";
-  if (!selected_state_root(vm, staged, staged_root) || strcmp(expected_root, staged_root) != 0) goto rejected;
+  if (!selected_state_root(vm, staged, staged_root) || strcmp(expected_root, staged_root) != 0) {
+    state_free(staged);
+    free(staged);
+    return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_ROOT_MISMATCH");
+  }
   State before = vm->state;
   char before_root[65];
   memcpy(before_root, vm->semantic_state_root, sizeof(before_root));
@@ -3577,11 +3568,244 @@ int rclvm_instance_session_restore_scalars(RclVmInstance *instance, const char *
   state_free(&before);
   instance->session_before_first_step = 0;
   return 1;
+}
+
+int rclvm_instance_session_restore_scalars(RclVmInstance *instance, const char *expected_root,
+  const RclVmInputV1 *facets, size_t facet_count, char **result_json, char *error, size_t error_capacity) {
+  if (result_json) *result_json = NULL;
+  if (!expected_root || (facet_count && !facets)) {
+    return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID");
+  }
+  if (!checkpoint_phase(instance, expected_root, error, error_capacity)) return 0;
+  VM *vm = &instance->vm;
+  if (facet_count != vm->state.count) return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
+  State *staged = (State *)calloc(1, sizeof(State));
+  if (!staged) return checkpoint_error(error, error_capacity, "RCL_NATIVE_OOM");
+  for (size_t i = 0; i < facet_count; i++) {
+    const RclVmInputV1 *input = &facets[i];
+    const StateEntry *current = input->path ? state_find_const(&vm->state, input->path) : NULL;
+    if (!current || (uint32_t)current->value.type != input->type || state_find(staged, input->path)
+        || input->type < VALUE_NUMBER || input->type > VALUE_STRING
+        || (input->type == VALUE_NUMBER && !isfinite(input->number))
+        || (input->type == VALUE_BOOL && input->truth != 0 && input->truth != 1)
+        || (input->type == VALUE_STRING && !session_scalar_text_valid(input))) goto rejected;
+    Value value = input->type == VALUE_NUMBER ? value_number(input->number) : session_scalar_value(input);
+    int stored = state_set(staged, input->path, &value);
+    value_free(&value);
+    if (!stored) goto rejected;
+  }
+  return checkpoint_install(instance, staged, expected_root, result_json, error, error_capacity);
 rejected:
   state_free(staged);
   free(staged);
-  if (error && error_capacity) snprintf(error, error_capacity, "%s", failure);
-  return 0;
+  return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
+}
+
+#define CHECKPOINT_WIRE_BYTES (2u * 1024u * 1024u)
+#define CHECKPOINT_WIRE_DEPTH 32u
+#define CHECKPOINT_WIRE_VALUES 65536u
+
+static int checkpoint_write(StringBuilder *output, const void *bytes, size_t count) {
+  if (count > CHECKPOINT_WIRE_BYTES - output->length) return 0;
+  sb_append_n(output, (const char *)bytes, count);
+  return 1;
+}
+
+static int checkpoint_write_integer(StringBuilder *output, uint64_t value, unsigned width) {
+  uint8_t bytes[8];
+  for (unsigned index = 0; index < width; index++) bytes[index] = (uint8_t)(value >> (8u * index));
+  return checkpoint_write(output, bytes, width);
+}
+
+static int checkpoint_write_text(StringBuilder *output, const char *text, size_t length) {
+  return session_text_valid(text, length)
+    && checkpoint_write_integer(output, length, 4) && checkpoint_write(output, text, length);
+}
+
+static int checkpoint_write_value(StringBuilder *output, const Value *value, unsigned depth, size_t *count) {
+  if (depth > CHECKPOINT_WIRE_DEPTH || ++*count > CHECKPOINT_WIRE_VALUES
+      || !checkpoint_write_integer(output, value->type, 1)) return 0;
+  switch (value->type) {
+    case VALUE_NUMBER: {
+      uint64_t bits;
+      memcpy(&bits, &value->number, sizeof(bits));
+      return isfinite(value->number) && checkpoint_write_integer(output, bits, 8);
+    }
+    case VALUE_BOOL:
+      return checkpoint_write_integer(output, (unsigned)value->boolean, 1);
+    case VALUE_STRING:
+      return checkpoint_write_text(output, value->string, shared_string_header(value->string)->byte_length);
+    case VALUE_SEQUENCE: {
+      const Sequence *sequence = value->sequence;
+      if (sequence->count > CHECKPOINT_WIRE_VALUES - *count
+          || !checkpoint_write_integer(output, sequence->count, 4)) return 0;
+      for (size_t index = 0; index < sequence->count; index++) {
+        if (!checkpoint_write_value(output, sequence_item(sequence, index), depth + 1, count)) return 0;
+      }
+      return 1;
+    }
+    default: return 0;
+  }
+}
+
+static void checkpoint_sorted_facets(const State *state, const StateEntry **sorted) {
+  for (size_t i = 0; i < state->count; i++) sorted[i] = &state->entries[i];
+  qsort(sorted, state->count, sizeof(*sorted), compare_entry_ptrs);
+}
+
+int rclvm_instance_session_sequence_evidence(RclVmInstance *instance, char **result_json, char *error, size_t error_capacity) {
+  if (!result_json) return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID");
+  *result_json = NULL;
+  if (!checkpoint_phase(instance, NULL, error, error_capacity)) return 0;
+  VM *vm = &instance->vm;
+  const StateEntry *sorted[MAX_STATE];
+  checkpoint_sorted_facets(&vm->state, sorted);
+  StringBuilder wire;
+  sb_init(&wire);
+  checkpoint_write(&wire, "RCP1", 4);
+  checkpoint_write_integer(&wire, vm->state.count, 4);
+  size_t count = 0;
+  for (size_t i = 0; i < vm->state.count; i++) {
+    if (!checkpoint_write_text(&wire, sorted[i]->key, strlen(sorted[i]->key))
+        || !checkpoint_write_value(&wire, &sorted[i]->value, 0, &count)) {
+      free(wire.data);
+      return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
+    }
+  }
+  const char *algorithm = vm->state_root_algorithm, *failure = NULL;
+  char root[65];
+  int rooted = strcmp(algorithm, "rcl.semantic-state-root.v3-candidate") == 0
+    ? state_root_v3_candidate(&vm->state, root, &failure) : state_root_v2(&vm->state, root, &failure);
+  if (!rooted) {
+    free(wire.data);
+    return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_ROOT_INVALID");
+  }
+  StringBuilder json;
+  sb_init(&json);
+  sb_append(&json, "{\"status\":\"ok\",\"format\":\"rcl.session-sequence-evidence.v1\",\"sourceRoot\":");
+  json_escape_sb(&json, vm->program.strings[vm->program.source_root_index]);
+  sb_append(&json, ",\"stateRootAlgorithm\":"); json_escape_sb(&json, algorithm);
+  sb_append(&json, ",\"stateRoot\":"); json_escape_sb(&json, root);
+  sb_append(&json, ",\"stateWireHex\":\"");
+  static const char hex[] = "0123456789abcdef";
+  sb_reserve(&json, wire.length * 2);
+  for (size_t index = 0; index < wire.length; index++) {
+    uint8_t byte = (uint8_t)wire.data[index];
+    json.data[json.length++] = hex[byte >> 4];
+    json.data[json.length++] = hex[byte & 15u];
+  }
+  free(wire.data);
+  sb_append(&json, "\"}");
+  *result_json = json.data;
+  return 1;
+}
+
+typedef struct { const uint8_t *next; size_t remaining, values; } CheckpointReader;
+
+static const uint8_t *checkpoint_read(CheckpointReader *input, size_t count) {
+  if (count > input->remaining) return NULL;
+  const uint8_t *bytes = input->next;
+  input->next += count;
+  input->remaining -= count;
+  return bytes;
+}
+
+static int checkpoint_read_integer(CheckpointReader *input, uint64_t *value, unsigned width) {
+  const uint8_t *bytes = checkpoint_read(input, width);
+  if (!bytes) return 0;
+  *value = 0;
+  for (unsigned index = 0; index < width; index++) *value |= (uint64_t)bytes[index] << (8u * index);
+  return 1;
+}
+
+static const char *checkpoint_read_text(CheckpointReader *input, size_t *length) {
+  uint64_t count;
+  if (!checkpoint_read_integer(input, &count, 4)) return NULL;
+  const char *bytes = (const char *)checkpoint_read(input, (size_t)count);
+  if (!session_text_valid(bytes, (size_t)count)) return NULL;
+  *length = (size_t)count;
+  return bytes;
+}
+
+static int checkpoint_read_value(CheckpointReader *input, Value *value, unsigned depth, ValueType expected_type) {
+  const uint8_t *tag = checkpoint_read(input, 1);
+  if (!tag || depth > CHECKPOINT_WIRE_DEPTH || ++input->values > CHECKPOINT_WIRE_VALUES
+      || (expected_type != VALUE_NULL && *tag != expected_type)) return 0;
+  uint64_t data;
+  switch (*tag) {
+    case VALUE_NUMBER: {
+      if (!checkpoint_read_integer(input, &data, 8)) return 0;
+      double number;
+      memcpy(&number, &data, sizeof(number));
+      if (!isfinite(number)) return 0;
+      *value = value_number(number);
+      return 1;
+    }
+    case VALUE_BOOL:
+      if (!checkpoint_read_integer(input, &data, 1) || data > 1) return 0;
+      *value = value_bool((int)data);
+      return 1;
+    case VALUE_STRING: {
+      size_t length;
+      const char *text = checkpoint_read_text(input, &length);
+      if (!text) return 0;
+      *value = value_string_n(text, length);
+      return 1;
+    }
+    case VALUE_SEQUENCE: {
+      if (!checkpoint_read_integer(input, &data, 4) || data > CHECKPOINT_WIRE_VALUES - input->values
+          || data > input->remaining) return 0;
+      *value = value_sequence_empty();
+      if (data == 0) return 1;
+      value->sequence->items = (Value *)calloc((size_t)data, sizeof(Value));
+      if (!value->sequence->items) { value_free(value); return 0; }
+      for (size_t index = 0; index < (size_t)data; index++) {
+        if (!checkpoint_read_value(input, &value->sequence->items[index], depth + 1, VALUE_NULL)) {
+          value_free(value);
+          return 0;
+        }
+        value->sequence->count++;
+      }
+      return 1;
+    }
+    default: return 0;
+  }
+}
+
+int rclvm_instance_session_restore_sequence(RclVmInstance *instance, const char *expected_root,
+  const uint8_t *bytes, size_t length, char **result_json, char *error, size_t error_capacity) {
+  if (result_json) *result_json = NULL;
+  if (!expected_root) return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID");
+  if (!checkpoint_phase(instance, expected_root, error, error_capacity)) return 0;
+  const State *before = &instance->vm.state;
+  if (!bytes || length < 8 || length > CHECKPOINT_WIRE_BYTES || memcmp(bytes, "RCP1", 4) != 0) {
+    return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
+  }
+  CheckpointReader input = { bytes + 4, length - 4, 0 };
+  uint64_t fields;
+  if (!checkpoint_read_integer(&input, &fields, 4) || fields != before->count) {
+    return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
+  }
+  const StateEntry *sorted[MAX_STATE];
+  checkpoint_sorted_facets(before, sorted);
+  State *staged = (State *)calloc(1, sizeof(State));
+  if (!staged) return checkpoint_error(error, error_capacity, "RCL_NATIVE_OOM");
+  for (size_t index = 0; index < before->count; index++) {
+    size_t name_length;
+    const char *name = checkpoint_read_text(&input, &name_length);
+    const StateEntry *field = sorted[index];
+    Value value = value_null();
+    if (!name || name_length != strlen(field->key) || memcmp(name, field->key, name_length) != 0
+        || !checkpoint_read_value(&input, &value, 0, field->value.type)) goto invalid;
+    int stored = state_set(staged, field->key, &value);
+    value_free(&value);
+    if (!stored) goto invalid;
+  }
+  if (input.remaining == 0) return checkpoint_install(instance, staged, expected_root, result_json, error, error_capacity);
+invalid:
+  state_free(staged);
+  free(staged);
+  return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
 }
 
 int rclvm_instance_session_step(RclVmInstance *instance, const char *rule, int realize,

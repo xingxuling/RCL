@@ -20,13 +20,13 @@ const run = args => {
 };
 const object = path.join(output, 'sha256.o'), vm = path.join(output, 'rclvm.wasm');
 run(['build-obj', 'native/wasi-sha256.zig', '-target', 'wasm32-wasi', '-O', 'ReleaseSmall', '-femit-bin=' + object]);
-run(['cc', '-target', 'wasm32-wasi', '-std=c11', '-O2', '-I', 'native/wasi-compat', 'native/rclvm.c', 'native/wasi-compat/stdio-capture.c', object, '-lm', '-o', vm]);
+run(['cc', '-target', 'wasm32-wasi', '-std=c11', '-O2', '-s', '-I', 'native/wasi-compat', 'native/rclvm.c', 'native/wasi-compat/stdio-capture.c', object, '-lm', '-o', vm]);
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const sources = ['native/rclvm.c', 'native/rclvm.h', 'native/semantic_state_v2.h','native/identifier_profile.h', 'native/number_format_ryu.h', 'native/wasi-sha256.zig', 'native/wasi-compat/openssl/sha.h', 'native/wasi-compat/stdio-capture.c', 'scripts/build-native-wasi.mjs'];
 const report = { format: 'rcl.native-wasi-build.v1', status: 'BUILT_NOT_RUNTIME_VERIFIED', target: 'wasm32-wasi',
   zigVersion: spawnSync(zig, ['version'], { encoding: 'utf8' }).stdout.trim(),
   sources: sources.map(name => ({ path: name, sha256: sha256(fs.readFileSync(path.join(ROOT, name))) })),
-  wasm: { path: vm, bytes: fs.statSync(vm).size, sha256: sha256(fs.readFileSync(vm)) },
+  wasm: { path: path.relative(ROOT, vm).replaceAll(path.sep, '/'), bytes: fs.statSync(vm).size, sha256: sha256(fs.readFileSync(vm)) },
   vmImplementationOwner: 'native/rclvm.c', cryptoOwner: 'Zig standard SHA-256', wasiHostOwner: 'Node WASI', securitySandboxClaimed: false };
 fs.writeFileSync(path.join(output, 'build-manifest.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify(report, null, 2));

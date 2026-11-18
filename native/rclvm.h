@@ -74,6 +74,12 @@ RCLVM_API int rclvm_instance_session_scalar_evidence(RclVmInstance *instance,
  * against the caller's already trusted root before replacing any facet. */
 RCLVM_API int rclvm_instance_session_restore_scalars(RclVmInstance *instance, const char *expected_root,
   const RclVmInputV1 *facets, size_t facet_count, char **result_json, char *error, size_t error_capacity);
+/* RCP1 evidence carries exact Number bits, Text bytes and nested Sequences.
+ * The restore frame uses the same bounded format and pre-STEP phase. */
+RCLVM_API int rclvm_instance_session_sequence_evidence(RclVmInstance *instance,
+  char **result_json, char *error, size_t error_capacity);
+RCLVM_API int rclvm_instance_session_restore_sequence(RclVmInstance *instance, const char *expected_root,
+  const uint8_t *bytes, size_t length, char **result_json, char *error, size_t error_capacity);
 RCLVM_API int rclvm_instance_session_step(RclVmInstance *instance, const char *rule, int realize,
   const RclVmInputV1 *inputs, size_t input_count, char **result_json, char *error, size_t error_capacity);
 /* Optional error snapshot; free a non-NULL result with rclvm_free_string.

@@ -195,7 +195,7 @@ that continuation makes the original backup manifest stale; retain the original
 backup or export a new directory when a fresh frozen backup is needed. Existing
 64 MiB / 10,000-command limits continue to apply to each full-prefix journal.
 
-## Scalar checkpoint continuation candidate
+## Checkpoint continuation candidates
 
 `await session.checkpoint(newDirectory, trustedJournalRoot)` captures a committed
 prefix in the writer's queue. It produces a fresh continuation store with the
@@ -221,18 +221,18 @@ lock. The caller selects which directory receives future commands.
 On reopen, the native writer validates the original initialization root. The
 host admits the pinned manifest, exact archive bytes, receipt chain, active
 journal and caller's pins under the writer lock. The VM then validates the
-complete scalar state against the state root bound by the manifest and replays
-the active journal. The manifest also binds the exact signed-zero facets sampled
-from the native runtime. The restore peer reads those signs back after loading.
+complete checkpoint state against the state root bound by the manifest and
+replays the active journal. The restore peer reads exact Number bits back after
+loading.
 Verification reports `checkpointRestored`, `archivedPrefixBindingVerified`
 and `replayedSuffixCommands`. `nativeSuffixReplayVerified` and
 `referenceSuffixReplayVerified` describe verification of the active segment.
 Keep the original store or full-prefix backup for independent execution of the
 archived commands.
 
-This candidate supports Number, Truth and bounded Unicode-scalar Text facets
+The scalar profile supports Number, Truth and bounded Unicode-scalar Text
 without NUL characters, with the default v2 root or explicit v3 candidate root.
-The native restore frame is limited to 2 MiB. The first rollover uses
+Its native restore frame is limited to 2 MiB. The first rollover uses
 `rcl.session-checkpoint.v2-candidate`. Subsequent rollovers use
 `rcl.session-checkpoint.v3-candidate` and bind the ordered archive segments and
 their join points. The earlier v1 candidate uses full archive replay to recover
@@ -244,6 +244,21 @@ archived bytes and exports a new directory. Checkpointed history pages and
 backups carry distinct candidate formats. Backup verification for a
 continuation requires its original trusted `expectedCheckpointRoot` in addition
 to any optional backup or head pins.
+
+A program that declares a Sequence facet uses the
+`rcl.session-checkpoint.v4-candidate` manifest. The supported state contains
+Number, Truth, Text and nested Sequences of those values. The manifest binds
+the ordered exact archive bytes and the native RCP1 state frame. That frame
+preserves IEEE-754 bits, including negative zero inside Sequences, and exact
+UTF-8 Text. It admits up to 2 MiB, 65,536 values, and 32 nested levels beyond
+the facet value. Text is at most 1 MiB per value and excludes NUL. AST values,
+compiler-specific objects and typed records in a Sequence use ordinary replay.
+
+On restoration the host reads the frame back from the native VM and compares
+its exact bytes. With reference verification enabled, export also compares
+the native and reference frames. The checkpoint root binds the Number sign
+bits that the semantic state root normalizes. The existing journal root
+algorithms, receipt formats and CLI commands apply to this profile.
 
 ```text
 rcl session checkpoint ./counter-state ./counter-next --expected-root <trusted-journal-root>

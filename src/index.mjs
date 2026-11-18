@@ -20,6 +20,7 @@ export { compileRealitySessionNative } from './session-compiler.mjs';
 export { openDurableRealitySession, verifyDurableRealitySession, verifyDurableRealitySessionBackup, RCL_DURABLE_SESSION_VERSION, RCL_SESSION_JOURNAL_FORMAT, RCL_SESSION_BACKUP_FORMAT, RCL_SESSION_HISTORY_FORMAT } from './durable-session.mjs';
 export { RCL_SESSION_CHECKPOINT_FORMAT, RCL_SESSION_CHECKPOINT_BACKUP_FORMAT, RCL_SESSION_CHECKPOINT_HISTORY_FORMAT } from './durable-session.mjs';
 export { RCL_SESSION_CHECKPOINT_CHAIN_FORMAT, RCL_SESSION_CHECKPOINT_CHAIN_BACKUP_FORMAT, RCL_SESSION_CHECKPOINT_CHAIN_HISTORY_FORMAT } from './durable-session.mjs';
+export { RCL_SESSION_CHECKPOINT_SEQUENCE_FORMAT } from './durable-session.mjs';
 export { RCL_SESSION_JOURNAL_V3_CANDIDATE_FORMAT, RCL_SESSION_COMMAND_IDENTITY_V3_CANDIDATE_FORMAT, RCL_SESSION_BACKUP_V3_CANDIDATE_FORMAT, RCL_SESSION_HISTORY_V3_CANDIDATE_FORMAT } from './durable-session.mjs';
 export { verifyDurableRealitySessionHistoryPage, verifyDurableRealitySessionHistoryPages, RCL_SESSION_HISTORY_VERIFICATION_FORMAT, RCL_SESSION_COMMAND_IDENTITY_FORMAT } from './durable-session.mjs';
 export { compileRealitySessionBytecode, RCL_BYTECODE_SESSION_FEATURE_VERSION } from './bytecode.mjs';

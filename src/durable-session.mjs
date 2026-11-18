@@ -4,14 +4,15 @@ import { createHash, randomUUID } from 'node:crypto';
 import { compileReality } from './compiler.mjs';
 import { compileRealitySessionBytecode } from './bytecode.mjs';
 import { compileRealitySessionNative } from './session-compiler.mjs';
-import { createNativeRealitySession, createNativeRealitySessionFromScalarCheckpoint, encodeSessionInputs } from './native-session.mjs';
-import { createRealitySession, createRealitySessionFromScalarCheckpoint } from './runtime.mjs';
+import { createNativeRealitySession, createNativeRealitySessionFromScalarCheckpoint, createNativeRealitySessionFromSequenceCheckpoint, encodeSessionInputs } from './native-session.mjs';
+import { createRealitySession, createRealitySessionFromScalarCheckpoint, createRealitySessionFromSequenceCheckpoint } from './runtime.mjs';
 import { semanticStateRootV2Stable } from './semantic-state-root-v2.mjs';
 import { semanticStateRootForAlgorithm, RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE } from './semantic-state-root.mjs';
 import {
   captureScalarSessionCheckpoint, applyScalarCheckpointNumberSigns, scalarCheckpointNegativeZeroFacets,
   normalizeSessionCommand, sessionError, RCL_SESSION_COMMAND_FORMAT, RCL_SESSION_RESULT_FORMAT,
 } from './session-contract.mjs';
+import { captureSequenceSessionCheckpoint, encodeSequenceCheckpointState, hasSequenceCheckpointState } from './session-checkpoint-state.mjs';
 
 export const RCL_DURABLE_SESSION_VERSION = '1.0.0';
 export const RCL_SESSION_JOURNAL_FORMAT = 'rcl.session-journal.v2';
@@ -29,6 +30,7 @@ export const RCL_SESSION_CHECKPOINT_HISTORY_FORMAT = 'rcl.session-checkpoint-his
 export const RCL_SESSION_CHECKPOINT_CHAIN_FORMAT = 'rcl.session-checkpoint.v3-candidate';
 export const RCL_SESSION_CHECKPOINT_CHAIN_BACKUP_FORMAT = 'rcl.session-checkpoint-backup.v2-candidate';
 export const RCL_SESSION_CHECKPOINT_CHAIN_HISTORY_FORMAT = 'rcl.session-checkpoint-history-page.v2-candidate';
+export const RCL_SESSION_CHECKPOINT_SEQUENCE_FORMAT = 'rcl.session-checkpoint.v4-candidate';
 const BACKUP_FILES = ['source.rcl', 'session.rbc', 'journal.jsonl'];
 const CHECKPOINT_MANIFEST = 'checkpoint.json';
 const CHECKPOINT_PREFIX = 'checkpoint-prefix.jsonl';
@@ -176,24 +178,26 @@ function readCheckpoint(storage, expectedRoot, algorithm) {
   let manifest;
   try { manifest = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes)); }
   catch { throw sessionError('RCL_SESSION_CHECKPOINT_MANIFEST_INVALID'); }
-  const required = ['format', 'sessionId', 'revision', 'programRoot', 'genesisRoot', 'journalRoot', 'initialStateRoot', 'stateRoot', 'stateRootAlgorithm', 'sourceHash', 'bytecodeHash', 'state'];
-  const chained = manifest?.format === RCL_SESSION_CHECKPOINT_CHAIN_FORMAT;
-  const exactNumberSigns = chained || manifest?.format === RCL_SESSION_CHECKPOINT_FORMAT;
-  required.push(chained ? 'archives' : 'prefix');
+  const required = ['format', 'sessionId', 'revision', 'programRoot', 'genesisRoot', 'journalRoot', 'initialStateRoot', 'stateRoot', 'stateRootAlgorithm', 'sourceHash', 'bytecodeHash'];
+  const scalarChain = manifest?.format === RCL_SESSION_CHECKPOINT_CHAIN_FORMAT;
+  const sequence = manifest?.format === RCL_SESSION_CHECKPOINT_SEQUENCE_FORMAT;
+  const exactNumberSigns = scalarChain || manifest?.format === RCL_SESSION_CHECKPOINT_FORMAT;
+  const hasArchiveList = scalarChain || sequence;
+  required.push(sequence ? 'stateWireHex' : 'state', hasArchiveList ? 'archives' : 'prefix');
   if (exactNumberSigns) required.push('negativeZeroFacets');
-  const archives = chained ? manifest.archives : [{ ...manifest?.prefix, checkpointRoot: null }];
+  const archives = hasArchiveList ? manifest.archives : [{ ...manifest?.prefix, checkpointRoot: null }];
   if (!manifest || typeof manifest !== 'object' || Object.keys(manifest).length !== required.length || !required.every(key => Object.hasOwn(manifest, key))
-      || (!exactNumberSigns && manifest.format !== LEGACY_CHECKPOINT_MANIFEST_FORMAT) || typeof manifest.sessionId !== 'string' || !manifest.sessionId
-      || !Array.isArray(archives) || archives.length < (chained ? 2 : 1) || archives.length > MAX_CHECKPOINT_ARCHIVES
+      || (!sequence && !exactNumberSigns && manifest.format !== LEGACY_CHECKPOINT_MANIFEST_FORMAT) || typeof manifest.sessionId !== 'string' || !manifest.sessionId
+      || !Array.isArray(archives) || archives.length < (scalarChain ? 2 : 1) || archives.length > MAX_CHECKPOINT_ARCHIVES
       || !Number.isSafeInteger(manifest.revision) || manifest.revision < 0 || manifest.revision > archives.length * MAX_COMMANDS
       || !['programRoot', 'genesisRoot', 'journalRoot', 'initialStateRoot', 'stateRoot', 'sourceHash', 'bytecodeHash'].every(key => isRoot(manifest[key]))
-      || (!chained && (!manifest.prefix || Object.keys(manifest.prefix).length !== 2))
+      || (!hasArchiveList && (!manifest.prefix || Object.keys(manifest.prefix).length !== 2))
       || archives.some((asset, index) => !validArchiveAsset(asset) || Object.keys(asset).length !== 3 || !Object.hasOwn(asset, 'checkpointRoot')
         || (index === 0 ? asset.checkpointRoot !== null : !isRoot(asset.checkpointRoot)))) {
     throw sessionError('RCL_SESSION_CHECKPOINT_MANIFEST_INVALID');
   }
   if (manifest.stateRootAlgorithm !== algorithm) throw sessionError('RCL_SESSION_JOURNAL_STATE_ROOT_ALGORITHM_UNSUPPORTED');
-  return { manifest, bytes, root: expectedRoot, exactNumberSigns, archives, chained };
+  return { manifest, bytes, root: expectedRoot, exactNumberSigns, sequence, archives, chained: archives.length > 1 };
 }
 
 function checkpointResume(checkpoint) {
@@ -452,16 +456,24 @@ async function openDurableSession(directory, options, backupFiles) {
   const bytecodeHash = hashBytes(bytecode);
   if (checkpoint && (checkpoint.manifest.sourceHash !== sourceHash || checkpoint.manifest.bytecodeHash !== bytecodeHash
       || checkpoint.manifest.programRoot !== program.programRoot)) throw sessionError('RCL_SESSION_CHECKPOINT_SOURCE_BINDING_MISMATCH');
-  const checkpointState = checkpoint ? captureScalarSessionCheckpoint(program, {
-    state: checkpoint.exactNumberSigns ? applyScalarCheckpointNumberSigns(checkpoint.manifest.state, checkpoint.manifest.negativeZeroFacets)
-      : checkpoint.manifest.state,
-    stateRoot: checkpoint.manifest.stateRoot,
-  }, algorithm) : null;
-  const restored = checkpoint?.exactNumberSigns ? checkpointState : null;
+  const sequenceProfile = hasSequenceCheckpointState(program);
+  let restored = null;
+  if (checkpoint?.sequence) {
+    if (!sequenceProfile) throw sessionError('RCL_SESSION_CHECKPOINT_FACET_UNSUPPORTED');
+    restored = captureSequenceSessionCheckpoint(program, checkpoint.manifest, algorithm);
+  } else if (checkpoint) {
+    const checkpointState = captureScalarSessionCheckpoint(program, {
+      state: checkpoint.exactNumberSigns ? applyScalarCheckpointNumberSigns(checkpoint.manifest.state, checkpoint.manifest.negativeZeroFacets)
+        : checkpoint.manifest.state,
+      stateRoot: checkpoint.manifest.stateRoot,
+    }, algorithm);
+    if (checkpoint.exactNumberSigns) restored = checkpointState;
+  }
   fs.mkdirSync(storage, { recursive: true, mode: 0o700 });
   if (!fs.statSync(storage).isDirectory() || fs.lstatSync(storage).isSymbolicLink()) throw sessionError('RCL_SESSION_DIRECTORY_INVALID');
+  const restoreReference = checkpoint?.sequence ? createRealitySessionFromSequenceCheckpoint : createRealitySessionFromScalarCheckpoint;
   const reference = options.verifyReference !== true ? null : restored
-    ? createRealitySessionFromScalarCheckpoint(program, restored, { stateRootAlgorithm: algorithm })
+    ? restoreReference(program, restored, { stateRootAlgorithm: algorithm })
     : createRealitySession(program, { stateRootAlgorithm: algorithm });
   // The daemon owns an OS lock for the entire read/replay/append lifetime.
   const nativeOptions = { ...options.native, bytecode, lockPath: path.join(storage, '.writer.lock') };
@@ -580,7 +592,8 @@ async function openDurableSession(directory, options, backupFiles) {
     if (restored) {
       // The restore-capable peer initializes and acquires its OS lock first.
       // Admit the pinned archive and suffix before sending the restore frame.
-      engine = await createNativeRealitySessionFromScalarCheckpoint(program, restored, nativeOptions, admitJournal);
+      const restoreNative = checkpoint.sequence ? createNativeRealitySessionFromSequenceCheckpoint : createNativeRealitySessionFromScalarCheckpoint;
+      engine = await restoreNative(program, restored, nativeOptions, admitJournal);
     } else {
       engine = await createNativeRealitySession(program, nativeOptions);
       admitJournal(engine.snapshot().stateRoot);
@@ -725,27 +738,40 @@ async function openDurableSession(directory, options, backupFiles) {
         if (expectedHead !== head.root) throw sessionError('RCL_SESSION_EXPECTED_HEAD_MISMATCH');
         if (legacyGenesis) throw sessionError('RCL_SESSION_CHECKPOINT_PREFIX_UNSUPPORTED');
         if (checkpoint && checkpoint.archives.length >= MAX_CHECKPOINT_ARCHIVES) throw sessionError('RCL_SESSION_CHECKPOINT_ARCHIVE_LIMIT');
-        const captured = engine.snapshot();
-        captureScalarSessionCheckpoint(program, { state: captured.state, stateRoot: captured.stateRoot }, algorithm);
-        let scalar;
-        try { scalar = await engine.readScalarCheckpoint(); }
+        if (!sequenceProfile) {
+          const { state, stateRoot } = engine.snapshot();
+          captureScalarSessionCheckpoint(program, { state, stateRoot }, algorithm);
+        }
+        let evidence;
+        try { evidence = await (sequenceProfile ? engine.readSequenceCheckpoint() : engine.readScalarCheckpoint()); }
         catch (error) {
           if (/^RCL_SESSION_NATIVE_/u.test(error.code ?? '')) { poisoned = true; await engine.close(); }
           throw error;
         }
-        const negativeZeroFacets = scalarCheckpointNegativeZeroFacets(scalar.state);
-        if (reference && JSON.stringify(negativeZeroFacets) !== JSON.stringify(scalarCheckpointNegativeZeroFacets(reference.snapshot().state))) {
-          throw sessionError('RCL_SESSION_CHECKPOINT_REFERENCE_NUMBER_SIGNS_MISMATCH');
+        let checkpointValues;
+        if (sequenceProfile) {
+          if (reference && encodeSequenceCheckpointState(program, reference.snapshot().state) !== evidence.stateWireHex) {
+            throw sessionError('RCL_SESSION_CHECKPOINT_REFERENCE_EXACT_STATE_MISMATCH');
+          }
+          checkpointValues = { stateWireHex: evidence.stateWireHex };
+        } else {
+          const negativeZeroFacets = scalarCheckpointNegativeZeroFacets(evidence.state);
+          if (reference && JSON.stringify(negativeZeroFacets) !== JSON.stringify(scalarCheckpointNegativeZeroFacets(reference.snapshot().state))) {
+            throw sessionError('RCL_SESSION_CHECKPOINT_REFERENCE_NUMBER_SIGNS_MISMATCH');
+          }
+          encodeSessionInputs(program, evidence.state);
+          checkpointValues = { state: evidence.state, negativeZeroFacets };
         }
-        encodeSessionInputs(program, scalar.state);
         const { assets, files } = captureExport();
         const active = files['journal.jsonl'];
-        const archives = checkpoint ? [...checkpoint.archives, { ...active, checkpointRoot: checkpoint.root }] : null;
-        const format = archives ? RCL_SESSION_CHECKPOINT_CHAIN_FORMAT : RCL_SESSION_CHECKPOINT_FORMAT;
+        const archives = checkpoint ? [...checkpoint.archives, { ...active, checkpointRoot: checkpoint.root }]
+          : sequenceProfile ? [{ ...active, checkpointRoot: null }] : null;
+        const format = sequenceProfile ? RCL_SESSION_CHECKPOINT_SEQUENCE_FORMAT
+          : archives ? RCL_SESSION_CHECKPOINT_CHAIN_FORMAT : RCL_SESSION_CHECKPOINT_FORMAT;
         const manifest = {
           format, sessionId, revision, programRoot: program.programRoot,
-          genesisRoot, journalRoot: head.root, initialStateRoot, stateRoot: scalar.stateRoot, stateRootAlgorithm: algorithm,
-          sourceHash, bytecodeHash, state: scalar.state, negativeZeroFacets,
+          genesisRoot, journalRoot: head.root, initialStateRoot, stateRoot: evidence.stateRoot, stateRootAlgorithm: algorithm,
+          sourceHash, bytecodeHash, ...checkpointValues,
           ...(archives ? { archives } : { prefix: active }),
         };
         const bytes = Buffer.from(JSON.stringify(manifest) + '\n', 'utf8');
@@ -762,7 +788,7 @@ async function openDurableSession(directory, options, backupFiles) {
         syncDirectory(target); syncDirectory(path.dirname(target));
         return {
           format, checkpointRoot, sessionId, revision,
-          programRoot: program.programRoot, journalRoot: head.root, stateRoot: scalar.stateRoot,
+          programRoot: program.programRoot, journalRoot: head.root, stateRoot: evidence.stateRoot,
           stateRootAlgorithm: algorithm, directory: target,
           ...(archives ? { archiveSha256s: archives.map(asset => asset.sha256) } : { prefixSha256: active.sha256 }),
         };

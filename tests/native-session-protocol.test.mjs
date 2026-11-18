@@ -10,6 +10,7 @@ import { compileRealitySessionBytecode } from '../src/bytecode.mjs';
 import { createNativeRealitySession, encodeSessionInputs } from '../src/native-session.mjs';
 import { defaultNativeExecutablePath } from '../src/native-vm-materialization.mjs';
 import { semanticStateRootV2Stable } from '../src/semantic-state-root-v2.mjs';
+import { encodeSequenceCheckpointState } from '../src/session-checkpoint-state.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const source = fs.readFileSync(path.join(ROOT, 'examples/sessions/governed-counter.rcl'), 'utf8');
@@ -92,6 +93,47 @@ test('scalar checkpoint restore is explicit, root-checked and restricted to befo
     const afterStep = run(['INIT', step, restore, step], ['--restore-scalar-checkpoint']);
     assert.equal(afterStep[3].message, 'RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID');
     assert.equal(afterStep[4].result.state['counter.value'], 4);
+  } finally { fs.rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('native Sequence restore rejects malformed or unpinned state before replacing any facet', () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-sequence-frame-'));
+  try {
+    const source = 'reality SequenceFrame { facet values : Sequence = empty_sequence() }';
+    const program = compileReality(source);
+    const bytecode = path.join(directory, 'session.rbc');
+    fs.writeFileSync(bytecode, compileRealitySessionBytecode(program));
+    const initial = { values: [] }, restored = { values: [[-0, true, '😀'], []] };
+    const stateRoot = semanticStateRootV2Stable(restored);
+    const wire = encodeSequenceCheckpointState(program, restored);
+    const malformed = Buffer.from(wire, 'hex');
+    malformed.writeUInt32LE(0xffffffff, 8 + 4 + 'values'.length + 1);
+    const restore = 'RESTORE_SEQUENCE ' + stateRoot + ' ' + wire;
+    const run = (commands, args = []) => {
+      const response = spawnSync(daemon, [bytecode, ...args], {
+        input: [...commands, 'QUIT', ''].join('\n'), encoding: 'utf8', timeout: 10_000, windowsHide: true,
+        env: { ...process.env, RCL_SEMANTIC_STATE_ROOT_ALGORITHM: 'rcl.semantic-state-root.v2' },
+      });
+      assert.equal(response.status, 0, response.stderr);
+      return response.stdout.trim().split('\n').map(JSON.parse);
+    };
+    const standard = run(['INIT', restore, 'SEQUENCE_EVIDENCE']);
+    assert.equal(standard[0].sequenceCheckpointRestore, undefined);
+    assert.equal(standard[2].status, 'error');
+    assert.equal(standard[3].result.stateWireHex, encodeSequenceCheckpointState(program, initial));
+    const opted = run([
+      restore, 'INIT', 'RESTORE_SEQUENCE ' + stateRoot + ' ' + malformed.toString('hex'),
+      'RESTORE_SEQUENCE ' + '0'.repeat(64) + ' ' + wire, 'SEQUENCE_EVIDENCE',
+      restore, 'SEQUENCE_EVIDENCE', restore,
+    ], ['--restore-sequence-checkpoint']);
+    assert.equal(opted[0].sequenceCheckpointRestore, true);
+    assert.equal(opted[1].message, 'RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID');
+    assert.equal(opted[3].message, 'RCL_SESSION_CHECKPOINT_STATE_INVALID');
+    assert.equal(opted[4].message, 'RCL_SESSION_CHECKPOINT_STATE_ROOT_MISMATCH');
+    assert.equal(opted[5].result.stateWireHex, encodeSequenceCheckpointState(program, initial));
+    assert.equal(opted[6].result.stateRoot, stateRoot);
+    assert.equal(opted[7].result.stateWireHex, wire);
+    assert.equal(opted[8].message, 'RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID');
   } finally { fs.rmSync(directory, { recursive: true, force: true }); }
 });
 

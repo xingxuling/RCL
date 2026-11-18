@@ -13,6 +13,7 @@ import {
   verifyDurableRealitySessionHistoryPages,
   RCL_SESSION_CHECKPOINT_FORMAT,
   RCL_SESSION_CHECKPOINT_CHAIN_FORMAT,
+  RCL_SESSION_CHECKPOINT_SEQUENCE_FORMAT,
 } from '../src/index.mjs';
 import { RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE } from '../src/semantic-state-root.mjs';
 import { semanticStateRootV2Stable as root } from '../src/semantic-state-root-v2.mjs';
@@ -123,16 +124,103 @@ test('checkpoint admission rejects drifted source, archive and suffix before acc
   } finally { await live?.close(); fs.rmSync(parent, { recursive: true, force: true }); }
 });
 
-test('non-scalar sessions keep full replay and cannot export a scalar checkpoint', async () => {
+test('a Sequence containing an AST value remains replayable and rejects an exact-data checkpoint', async () => {
   const parent = temp(); let live;
   try {
     const original = path.join(parent, 'original'), continuation = path.join(parent, 'continue');
-    const source = 'reality SequenceState { facet values : Sequence = sequence_append(empty_sequence(), 1) }';
+    const source = 'reality SequenceState { facet values : Sequence = sequence_append(empty_sequence(), facet_ast("x", "Number", "Number", "1", make_span(0, 1, 1, 1))) }';
     live = await openDurableRealitySession(original, { source });
     const { journalRoot } = live.snapshot();
-    await assert.rejects(live.checkpoint(continuation, journalRoot), { code: 'RCL_SESSION_CHECKPOINT_FACET_UNSUPPORTED' });
+    await assert.rejects(live.checkpoint(continuation, journalRoot), { code: 'RCL_SESSION_CHECKPOINT_VALUE_UNSUPPORTED' });
     assert.equal(fs.existsSync(continuation), false);
     assert.equal(live.snapshot().journalRoot, journalRoot);
+  } finally { await live?.close(); fs.rmSync(parent, { recursive: true, force: true }); }
+});
+
+for (const algorithm of ['rcl.semantic-state-root.v2', RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE]) {
+  test('Sequence checkpoint preserves exact replay across rollover with ' + algorithm, async () => {
+    const parent = temp(); let live, resumed, rolled;
+    try {
+      const original = path.join(parent, 'original'), continuation = path.join(parent, 'continue');
+      const second = path.join(parent, 'second'), backup = path.join(parent, 'backup');
+      const source = [
+        'reality NestedSequence {',
+        '  facet values : Sequence = empty_sequence()',
+        '  facet reported : Number = 0',
+        '  facet 名称 : Text = "😀 é"',
+        '  facet enabled : Truth = false',
+        '  subject actor {}',
+        '  emergence fill { cause actor when true',
+        '    alter values <- sequence_append(empty_sequence(), sequence_append(sequence_append(sequence_append(empty_sequence(), -0), empty_sequence()), 名称))',
+        '    alter enabled <- true',
+        '  }',
+        '  emergence readsign { cause actor when enabled',
+        '    alter reported <- sequence_get(bytes_f64le(sequence_get(sequence_get(values, 0), 0)), 7)',
+        '  }',
+        '}',
+      ].join('\n');
+      const native = { stateRootAlgorithm: algorithm };
+      live = await openDurableRealitySession(original, { source, native, verifyReference: true });
+      const invoke = (requestId, expectedRevision, rule) => ({ requestId, expectedRevision, rule });
+      const fill = invoke('fill', 0, 'fill'), first = await live.invoke(fill);
+      const exported = await live.checkpoint(continuation, first.receipt.root);
+      assert.equal(exported.format, RCL_SESSION_CHECKPOINT_SEQUENCE_FORMAT);
+      assert.equal(exported.archiveSha256s.length, 1);
+      const manifest = JSON.parse(fs.readFileSync(path.join(continuation, 'checkpoint.json')));
+      assert.ok(manifest.stateWireHex.startsWith('52435031'));
+      assert.equal(manifest.archives[0].checkpointRoot, null);
+      await assert.rejects(openDurableRealitySession(continuation, { native }), { code: 'RCL_SESSION_CHECKPOINT_TRUSTED_ROOT_REQUIRED' });
+      const options = { native, expectedCheckpointRoot: exported.checkpointRoot, verifyReference: true };
+      resumed = await openDurableRealitySession(continuation, options);
+      assert.deepEqual(await resumed.invoke(fill), { ...first, replayed: true });
+      const event = invoke('inspect-sign', 1, 'readsign');
+      const result = await resumed.invoke(event);
+      assert.equal(result.result.state.reported, 128);
+      assert.deepEqual(result, await live.invoke(event));
+      const exportedAgain = await resumed.checkpoint(second, result.receipt.root);
+      assert.equal(exportedAgain.format, RCL_SESSION_CHECKPOINT_SEQUENCE_FORMAT);
+      assert.equal(exportedAgain.archiveSha256s.length, 2);
+      await resumed.close(); resumed = null;
+      const rolloverOptions = { ...options, expectedCheckpointRoot: exportedAgain.checkpointRoot };
+      rolled = await openDurableRealitySession(second, rolloverOptions);
+      assert.equal(rolled.snapshot().checkpointArchiveSegments, 2);
+      const nextEvent = invoke('inspect-after-rollover', 2, 'readsign');
+      const final = await rolled.invoke(nextEvent);
+      assert.deepEqual(final, await live.invoke(nextEvent));
+      const history = verifyDurableRealitySessionHistoryPages([await rolled.history()], {
+        expectedJournalRoot: final.receipt.root, expectedCheckpointRoot: exportedAgain.checkpointRoot,
+      });
+      assert.equal(history.completeHistory, true);
+      assert.equal(history.checkpointArchiveSegments, 2);
+      const saved = await rolled.backup(backup);
+      await rolled.close(); rolled = null;
+      const verified = await verifyDurableRealitySessionBackup(backup, {
+        ...rolloverOptions, expectedBackupRoot: saved.backupRoot, expectedJournalRoot: final.receipt.root,
+      });
+      assert.equal(verified.replayedArchiveCommands, 0);
+      assert.equal(verified.replayedSuffixCommands, 1);
+      assert.equal(verified.referenceSuffixReplayVerified, true);
+      assert.equal(verified.stateRoot, final.result.afterRoot);
+    } finally { await rolled?.close(); await resumed?.close(); await live?.close(); fs.rmSync(parent, { recursive: true, force: true }); }
+  });
+}
+
+test('Sequence checkpoint export rejects a state deeper than the restore profile before writing a destination', async () => {
+  const parent = temp(); let live;
+  try {
+    const source = [
+      'reality TooDeep {',
+      '  reckon nest(remaining : Number) -> Sequence = choose(remaining == 0, empty_sequence(), sequence_append(empty_sequence(), nest(remaining - 1)))',
+      '  facet values : Sequence = nest(33)',
+      '}',
+    ].join('\n');
+    live = await openDurableRealitySession(path.join(parent, 'original'), { source });
+    const initial = live.snapshot();
+    const destination = path.join(parent, 'continue');
+    await assert.rejects(live.checkpoint(destination, initial.journalRoot), { code: 'RCL_SESSION_CHECKPOINT_STATE_LIMIT' });
+    assert.equal(fs.existsSync(destination), false);
+    assert.equal(live.snapshot().journalRoot, initial.journalRoot);
+    assert.equal(live.snapshot().native.peerStatus, 'NO_EXIT_OBSERVED');
   } finally { await live?.close(); fs.rmSync(parent, { recursive: true, force: true }); }
 });
 

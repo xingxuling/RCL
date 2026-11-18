@@ -5,6 +5,7 @@ import { RCLRuntimeError } from './errors.mjs';
 import { canonicalReality, realityRoot, RCL_REFERENCE_STATE_ROOT_ALGORITHM } from './canonical.mjs';
 import { semanticStateRootForAlgorithm, RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE } from './semantic-state-root.mjs';
 import { RCL_SESSION_FORMAT, validateSessionProgram, normalizeSessionCommand, captureScalarSessionCheckpoint, sessionResult } from './session-contract.mjs';
+import { captureSequenceSessionCheckpoint } from './session-checkpoint-state.mjs';
 import {
   applyBinary,
   quantity,
@@ -1486,7 +1487,11 @@ export function createRealitySessionFromScalarCheckpoint(compiledOrSource, check
   return openReferenceRealitySession(compiledOrSource, options, checkpoint ?? null);
 }
 
-function openReferenceRealitySession(compiledOrSource, options, checkpoint) {
+export function createRealitySessionFromSequenceCheckpoint(compiledOrSource, checkpoint, options = {}) {
+  return openReferenceRealitySession(compiledOrSource, options, checkpoint ?? null, captureSequenceSessionCheckpoint);
+}
+
+function openReferenceRealitySession(compiledOrSource, options, checkpoint, captureCheckpoint = captureScalarSessionCheckpoint) {
   const stateRootAlgorithm = options.stateRootAlgorithm ?? 'rcl.semantic-state-root.v2';
   if (!['rcl.semantic-state-root.v2', RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE].includes(stateRootAlgorithm)) {
     throw new RCLRuntimeError('RCL_SESSION_STATE_ROOT_ALGORITHM_UNSUPPORTED', 'Unsupported session state root algorithm');
@@ -1494,7 +1499,7 @@ function openReferenceRealitySession(compiledOrSource, options, checkpoint) {
   const program = cloneRuntimeValue(typeof compiledOrSource === 'string' ? compileReality(compiledOrSource) : compiledOrSource);
   validateSessionProgram(program);
   const functions = new Map(program.reckons.map(fn => [fn.name, fn]));
-  const state = checkpoint === undefined ? initializeState(program, functions) : captureScalarSessionCheckpoint(program, checkpoint, stateRootAlgorithm).state;
+  const state = checkpoint === undefined ? initializeState(program, functions) : captureCheckpoint(program, checkpoint, stateRootAlgorithm).state;
   const runtime = {
     program, functions, state,
     stateRootAlgorithm,

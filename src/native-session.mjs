@@ -11,6 +11,7 @@ import {
   RCL_SESSION_FORMAT, RCL_SESSION_INPUT_TYPES, normalizeSessionCommand, captureScalarSessionCheckpoint,
   applyScalarCheckpointNumberSigns, scalarCheckpointNegativeZeroFacets, sessionResult, sessionError,
 } from './session-contract.mjs';
+import { captureSequenceSessionCheckpoint, encodeSequenceCheckpointState } from './session-checkpoint-state.mjs';
 import { defaultNativeExecutablePath } from './native-vm-materialization.mjs';
 import { nativeLinuxArtifactBinding } from './native-linux-build-contract.mjs';
 
@@ -126,15 +127,20 @@ export async function createNativeRealitySessionFromScalarCheckpoint(sourceOrPro
   return openNativeRealitySession(sourceOrProgram, options, checkpoint ?? null, admitCheckpoint);
 }
 
-async function openNativeRealitySession(sourceOrProgram, options, checkpoint, admitCheckpoint) {
+export async function createNativeRealitySessionFromSequenceCheckpoint(sourceOrProgram, checkpoint, options = {}, admitCheckpoint) {
+  return openNativeRealitySession(sourceOrProgram, options, checkpoint ?? null, admitCheckpoint, true);
+}
+
+async function openNativeRealitySession(sourceOrProgram, options, checkpoint, admitCheckpoint, sequenceRestore = false) {
   const stateRootAlgorithm = options.stateRootAlgorithm ?? 'rcl.semantic-state-root.v2';
   if (!['rcl.semantic-state-root.v2', RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE].includes(stateRootAlgorithm)) {
     throw sessionError('RCL_SESSION_STATE_ROOT_ALGORITHM_UNSUPPORTED');
   }
   const verification = { stateRootAlgorithm, rejectProjectedAst: options.rejectProjectedAst === true };
   const program = structuredClone(typeof sourceOrProgram === 'string' ? compileReality(sourceOrProgram) : sourceOrProgram);
-  const restored = checkpoint === undefined ? null : captureScalarSessionCheckpoint(program, checkpoint, stateRootAlgorithm);
-  const wireCheckpoint = restored && encodeSessionInputs(program, restored.state).toString('hex');
+  const captureCheckpoint = sequenceRestore ? captureSequenceSessionCheckpoint : captureScalarSessionCheckpoint;
+  const restored = checkpoint === undefined ? null : captureCheckpoint(program, checkpoint, stateRootAlgorithm);
+  const wireCheckpoint = restored && (sequenceRestore ? restored.stateWireHex : encodeSessionInputs(program, restored.state).toString('hex'));
   const bytecode = options.bytecode === undefined ? compileRealitySessionBytecode(program) : Buffer.from(options.bytecode);
   // A supplied artifact must match bootstrap lowering before it can acquire inputs.
   if (options.bytecode !== undefined && !bytecode.equals(compileRealitySessionBytecode(program))) {
@@ -150,7 +156,7 @@ async function openNativeRealitySession(sourceOrProgram, options, checkpoint, ad
     fs.writeFileSync(bytecodePath, bytecode);
     const args = [bytecodePath];
     if (options.lockPath) args.push(path.resolve(options.lockPath));
-    if (restored) args.push('--restore-scalar-checkpoint');
+    if (restored) args.push(sequenceRestore ? '--restore-sequence-checkpoint' : '--restore-scalar-checkpoint');
     child = spawn(daemonPath, args, {
       windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'],
       env: { ...process.env, ...(options.env ?? {}), RCL_SEMANTIC_STATE_ROOT_ALGORITHM: stateRootAlgorithm },
@@ -241,23 +247,42 @@ async function openNativeRealitySession(sourceOrProgram, options, checkpoint, ad
     const exact = applyScalarCheckpointNumberSigns(state, payload.negativeZeroFacets);
     return captureScalarSessionCheckpoint(program, { state: exact, stateRoot }, stateRootAlgorithm);
   });
+  let sequenceEvidenceSupported = false;
+  function readSequenceEvidence() {
+    if (!sequenceEvidenceSupported) throw sessionError('RCL_SESSION_CHECKPOINT_SEQUENCE_PEER_UNSUPPORTED');
+    // Check the projection's value profile before asking the peer for its exact bytes.
+    encodeSequenceCheckpointState(program, state);
+    const stateRoot = semanticStateRootForAlgorithm(state, stateRootAlgorithm);
+    return send('SEQUENCE_EVIDENCE', payload => {
+      evidence(payload.status === 'ok' && payload.format === 'rcl.session-sequence-evidence.v1'
+        && payload.sourceRoot === program.programRoot && payload.stateRootAlgorithm === stateRootAlgorithm
+        && payload.stateRoot === stateRoot, 'RCL_SESSION_NATIVE_CHECKPOINT_EVIDENCE_INVALID');
+      return captureSequenceSessionCheckpoint(program, payload, stateRootAlgorithm);
+    });
+  }
   try {
     const greeting = await ready;
     if (greeting.status !== 'ready') throw sessionError('RCL_SESSION_NATIVE_NOT_READY');
-    if (restored && greeting.scalarCheckpointRestore !== true) throw sessionError('RCL_SESSION_NATIVE_CHECKPOINT_UNSUPPORTED');
+    sequenceEvidenceSupported = greeting.sequenceCheckpointEvidence === true;
+    const restoreSupported = sequenceRestore ? greeting.sequenceCheckpointRestore : greeting.scalarCheckpointRestore;
+    if (restored && restoreSupported !== true) throw sessionError('RCL_SESSION_NATIVE_CHECKPOINT_UNSUPPORTED');
     const initial = await send('INIT', payload => verifySessionReply(program, payload, undefined, undefined, verification));
     state = initial.state;
     if (restored) {
       initialStateRoot = initial.stateRoot;
       if (admitCheckpoint) admitCheckpoint(initialStateRoot);
-      const opened = await send(`RESTORE ${restored.stateRoot} ${wireCheckpoint}`, payload => {
+      const kind = sequenceRestore ? 'RESTORE_SEQUENCE' : 'RESTORE';
+      const opened = await send(`${kind} ${restored.stateRoot} ${wireCheckpoint}`, payload => {
         const result = verifySessionReply(program, payload, undefined, undefined, verification);
         evidence(result.stateRoot === restored.stateRoot, 'RCL_SESSION_NATIVE_CHECKPOINT_STATE_ROOT_MISMATCH');
         return result;
       });
       state = opened.state;
-      const checked = await readScalarEvidence();
-      if (JSON.stringify(scalarCheckpointNegativeZeroFacets(checked.state))
+      const checked = await (sequenceRestore ? readSequenceEvidence() : readScalarEvidence());
+      if (sequenceRestore && checked.stateWireHex !== wireCheckpoint) {
+        throw sessionError('RCL_SESSION_NATIVE_CHECKPOINT_EXACT_STATE_MISMATCH');
+      }
+      if (!sequenceRestore && JSON.stringify(scalarCheckpointNegativeZeroFacets(checked.state))
           !== JSON.stringify(scalarCheckpointNegativeZeroFacets(restored.state))) {
         throw sessionError('RCL_SESSION_NATIVE_CHECKPOINT_NUMBER_SIGNS_MISMATCH');
       }
@@ -273,14 +298,16 @@ async function openNativeRealitySession(sourceOrProgram, options, checkpoint, ad
       ...(restored ? { initialStateRoot, restoredCheckpointStateRoot: restored.stateRoot } : {}),
       peerStatus: closed ? 'CLOSED' : closing ? 'CLOSING' : 'NO_EXIT_OBSERVED', snapshotOrigin: 'LAST_VERIFIED_REPLY' },
   });
+  function readCheckpoint(readEvidence) {
+    if (closing || closed) return Promise.reject(sessionError('RCL_SESSION_NATIVE_CLOSED'));
+    const operation = pending.then(readEvidence);
+    pending = operation.catch(() => {});
+    return operation;
+  }
   return Object.freeze({
     snapshot,
-    readScalarCheckpoint() {
-      if (closing || closed) return Promise.reject(sessionError('RCL_SESSION_NATIVE_CLOSED'));
-      const operation = pending.then(readScalarEvidence);
-      pending = operation.catch(() => {});
-      return operation;
-    },
+    readScalarCheckpoint: () => readCheckpoint(readScalarEvidence),
+    readSequenceCheckpoint: () => readCheckpoint(readSequenceEvidence),
     invoke(input) {
       if (closing || closed) return Promise.reject(sessionError('RCL_SESSION_NATIVE_CLOSED'));
       const command = normalizeSessionCommand(program, input);

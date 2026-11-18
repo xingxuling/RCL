@@ -101,8 +101,12 @@ static char *wire_text(const uint8_t *data, size_t length, size_t *offset, size_
   return text;
 }
 
-static int run_session_command(RclVmInstance *vm, char *line, int restore, char **json, char *error, size_t capacity) {
-  char *mode_or_root = strtok(line + (restore ? 8 : 5), " ");
+enum SessionCommand { SESSION_STEP, SESSION_RESTORE_SCALAR, SESSION_RESTORE_SEQUENCE };
+
+static int run_session_command(RclVmInstance *vm, char *arguments, enum SessionCommand command,
+  char **json, char *error, size_t capacity) {
+  int restore = command != SESSION_STEP;
+  char *mode_or_root = strtok(arguments, " ");
   char *rule = restore ? NULL : strtok(NULL, " ");
   char *hex = strtok(NULL, " ");
   if (!mode_or_root || !hex || strtok(NULL, " ")
@@ -116,6 +120,11 @@ static int run_session_command(RclVmInstance *vm, char *line, int restore, char 
     int high = hex_digit(hex[i * 2]), low = hex_digit(hex[i * 2 + 1]);
     if (high < 0 || low < 0) { free(data); goto invalid; }
     data[i] = (uint8_t)(high * 16 + low);
+  }
+  if (command == SESSION_RESTORE_SEQUENCE) {
+    int result = rclvm_instance_session_restore_sequence(vm, mode_or_root, data, length, json, error, capacity);
+    free(data);
+    return result;
   }
   if (memcmp(data, "RCI1", 4)) { free(data); goto invalid; }
   size_t offset = 4;
@@ -150,9 +159,13 @@ invalid:
 }
 
 int main(int argc, char **argv) {
-  int allow_restore = argc >= 3 && strcmp(argv[argc - 1], "--restore-scalar-checkpoint") == 0;
-  int positional = argc - allow_restore;
-  if (positional != 2 && positional != 3) { fprintf(stderr, "Usage: rclvmd <program.rbc> [writer-lock-path] [--restore-scalar-checkpoint]\n"); return 2; }
+  int allow_scalar_restore = argc >= 3 && strcmp(argv[argc - 1], "--restore-scalar-checkpoint") == 0;
+  int allow_sequence_restore = argc >= 3 && strcmp(argv[argc - 1], "--restore-sequence-checkpoint") == 0;
+  int positional = argc - allow_scalar_restore - allow_sequence_restore;
+  if (positional != 2 && positional != 3) {
+    fprintf(stderr, "Usage: rclvmd <program.rbc> [writer-lock-path] [--restore-scalar-checkpoint|--restore-sequence-checkpoint]\n");
+    return 2;
+  }
   if (positional == 3 && !acquire_writer_lock(argv[2])) { fprintf(stderr, "RCL_SESSION_WRITER_BUSY_OR_LOCK_INVALID\n"); return 1; }
   RclVmInstance *vm = rclvm_instance_create();
   char error[512] = {0};
@@ -160,8 +173,9 @@ int main(int argc, char **argv) {
     fprintf(stderr, "{\"status\":\"error\",\"message\":\"%s\"}\n", error);
     rclvm_instance_destroy(vm); release_writer_lock(); return 1;
   }
-  printf("{\"status\":\"ready\",\"vm\":\"%s\"%s}\n", rclvm_version(),
-    allow_restore ? ",\"scalarCheckpointRestore\":true" : ""); fflush(stdout);
+  printf("{\"status\":\"ready\",\"vm\":\"%s\",\"sequenceCheckpointEvidence\":true%s%s}\n", rclvm_version(),
+    allow_scalar_restore ? ",\"scalarCheckpointRestore\":true" : "",
+    allow_sequence_restore ? ",\"sequenceCheckpointRestore\":true" : ""); fflush(stdout);
   size_t line_capacity = MAX_SESSION_WIRE * 2u + 4096u;
   char *line = (char *)malloc(line_capacity);
   if (!line) { rclvm_instance_destroy(vm); release_writer_lock(); return 1; }
@@ -174,13 +188,19 @@ int main(int argc, char **argv) {
     if (strcmp(line, "QUIT") == 0) break;
     if (strcmp(line, "RESET") == 0) { rclvm_instance_reset(vm, 1); puts("{\"status\":\"reset\"}"); fflush(stdout); continue; }
     int step = strncmp(line, "STEP ", 5) == 0;
-    int restore = allow_restore && strncmp(line, "RESTORE ", 8) == 0;
+    int scalar_restore = allow_scalar_restore && strncmp(line, "RESTORE ", 8) == 0;
+    int sequence_restore = allow_sequence_restore && strncmp(line, "RESTORE_SEQUENCE ", 17) == 0;
     int scalar_evidence = strcmp(line, "SCALAR_EVIDENCE") == 0;
-    if (strcmp(line, "RUN") == 0 || strcmp(line, "RUN_RESET") == 0 || strcmp(line, "INIT") == 0 || step || restore || scalar_evidence) {
+    int sequence_evidence = strcmp(line, "SEQUENCE_EVIDENCE") == 0;
+    if (strcmp(line, "RUN") == 0 || strcmp(line, "RUN_RESET") == 0 || strcmp(line, "INIT") == 0
+        || step || scalar_restore || sequence_restore || scalar_evidence || sequence_evidence) {
       char *json = NULL; error[0] = '\0'; double start = now_ms();
       int ok = strcmp(line, "INIT") == 0 ? rclvm_instance_session_initialize(vm, &json, error, sizeof(error))
-        : step || restore ? run_session_command(vm, line, restore, &json, error, sizeof(error))
+        : step ? run_session_command(vm, line + 5, SESSION_STEP, &json, error, sizeof(error))
+        : scalar_restore ? run_session_command(vm, line + 8, SESSION_RESTORE_SCALAR, &json, error, sizeof(error))
+        : sequence_restore ? run_session_command(vm, line + 17, SESSION_RESTORE_SEQUENCE, &json, error, sizeof(error))
         : scalar_evidence ? rclvm_instance_session_scalar_evidence(vm, &json, error, sizeof(error))
+        : sequence_evidence ? rclvm_instance_session_sequence_evidence(vm, &json, error, sizeof(error))
         : rclvm_instance_run(vm, strcmp(line, "RUN_RESET") == 0, &json, error, sizeof(error));
       double elapsed = now_ms() - start;
       if (json) {

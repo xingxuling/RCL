@@ -141,3 +141,11 @@ and request IDs across rollovers. A local native acceptance ran through command
 on reopen. Focused checks also cover four archived segments, an invalid archive
 join and verified backups. The package and default state-root identities stay
 at 2.0.0 and v2 respectively. See the [session contract](../v2.0/session-contract.md).
+
+### 2026-11-18 Sequence checkpoint candidate
+
+The candidate now restores bounded nested Sequences of Number, Truth and Text
+from an exact native state frame. Windows and Linux controls restore negative
+zero inside a nested Sequence, continue across two rollovers and verify
+the final backup with native and reference execution. TD-017 remains ACTIVE
+for general runtime values and disk compaction.
