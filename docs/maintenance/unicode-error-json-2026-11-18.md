@@ -1,0 +1,7 @@
+# Strict UTF-8 for bounded native error text
+
+A semantic assertion with a long supplementary-Unicode detail exposed truncation in the 512-byte native error buffer: the final scalar could be cut in the middle and produce invalid UTF-8 JSON. Native VM error formatting now retains a complete UTF-8 prefix. Structured diagnostic code and Span fields remain complete; the bounded textual excerpt does not promise a full detail string.
+
+The original strict TextDecoder control failed against raw stderr. After rebuilding Windows VM/compiler/DLL/static/provider assets and Linux/WASI distributions, all twenty-one structured-diagnostic/ABI controls pass, including actual DLL lifecycle/link checks and the strict raw-byte Unicode regression. Linux WSL2 and Node WASI also emit strict UTF-8 for the long-error control and retain the expected diagnostic. The exact Windows prebuilt source/artifact manifest revalidates at `6ad9ef3249614cb5fdca0405cc135654b476a8be0e0d1061378c6a15139738b8`.
+
+The RCL compiler source/artifact remains `7daafded31c33c5b3fc4dfed7cd8cc01a8e9d9a7c91c60bbb59f86c1f7954567` (430,165 bytes). Fresh native C0=C1=C2 and unchanged 109,935,699-instruction counts pass on Windows, Linux and WASI. Captured identities are in `final-native-portable-2026-11-18.json`. The independent six-test JS/native compiler suite passed for this RCL source before this error-only C formatting increment; the fresh native rebuild and error controls supply the later VM-source verification. No algorithm/version promotion, server deployment or publication.

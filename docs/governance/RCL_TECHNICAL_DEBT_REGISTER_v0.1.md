@@ -105,6 +105,18 @@ pass. TD-020 stays ACTIVE: an explicit independently constructed AstNode control
 still differs, and other compiler/typed value families retain their prior policy.
 See `docs/maintenance/reference-sequence-equality-2026-10-28.json`.
 
+### 2026-11-13 compiler-value equality progress
+
+The reference equality owner now compares Symbol, SemanticNode, IrNode and
+ParseState using the existing native field and nested-value policies. Focused
+native/reference controls exercise independent values, differences and sequence
+nesting. TD-020 remains ACTIVE: AstNode raw literal spelling is not retained in
+the public reference representation, and typed-value identity and other families
+remain unresolved. The reference runtime now retains spelling privately during
+execution and replay, but the v2 state root does not bind it, including for
+AstNodes nested in durable-session Sequences. No root algorithm or release status
+changes. See `docs/maintenance/compiler-value-equality-2026-11-13.md`.
+
 ### 2026-10-28 durable identity and history verification
 
 | ID | Status | Area | Debt | Closure evidence or next gate |
@@ -114,3 +126,18 @@ See `docs/maintenance/reference-sequence-equality-2026-10-28.json`.
 The new offline verifier checks complete supplied-page continuity and explicitly
 does not execute commands. It is not checkpoint admission or compaction. TD-017
 remains ACTIVE with the original replay limits.
+
+
+### 2026-11-18 local continuation candidate
+
+TD-019 remains ACTIVE. The local continuation now retains token-backed UTF-16 offsets and raw lengths and exposes optional structured semantic diagnostics through native errors, the SDK, CLI and MCP. Fallback spans and uncovered semantic contexts remain. The compiler reaches exact JS/Windows/Linux-WSL/WASI fixed points with the unchanged instruction-headroom gate; this is a local branch candidate, not canonical-main closure. TD-011 also remains ACTIVE: a fresh offline-installable local archive and Linux filesystem execution proof do not replace hosted release gates or published/downstream acceptance. See `docs/maintenance/rcl-continuation-delivery-2026-11-18.md` and its source-bound JSON record. No Actions or publication occurred.
+
+### 2026-11-18 scalar checkpoint candidate
+
+TD-017 remains ACTIVE for Sequence state and disk compaction. The scalar
+candidate preserves immutable archives, exact Number sign bits, receipt chains
+and request IDs across rollovers. A local native acceptance ran through command
+20,001, retaining two 10,000-command segments and replaying one active command
+on reopen. Focused checks also cover four archived segments, an invalid archive
+join and verified backups. The package and default state-root identities stay
+at 2.0.0 and v2 respectively. See the [session contract](../v2.0/session-contract.md).

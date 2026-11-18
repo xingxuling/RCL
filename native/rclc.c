@@ -40,13 +40,18 @@ static void print_json_string(FILE *out, const char *value) {
   fputc('"', out);
 }
 
-static int fail(const char *code, const char *message) {
+static int fail_with_cause(const char *code, const char *message, const char *cause) {
   fputs("{\"status\":\"error\",\"code\":", stderr);
   print_json_string(stderr, code);
   fputs(",\"message\":", stderr);
   print_json_string(stderr, message);
+  if (cause) { fputs(",\"cause\":", stderr); fputs(cause, stderr); }
   fputs("}\n", stderr);
   return 1;
+}
+
+static int fail(const char *code, const char *message) {
+  return fail_with_cause(code, message, NULL);
 }
 
 static int read_source_file(const char *path, CompilerInput *input, char *error, size_t error_capacity) {
@@ -253,9 +258,12 @@ int main(int argc, char **argv) {
   if (ok) ok = rclvm_instance_register_provider(instance, &provider, error, sizeof(error));
   if (ok) ok = rclvm_instance_run(instance, 1, NULL, error, sizeof(error));
   if (!ok) {
+    char *cause = rclvm_instance_get_last_error_json(instance);
+    int status = fail_with_cause("RCLC_COMPILER_FAILURE", error[0] ? error : "Native compiler execution failed", cause);
+    rclvm_free_string(cause);
     rclvm_instance_destroy(instance);
     free(input.source);
-    return fail("RCLC_COMPILER_FAILURE", error[0] ? error : "Native compiler execution failed");
+    return status;
   }
 
   const char *output_state = NULL;

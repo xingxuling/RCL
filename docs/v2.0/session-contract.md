@@ -83,6 +83,11 @@ Invalid reply evidence closes the native process with
 RCL_SESSION_NATIVE_EVIDENCE_INVALID. Its cached snapshot remains the last verified
 state. A durable writer receiving such evidence or losing its native transport
 closes with RCL_SESSION_DURABILITY_UNCERTAIN and rejects further reads/invocations.
+Native snapshots label their origin `LAST_VERIFIED_REPLY` and report peer status
+as `CLOSED`, `CLOSING` or `NO_EXIT_OBSERVED`. The last is an observation, not a
+health check; a cached snapshot after closure does not establish current live
+state. Closing drains previously accepted invocations, rejects new invocations,
+and repeated close calls share the same completion.
 Reopen it to verify the durable prefix before retrying the same request. Ordinary
 structured VM rejections retain their rollback contract and leave the writer usable.
 
@@ -138,8 +143,8 @@ Incomplete tails fail closed by default. repairIncompleteTail:true first verifie
 the complete prefix, saves the tail bytes in a separate recovery file, and only
 then truncates that incomplete suffix. Corrupt complete records are never repaired
 this way. An uncertain append poisons/closes the writer; reopen and request retry
-resolve whether the command was persisted. Journals are bounded to 64 MiB and
-10,000 accepted commands; compaction/migration is not implemented in this profile.
+resolve whether the command was persisted. A full-prefix journal is bounded to
+64 MiB and 10,000 accepted commands.
 
 Hashing plus replay checks consistency, not authenticity of an entire replaced
 history. Supply an externally trusted expectedJournalRoot or minimumRevision to
@@ -177,8 +182,8 @@ const restored = await openDurableRealitySession('./counter-backup', {
 ```
 
 Import `verifyDurableRealitySessionBackup` from the package alongside the session
-APIs. It checks the fixed asset names and manifest before starting a native writer,
-then performs ordinary full native replay and compares the replayed identity,
+APIs. It checks the admitted asset names and manifest before starting a native writer.
+For a full-prefix journal it replays every command and compares the replayed identity,
 revision and state root against the manifest. Independent reference replay is
 optional. Corrupt files, missing completion manifests and false state claims fail
 verification. Keep trusted backup/history roots outside the backup directory;
@@ -190,14 +195,71 @@ that continuation makes the original backup manifest stale; retain the original
 backup or export a new directory when a fresh frozen backup is needed. Existing
 64 MiB / 10,000-command limits continue to apply to each full-prefix journal.
 
+## Scalar checkpoint continuation candidate
+
+`await session.checkpoint(newDirectory, trustedJournalRoot)` captures a committed
+prefix in the writer's queue. It produces a fresh continuation store with the
+original source, bytecode, archived journal and a new active journal. The
+returned `checkpointRoot` is the SHA-256 digest of the exact `checkpoint.json`
+bytes. Retain that root in a trusted application or record and provide it on
+every subsequent open.
+
+```js
+const checkpoint = await session.checkpoint('./counter-next', trustedJournalRoot);
+const continuation = await openDurableRealitySession('./counter-next', {
+  expectedCheckpointRoot: checkpoint.checkpointRoot,
+  expectedJournalRoot: checkpoint.journalRoot,
+  verifyReference: true,
+});
+```
+
+The active store keeps the original session ID, revisions and receipt roots.
+Request IDs in the archive continue to return their exact earlier receipts.
+The original directory and the continuation each have an independent writer
+lock. The caller selects which directory receives future commands.
+
+On reopen, the native writer validates the original initialization root. The
+host admits the pinned manifest, exact archive bytes, receipt chain, active
+journal and caller's pins under the writer lock. The VM then validates the
+complete scalar state against the state root bound by the manifest and replays
+the active journal. The manifest also binds the exact signed-zero facets sampled
+from the native runtime. The restore peer reads those signs back after loading.
+Verification reports `checkpointRestored`, `archivedPrefixBindingVerified`
+and `replayedSuffixCommands`. `nativeSuffixReplayVerified` and
+`referenceSuffixReplayVerified` describe verification of the active segment.
+Keep the original store or full-prefix backup for independent execution of the
+archived commands.
+
+This candidate supports Number, Truth and bounded Unicode-scalar Text facets
+without NUL characters, with the default v2 root or explicit v3 candidate root.
+The native restore frame is limited to 2 MiB. The first rollover uses
+`rcl.session-checkpoint.v2-candidate`. Subsequent rollovers use
+`rcl.session-checkpoint.v3-candidate` and bind the ordered archive segments and
+their join points. The earlier v1 candidate uses full archive replay to recover
+Number sign bits.
+
+The candidate accepts up to four archived segments and one active segment.
+Each segment has a 64 MiB and 10,000-command limit. A rollover copies the
+archived bytes and exports a new directory. Checkpointed history pages and
+backups carry distinct candidate formats. Backup verification for a
+continuation requires its original trusted `expectedCheckpointRoot` in addition
+to any optional backup or head pins.
+
+```text
+rcl session checkpoint ./counter-state ./counter-next --expected-root <trusted-journal-root>
+rcl session inspect ./counter-next --expected-checkpoint-root <trusted-checkpoint-root>
+rcl session verify ./counter-next --expected-checkpoint-root <trusted-checkpoint-root> --reference
+rcl session checkpoint ./counter-next ./counter-later --expected-checkpoint-root <trusted-checkpoint-root> --expected-root <trusted-current-head>
+```
+
 ## Paginated committed history
 
 `session.history({ fromRevision: 1, limit: 100, expectedJournalRoot })` queues a
 consistent page with invocations and backups. It returns full command receipts
 that this writer has replayed or acknowledged, including forecast receipts but
 without additional entries for idempotent retries. Entries are detached copies;
-reading does not append or rewrite the journal. This is the writer's admitted
-prefix, not an independent reread/replay of files on each history query.
+reading leaves the journal bytes intact. Queries use the writer's admitted
+history, including archived receipts when opening a checkpoint continuation.
 
 The `rcl.session-history-page.v1` result includes the current revision/head/state
 root, `previousRoot` immediately before the page, `entries`, `nextRevision` or
@@ -209,9 +271,9 @@ page is a consistency checksum, not an independently trusted history anchor.
 
 Revisions begin at 1; genesis has no command receipts. A request at current
 revision plus one returns an empty terminal page. Larger offsets reject. The
-page limit is 1 through 1000, default 100. Invalid options and stale pins leave
-the writer usable. Existing full-prefix limits and writer ownership apply;
-history pagination does not implement checkpointing or journal compaction.
+page limit is 1 through 1000, default 100. The writer remains usable after an
+invalid option or stale pin. Pages cover the full admitted receipt chain,
+including archived segments in checkpointed sessions.
 
 ## CLI and example
 
@@ -240,8 +302,8 @@ expectedJournalRoot and minimumRevision. Keep these anchors outside the session
 directory in a trusted application or record. Checking a root read from the same
 possibly rolled-back history does not supply an independent anchor. Pins refer
 to the current complete prefix before an invocation or incomplete-tail repair.
-These four operations, history and backup/backup-verify also accept --reference for
-independent reference replay. backup-verify additionally accepts
+These four operations, history, checkpoint and backup/backup-verify also accept
+--reference for independent reference replay. backup-verify additionally accepts
 --expected-backup-root; it is rejected for other operations.
 Only history accepts --from-revision and --limit.
 Unknown, duplicate, malformed or operation-inappropriate flags fail before any

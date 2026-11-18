@@ -1,0 +1,9 @@
+# Linux executable modes in local npm candidates
+
+A Windows npm pack retained Linux ELF contents but wrote their archive modes as 0644, despite executable modes already recorded by Git. WSL execution from a Windows shared drive did not prove the tar's Linux execution permissions. A real extraction under the WSL Linux /tmp filesystem reproduced execution denial with exit code 126.
+
+`scripts/normalize-candidate-executable-modes.py` streams a raw npm archive into a distinct local candidate, adds execute bits only for four known current/frozen Linux VM/compiler paths, and verifies every payload hash, entry order/count and all other modes after rewriting. It extracts no members and refuses existing outputs or a target outside the source candidate directory. It requires Python 3.11 or newer. This changes archive metadata, not native program bytes, state roots or frozen-variant implementation authority.
+
+The initial 6a515b2 prototype normalization verified 3,554 entries and preserved every payload hash. `scripts/verify-candidate-linux-execution.mjs` then extracted only the current Linux VM, compiler and compiler artifact into a fresh Linux directory, independently checked binary hashes, observed the raw 0644 failure, and executed the 0755 candidate without any runtime chmod. Native compilation matched reference bytes and the verified state was value=1.5. This verifier uses explicit WSL identity and removes only its individually tracked temporary files/directories.
+
+Reproduction uses npm pack with scripts disabled, then the normalizer with distinct source/target tgz paths, then the Linux verifier with raw archive, normalized archive and a fresh report path. A later current candidate must be regenerated and rechecked; the prototype evidence does not claim current-code installation, Android/hardware acceptance or publication.

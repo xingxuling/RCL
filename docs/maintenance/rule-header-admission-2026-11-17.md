@@ -1,0 +1,7 @@
+# Rule participants and required clauses
+
+The native compiler previously accepted rules with missing or unknown actors/participants and no actual alteration/call effect. Missing when clauses could fail only later as an internal sequence-index error. Header admission now uses the complete parsed subject list to require emergence cause, resonance from/into, known subject references, a when expression and at least one alteration or host call. Forward subject declarations remain valid. No new requirement for a needs clause or authority policy is invented beyond the reference contract.
+
+A private rule-name Span survives parsing without entering canonical rule JSON. Header diagnostics now return the reference diagnostic code with this declaration-name range, including raw UTF-16 offset/length; unknown-subject diagnostics currently locate the rule name rather than the subject-reference token.
+
+Ten malformed rules each run through general/session compilers with LF/CRLF and retained output (40 native rejection controls). Two valid forward-declaration programs retain exact reference bytes and native state changes. Fifty-one header/type/host-call checks pass. The native C0=C1=C2 artifact is `0fe1a68e1623190d83a7667ff0d58ef56ed38e8397084591b9262b9d242a37dd` (428,943 bytes), 109,079,953 instructions per generation, still meeting the unchanged 180-million headroom gate. This does not close all rule/subject declaration semantics or TD-019. No Actions or publication.
