@@ -26,9 +26,22 @@ export async function createNativeUiWebBridge(source,options={}){
     if(req.headers['x-rcl-ui-token']!==token){reply(403,{code:'UI_TRANSPORT_UNAUTHORIZED'});return;}
     if(req.method==='GET'&&req.url==='/api/state'){reply(200,runtime.snapshot());return;}
     if(req.method!=='POST'||req.url!=='/api/event'){reply(405,{code:'METHOD_NOT_ALLOWED'});return;}
-    let bytes='';for await(const chunk of req){bytes+=chunk;if(bytes.length>65536){reply(413,{code:'UI_REQUEST_LIMIT'});return;}}
-    let body;try{body=JSON.parse(bytes);}catch{reply(400,{code:'UI_REQUEST_JSON'});return;}
-    try{const receipt=await runtime.dispatch(body.event,{expectedStateRoot:body.expectedStateRoot,authorized:body.authorized??true});reply(200,{snapshot:runtime.snapshot(),receipt});}
+    const chunks = [];
+    let bytes = 0;
+    let body;
+    try {
+      for await (const chunk of req) {
+        bytes += chunk.byteLength;
+        if (bytes > 65536) { reply(413, { code: 'UI_REQUEST_LIMIT' }); return; }
+        chunks.push(chunk);
+      }
+      body = JSON.parse(new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(Buffer.concat(chunks, bytes)));
+    } catch {
+      if (!res.destroyed) reply(400, { code: 'UI_REQUEST_JSON' });
+      return;
+    }
+    if (!body || typeof body !== 'object' || Array.isArray(body)) { reply(400, { code: 'UI_REQUEST_JSON' }); return; }
+    try{const receipt=await runtime.dispatch(body.event,{expectedStateRoot:body.expectedStateRoot,authorized:body.authorized});reply(200,{snapshot:runtime.snapshot(),receipt});}
     catch(error){const code=nativeUiExecutionErrorCode(error)??'UI_EXECUTION_FAILED';reply(code==='RCL_UI_NATIVE_STALE_STATE'||code==='RCL_UI_NATIVE_BACKPRESSURE'?409:400,{code});}
   });
   try{await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});}

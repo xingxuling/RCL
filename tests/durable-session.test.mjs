@@ -94,6 +94,63 @@ test('an incomplete tail requires explicit recovery and its bytes are retained s
   } finally { await session?.close(); fs.rmSync(directory, { recursive: true, force: true }); }
 });
 
+test('tail repair leaves a journal that changed after replay intact', async () => {
+  const directory = temp(); let session;
+  const open = fs.openSync;
+  try {
+    const journal = path.join(directory, 'journal.jsonl');
+    session = await openDurableRealitySession(directory, { source });
+    await session.invoke(first);
+    const { journalRoot } = session.snapshot();
+    await session.close(); session = null;
+    const prefix = fs.readFileSync(journal), firstTail = Buffer.from('{"format":"partial');
+    const later = Buffer.from('-write');
+    fs.appendFileSync(journal, firstTail);
+    let changed = false;
+    fs.openSync = (file, flags, ...args) => {
+      if (file === journal && flags === 'r+' && !changed) {
+        changed = true;
+        fs.appendFileSync(journal, later);
+      }
+      return open(file, flags, ...args);
+    };
+    const options = { repairIncompleteTail: true, expectedJournalRoot: journalRoot };
+    await assert.rejects(openDurableRealitySession(directory, options), error => error.code === 'RCL_SESSION_RECOVERY_SOURCE_CHANGED');
+    fs.openSync = open;
+    assert.equal(changed, true);
+    assert.deepEqual(fs.readFileSync(journal), Buffer.concat([prefix, firstTail, later]));
+    assert.equal(fs.readdirSync(directory).some(name => name.startsWith('recovery-tail-')), false);
+    session = await openDurableRealitySession(directory, options);
+    assert.deepEqual(fs.readFileSync(session.snapshot().recovery.backupPath), Buffer.concat([firstTail, later]));
+    assert.deepEqual(fs.readFileSync(journal), prefix);
+  } finally { fs.openSync = open; await session?.close(); fs.rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('journal decoding respects the record cap, strict UTF-8 and initial BOM', async () => {
+  const directory = temp(); let session;
+  try {
+    const journal = path.join(directory, 'journal.jsonl');
+    session = await openDurableRealitySession(directory, { source });
+    await session.invoke(first);
+    const { journalRoot } = session.snapshot();
+    await session.close(); session = null;
+    const original = fs.readFileSync(journal), bom = Buffer.from([0xef, 0xbb, 0xbf]);
+    const options = { expectedJournalRoot: journalRoot };
+    fs.writeFileSync(journal, Buffer.concat([bom, original]));
+    session = await openDurableRealitySession(directory, options);
+    assert.deepEqual(session.snapshot().journalRoot, journalRoot);
+    await session.close(); session = null;
+
+    const firstLineEnd = original.indexOf(10) + 1;
+    fs.writeFileSync(journal, Buffer.concat([original.subarray(0, firstLineEnd), bom, original.subarray(firstLineEnd)]));
+    await assert.rejects(openDurableRealitySession(directory, options), error => error.code === 'RCL_SESSION_JOURNAL_JSON_INVALID');
+    fs.writeFileSync(journal, Buffer.concat([original, Buffer.from([0x22, 0xc3, 0x22, 10])]));
+    await assert.rejects(openDurableRealitySession(directory, options), error => error.code === 'RCL_SESSION_JOURNAL_UTF8_INVALID');
+    fs.writeFileSync(journal, Buffer.concat([original, Buffer.from('{}\n'.repeat(10000))]));
+    await assert.rejects(openDurableRealitySession(directory, options), error => error.code === 'RCL_SESSION_JOURNAL_GENESIS_OR_LIMIT_INVALID');
+  } finally { await session?.close(); fs.rmSync(directory, { recursive: true, force: true }); }
+});
+
 test('valid recomputed hashes cannot substitute for native semantic replay', async () => {
   const directory = temp(); let session;
   try {

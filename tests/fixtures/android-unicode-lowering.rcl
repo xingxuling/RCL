@@ -1,0 +1,64 @@
+reality AndroidNames {
+  ui Display {
+    state large : Number = 1e30
+    state count : Number = 0
+    state fraction : Number = 0.25
+    state enabled : Truth = true
+    derived 甲 : Text = "当前：" + count
+    derived 乙 : Text = "总量：" + large
+    derived 数值一致 : Truth = count == 1
+    derived 文本顺序 : Truth = "a" < "b"
+    derived 丙 : Text = choose(文本顺序, "小数：" + fraction, "待核对")
+
+    lifecycle {
+      create
+      activate
+      resume
+      suspend
+      destroy
+      restore large
+      restore count
+      restore fraction
+      restore enabled
+    }
+
+    view Root {
+      layout vertical {
+        padding 1.5
+        gap 2.5
+      }
+      view a_b {
+        text c { value "路径一" }
+      }
+      view a {
+        text b_c { value "路径二" }
+      }
+      text 甲 { bind value <- 甲 }
+      text 乙 { bind value <- 乙 }
+      text 丙 { bind value <- 丙 }
+      action 增加 {
+        label "增加"
+        bind disabled <- 数值一致
+        on activate { set count <- count + 1 }
+      }
+      action 重置 {
+        label "重置"
+        on activate { set count <- 0 }
+      }
+      action 放大 {
+        label "放大"
+        on activate {
+          set large <- large * 2
+          set fraction <- fraction + 0.125
+        }
+      }
+      action 溢出 {
+        label "溢出"
+        on activate {
+          set count <- 99
+          set large <- large / 0
+        }
+      }
+    }
+  }
+}

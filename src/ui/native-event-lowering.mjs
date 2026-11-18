@@ -3,6 +3,7 @@ import {compileNativeUiDeclarations,collectUiNodes} from './ui-compiler.mjs';
 import {parseReality} from '../parser.mjs';
 import {nativeDataLiteral} from '../native-data-literals.mjs';
 import {semanticStateRootForAlgorithm} from '../semantic-state-root.mjs';
+import {lowerNativeUiEventGuards} from './native-event-guards.mjs';
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const root=state=>semanticStateRootForAlgorithm(state,'rcl.semantic-state-root.v2');
 const failure=code=>Object.assign(new Error(code),{code});
@@ -25,7 +26,12 @@ export function lowerNativeUiEvent(source,{state=null,event=null,authorized=true
   let handler;if(event){handler=ui.eventGraph.events.find(h=>h.nodeId===event.nodeId&&h.type===event.type);if(!handler)throw failure('RCL_UI_NATIVE_EVENT_UNKNOWN');
     if(handler.authority!=='ui-local'||handler.statements.some(s=>s.kind!=='set-state'))throw failure('RCL_UI_NATIVE_AUTHORITY_UNSUPPORTED');
     if(new Set(handler.statements.map(s=>s.target)).size!==handler.statements.length)throw failure('RCL_UI_NATIVE_DUPLICATE_SET');}
-  const parameters=handler?.parameters??[];for(const p of parameters)typed(event?.payload?.[p.id],p.valueType);
+  const parameters = handler?.parameters ?? [];
+  const inputDeclarations = parameters.map((parameter) => {
+    if (!event.payload || !Object.hasOwn(event.payload, parameter.id)) throw failure('RCL_UI_NATIVE_INPUT_TYPE');
+    const value = typed(event.payload[parameter.id], parameter.valueType);
+    return '  facet ui.input.' + identifier(parameter.id) + ' : ' + parameter.valueType + ' = ' + value;
+  });
   const active=new Set();
   function expression(e){
     if(e.kind==='literal')return nativeDataLiteral(e.value);
@@ -39,13 +45,15 @@ export function lowerNativeUiEvent(source,{state=null,event=null,authorized=true
     if(e.kind==='choose')return'choose('+e.args.map(expression).join(', ')+')';
     throw failure('RCL_UI_NATIVE_EXPRESSION_UNSUPPORTED');
   }
+  const guards = handler ? lowerNativeUiEventGuards(ui, source, handler, expression) : null;
   const nodes=collectUiNodes(ui.viewTree),rendered=nodes.flatMap(n=>n.bindings.map(b=>({nodeId:n.id,property:b.property,type:b.expression.valueType,path:'ui.rendered.'+identifier(n.id)+'.'+identifier(b.property),expression:b.expression})));
   const declarations=[...ui.state.map(s=>'  facet ui.state.'+identifier(s.id)+' : '+s.valueType+' = '+typed(before[s.id],s.valueType)),
-    ...parameters.map(p=>'  facet ui.input.'+identifier(p.id)+' : '+p.valueType+' = '+typed(event.payload[p.id],p.valueType)),
+    ...inputDeclarations,
     ...ui.derivedState.map(d=>'  facet ui.derived.'+identifier(d.id)+' : '+d.valueType+' = '+zero(d.valueType)),
     ...rendered.map(r=>'  facet '+r.path+' : '+r.type+' = '+zero(r.type))];
   const code=['reality NativeUiEventExecution {',
     '  reckon binary_scale(value : Number, exponent : Number) -> Number = choose(exponent == 0, value, choose(exponent > 0, binary_scale(value * 2, exponent - 1), binary_scale(value / 2, exponent + 1)))',
+    ...(guards?.definitions ?? []),
     '  facet ui.semantic_root : Text = '+JSON.stringify(ui.semanticRoot),
     '  facet ui.before_root : Text = '+JSON.stringify(root(before)),
     '  facet event.authorized : Truth = '+String(Boolean(authorized)),
@@ -53,8 +61,10 @@ export function lowerNativeUiEvent(source,{state=null,event=null,authorized=true
     '  subject handler { warrant ui.mutate on ui.state while event.authorized }',
     '  subject painter { warrant ui.paint on ui }'];
   if(handler)code.push('  emergence dispatch {','    cause handler','    when event.phase == 0','    needs ui.mutate on ui.state',
+    ...(guards.condition ? [`    alter event.phase <- choose(${guards.condition}, 1, 0)`] : []),
     ...handler.statements.map(s=>'    alter ui.state.'+identifier(s.target)+' <- '+expression(s.expression)),
-    '    alter event.phase <- 1','    witness "ui:source-owned-event"','  }');
+    ...(guards.condition ? [] : ['    alter event.phase <- 1']),
+    '    witness "ui:source-owned-event"','  }');
   code.push('  emergence paint {','    cause painter','    when event.phase == 1','    needs ui.paint on ui',
     ...ui.derivedState.map(d=>'    alter ui.derived.'+identifier(d.id)+' <- '+expression(d.expression)),
     ...rendered.map(r=>'    alter '+r.path+' <- '+expression(r.expression)),

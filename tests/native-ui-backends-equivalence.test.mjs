@@ -16,6 +16,7 @@ import {
   emitNativeAndroidActivity,
   traceNativeUiAndroidApplication,
 } from '../src/android-application-compiler.mjs';
+import { emitNativeUiAndroidBridge } from '../src/ui/native-android-bridge.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const RCL_PATH = path.join(ROOT, 'examples/native-ui/counter.rcl');
@@ -77,6 +78,43 @@ test('fixed-size layout lowers from one canonical root to Web CSS and Android La
   assert.match(java, /LinearLayout\.LayoutParams params_Root_Panel = new LinearLayout\.LayoutParams\(320, 180\)/u);
 });
 
+test('Android Java names distinguish Unicode IDs and separate layout relationships', () => {
+  const source = fs.readFileSync(path.join(ROOT, 'tests/fixtures/android-unicode-lowering.rcl'), 'utf8');
+  const manifest = compileRclAndroidApplication(source, { applicationId: 'org.rcl.unicode' });
+  const java = emitNativeAndroidActivity(manifest);
+  assert.match(java, /view_\$rcl\$3275/u);
+  assert.match(java, /view_\$rcl\$594e/u);
+  assert.match(java, /derive_\$rcl\$3275/u);
+  assert.match(java, /derive_\$rcl\$594e/u);
+  assert.match(java, /LayoutParams params_\$rcl\$layout\$c =/u);
+  assert.match(java, /LayoutParams params_\$rcl\$layout\$b_c =/u);
+  assert.match(java, /setPadding\(2, 2, 2, 2\)/u);
+  assert.match(java, /setMargins\(0, 3, 0, 0\)/u);
+  assert.match(java, /state\.put\("large", 1e\+30d\)/u);
+  assert.match(java, /return rclText\(left\)\+rclText\(right\)/u);
+  const bridge = emitNativeUiAndroidBridge(source);
+  assert.match(bridge.java, /views\.put\("甲", view_\$rcl\$3275\)/u);
+  assert.match(bridge.java, /views\.put\("乙", view_\$rcl\$594e\)/u);
+  assert.match(bridge.java, /LayoutParams params_\$rcl\$layout\$c =/u);
+  assert.doesNotMatch(bridge.java, /private static String rclText/u);
+  assert.match(java, /putDouble\("rcl\.ui\.state\.fraction",/u);
+  assert.match(java, /rclTypeMatches\(value, "Truth"\).*restored\.put\("enabled", value\)/u);
+  assert.match(java, /rclTypeMatches\(next, "Number"\).*proposed\.put\("large", next\)/u);
+  assert.match(java, /Log\.w\(RCL_UI_LOG_TAG, "rejected " \+ code\);/u);
+  const events = [{ nodeId: '增加', type: 'activate' }, { nodeId: '重置', type: 'activate' }, { nodeId: '放大', type: 'activate' }];
+  const trace = traceNativeUiAndroidApplication(manifest, events);
+  assert.equal(trace.events[0].afterState.count, 1);
+  assert.equal(trace.events[0].renderedSemanticState.增加.disabled, true);
+  assert.equal(trace.events[1].afterState.count, 0);
+  assert.equal(trace.events[2].afterState.large, 2e30);
+  assert.equal(trace.events[2].renderedSemanticState.乙.value, '总量：2e+30');
+  assert.equal(trace.events[2].renderedSemanticState.丙.value, '小数：0.375');
+  assert.throws(
+    () => traceNativeUiAndroidApplication(manifest, [{ nodeId: '溢出', type: 'activate' }]),
+    /RCL_UI_EVENT_MUTATION_RUNTIME_TYPE:large:Number/u,
+  );
+});
+
 test('navigation lowers from one canonical root to Web visibility and Android native View visibility', () => {
   const events = [
     { nodeId: 'OpenSettings', type: 'activate' },
@@ -93,10 +131,12 @@ test('navigation lowers from one canonical root to Web visibility and Android na
   const java = emitNativeAndroidActivity(android);
   assert.match(html, /data-rcl-route="home"/u);
   assert.match(html, /data-rcl-route="settings"/u);
-  assert.match(html, /el\.hidden=el\.dataset\.rclRoute!==currentRoute/u);
+  assert.match(html, /el\.hidden=!nodeVisible\(node,values\)/u);
   assert.match(java, /private String currentRoute = "home"/u);
   assert.match(java, /View\.VISIBLE : View\.GONE/u);
   assert.match(java, /String proposedRoute = currentRoute/u);
+  assert.throws(() => traceNativeUiWebApplication(web, [events[1]]), /RCL_UI_EVENT_HIDDEN:BackHome:activate/u);
+  assert.throws(() => traceNativeUiAndroidApplication(android, [events[1]]), /RCL_UI_EVENT_HIDDEN:BackHome:activate/u);
 
   const webTrace = traceNativeUiWebApplication(web, events);
   const androidTrace = traceNativeUiAndroidApplication(android, events);

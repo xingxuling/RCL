@@ -32,9 +32,12 @@ test('actual resumable GPU compiler owns emission, values, transactions, rejecti
     await run('reality Bytes { facet u8 : Sequence = bytes_u8(255) facet u16 : Sequence = bytes_u16le(65535) facet u32 : Sequence = bytes_u32le(4294967295) facet i32 : Sequence = bytes_i32le(-2147483648) facet f64 : Sequence = bytes_f64le(1.5) facet utf : Sequence = utf8_bytes("中😀") facet hex : Sequence = hex_bytes("00ff7F") facet empty : Text = sha256_text("") facet short : Text = sha256_text("abc") facet multi : Text = sha256_text("'+ 'abcd'.repeat(40)+'") }','device-bytes-sha256');
     await run('reality Decimals { facet a : Number = number_from_text(" -1.25e+2 ") facet b : Number = number_from_text("+0.1") facet c : Number = number_from_text("9007199254740991") facet d : Number = number_from_text("") facet e : Number = number_from_text("1e-300") }','device-decimal');
     const decimalRejections=[];
+    // The device's frozen decimal profile rejects underflow and subnormals.
+    // Use its paired native profile for these rejection controls.
+    const frozenNative=path.resolve('native/sequence-runtime/portable/windows/rclvm.exe');
     for(const text of ['.','-','+','-.','1e','1e+','1e-','1e-999','1e-308']){
       const bytes=compileRealityToBytecode('reality InvalidDecimal { facet result : Number = number_from_text(split_after('+JSON.stringify('value::'+text)+', "::")) }'),file=path.join(directory,'invalid-decimal.rbc');fs.writeFileSync(file,bytes);
-      const native=spawnSync(path.resolve('native/rclvm.exe'),[file],{encoding:'utf8',windowsHide:true});assert.notEqual(native.status,0);assert.match(native.stderr,/RCL_TEXT_NUMBER_INVALID/);
+      const native=spawnSync(frozenNative,[file],{encoding:'utf8',windowsHide:true});assert.notEqual(native.status,0);assert.match(native.stderr,/RCL_TEXT_NUMBER_INVALID/);
       await assert.rejects(()=>target.execute(file,decodeBytecode(bytes).sourceRoot),caught=>caught.code==='RCL_NUMBER_FROM_TEXT');decimalRejections.push(text);
     }
     await run(fs.readFileSync('examples/sequence-runtime/transactions.rcl','utf8'),'sequence-transaction');

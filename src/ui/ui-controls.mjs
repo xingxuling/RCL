@@ -1,5 +1,13 @@
 // Native UI typed controls. The input kind is a source-declared, immutable choice.
 export const UI_INPUT_KINDS = Object.freeze(['text', 'email', 'password', 'checkbox', 'switch', 'slider', 'select', 'radio', 'date', 'textarea']);
+// Use the same ECMAScript whitespace set in every form runtime.
+export const UI_EMAIL_WHITESPACE = Object.freeze([...String.fromCodePoint(
+  0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x20, 0xa0, 0x1680,
+  0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200a,
+  0x2028, 0x2029, 0x202f, 0x205f, 0x3000, 0xfeff,
+)]);
+const EMAIL_CHARACTER = `[^${UI_EMAIL_WHITESPACE.map((character) => String.raw`\u${character.codePointAt(0).toString(16).padStart(4, '0')}`).join('')}@]`;
+export const UI_EMAIL_PATTERN = new RegExp(String.raw`^${EMAIL_CHARACTER}+@${EMAIL_CHARACTER}+\.${EMAIL_CHARACTER}+$`);
 export function inputKind(node) {
   return node.role === 'input' ? node.localProperties.find((x) => x.property === 'input_kind')?.value ?? 'text' : null;
 }
@@ -87,7 +95,7 @@ export function formFieldError(node, value) {
     if (prop('min_length') !== undefined && length < prop('min_length')) return 'min_length';
     if (prop('max_length') !== undefined && length > prop('max_length')) return 'max_length';
   }
-  if (kind === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'email';
+  if (kind === 'email' && !UI_EMAIL_PATTERN.test(value)) return 'email';
   if (kind === 'date' && !isRclIsoDate(value)) return 'date';
   if (['select', 'radio'].includes(kind) && !inputOptions(node).includes(value)) return 'option';
   return null;
@@ -102,13 +110,13 @@ export function formValidationNodes(nodes, scopeId = null) {
   return selected;
 }
 export function formValidation(nodes, rendered, scopeId = null) {
-  const fields = {};
+  const fields = [];
   for (const node of formValidationNodes(nodes, scopeId)) {
     if (node.role !== 'input') continue;
-    const binding = rendered[node.id] ?? {};
+    const binding = Object.hasOwn(rendered, node.id) ? rendered[node.id] ?? {} : {};
     const value = binding.value ?? node.localProperties.find((x) => x.property === 'value')?.value;
     const error = formFieldError(node, value);
-    if (error) fields[node.id] = error;
+    if (error) fields.push([node.id, error]);
   }
-  return { valid: Object.keys(fields).length === 0, fields };
+  return { valid: fields.length === 0, fields: Object.fromEntries(fields) };
 }

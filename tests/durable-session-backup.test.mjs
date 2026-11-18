@@ -85,6 +85,50 @@ test('asset and manifest corruption fail before any native writer is started', a
   } finally { await live?.close(); fs.rmSync(directory, { recursive: true, force: true }); }
 });
 
+test('native replay checks the exact journal bytes bound by the backup manifest', async () => {
+  const directory = temp();
+  const readFile = fs.readFileSync;
+  let live;
+  try {
+    live = await openDurableRealitySession(path.join(directory, 'live'), { source });
+    await live.invoke(command(0));
+    const backup = path.join(directory, 'backup');
+    const manifest = await live.backup(backup);
+    const journal = path.join(backup, 'journal.jsonl');
+    const original = readFile(journal);
+    const records = original.toString('utf8').trimEnd().split('\n').map(line => JSON.parse(line));
+    const reordered = Buffer.from(records.map(record => JSON.stringify(Object.fromEntries(Object.entries(record).reverse()))).join('\n') + '\n');
+    assert.equal(reordered.length, original.length);
+    assert.notDeepEqual(reordered, original);
+
+    let changed = false;
+    fs.readFileSync = (file, ...args) => {
+      const bytes = readFile(file, ...args);
+      if (file === journal && !changed) {
+        changed = true;
+        fs.writeFileSync(journal, reordered);
+      }
+      return bytes;
+    };
+    try {
+      await assert.rejects(
+        verifyDurableRealitySessionBackup(backup, { expectedBackupRoot: manifest.backupRoot }),
+        error => error.code === 'RCL_SESSION_BACKUP_ASSET_MISMATCH',
+      );
+    } finally { fs.readFileSync = readFile; }
+    assert.equal(changed, true);
+    assert.deepEqual(readFile(journal), reordered);
+    fs.writeFileSync(journal, original);
+    const verified = await verifyDurableRealitySessionBackup(backup, { expectedBackupRoot: manifest.backupRoot });
+    assert.equal(verified.journalRoot, manifest.journalRoot);
+    assert.equal(verified.externalBackupAnchorChecked, true);
+  } finally {
+    fs.readFileSync = readFile;
+    await live?.close();
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+});
+
 test('failed backup storage is unacknowledged and leaves the live writer usable', async () => {
   const directory = temp(); let live;
   const open = fs.openSync;
@@ -126,6 +170,29 @@ test('live storage drift rejects export before creating a target', async () => {
     fs.appendFileSync(path.join(storage, 'journal.jsonl'), '{"partial":');
     await assert.rejects(live.backup(target), error => error.code === 'RCL_SESSION_BACKUP_SOURCE_CHANGED');
     assert.equal(fs.existsSync(target), false);
+  } finally { await live?.close(); fs.rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('backup requires the exact live prefix even when stored receipt roots are unchanged', async () => {
+  const directory = temp(); let live;
+  try {
+    const storage = path.join(directory, 'live'), target = path.join(directory, 'backup');
+    const journal = path.join(storage, 'journal.jsonl');
+    live = await openDurableRealitySession(storage, { source });
+    const commandResult = await live.invoke(command(0));
+    const original = fs.readFileSync(journal);
+    const records = original.toString('utf8').trimEnd().split('\n').map(JSON.parse);
+    const reordered = Buffer.from(records.map(record => JSON.stringify(Object.fromEntries(Object.entries(record).reverse()))).join('\n') + '\n');
+    assert.equal(reordered.length, original.length);
+    assert.notDeepEqual(reordered, original);
+    fs.writeFileSync(journal, reordered);
+    await assert.rejects(live.backup(target), error => error.code === 'RCL_SESSION_BACKUP_SOURCE_CHANGED');
+    assert.equal(fs.existsSync(target), false);
+    assert.equal(live.snapshot().journalRoot, commandResult.receipt.root);
+    fs.writeFileSync(journal, original);
+    const manifest = await live.backup(target);
+    assert.deepEqual(fs.readFileSync(path.join(target, 'journal.jsonl')), original);
+    assert.equal((await verifyDurableRealitySessionBackup(target)).journalRoot, manifest.journalRoot);
   } finally { await live?.close(); fs.rmSync(directory, { recursive: true, force: true }); }
 });
 

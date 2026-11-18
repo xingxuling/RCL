@@ -33,7 +33,9 @@ test('K03 compiler emits a native Activity with state observation, authority and
   assert.match(java, /RCL_ANDROID_PRESERVE_FAILED:increment/u);
   assert.match(java, /onSaveInstanceState/u);
   assert.match(java, /restoreState/u);
-  assert.match(java, /if \(Math\.rint\(result\) == result\) return Long\.valueOf/u);
+  assert.match(java, /return Double\.valueOf\(result\)/u);
+  assert.match(java, /putDouble\("rcl\.state\.app\.count",/u);
+  assert.match(java, /if \(value instanceof Number\) state\.put\("app\.count", value\)/u);
   assert.doesNotMatch(java, /\? Long\.valueOf\(\(long\) result\) : Double\.valueOf/u);
 });
 
