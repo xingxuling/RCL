@@ -1201,7 +1201,8 @@ export async function handleRclMcpMessage(message) {
     }
     return jsonRpcError(id, -32601, `Method not found: ${message.method}`);
   } catch (error) {
-    return jsonRpcError(id, -32000, error.message ?? String(error), { name: error.name });
+    const diagnostic = error.diagnostic ?? error.details?.diagnostic;
+    return jsonRpcError(id, -32000, error.message ?? String(error), { name: error.name, ...(diagnostic ? { code: error.code, diagnostic } : {}) });
   }
 }
 

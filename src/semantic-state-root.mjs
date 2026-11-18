@@ -1,11 +1,13 @@
 import { RCL_SEMANTIC_STATE_ROOT_V2_ALGORITHM, semanticStateRootV2 } from './canonical-f64.mjs';
 import { createHash } from 'node:crypto';
-import { RCL_SEMANTIC_STATE_ROOT_V2, semanticStateRootV2Stable } from './semantic-state-root-v2.mjs';
+import { RCL_SEMANTIC_STATE_ROOT_V2, semanticStateCanonicalV2Stable, semanticStateRootV2Stable } from './semantic-state-root-v2.mjs';
+import { isProjectedAstLiteral, projectAstLiterals } from './compiler-primitives.mjs';
 export { RCL_SEMANTIC_STATE_ROOT_V2, semanticStateRootV2Stable } from './semantic-state-root-v2.mjs';
 
 export const RCL_NATIVE_STATE_ROOT_ALGORITHM = 'rcl.semantic-state-root.v1';
 export const RCL_DEFAULT_NATIVE_STATE_ROOT_ALGORITHM = RCL_SEMANTIC_STATE_ROOT_V2;
-export const RCL_NATIVE_STATE_ROOT_ALGORITHMS = Object.freeze([RCL_NATIVE_STATE_ROOT_ALGORITHM, RCL_SEMANTIC_STATE_ROOT_V2_ALGORITHM, RCL_SEMANTIC_STATE_ROOT_V2]);
+export const RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE = 'rcl.semantic-state-root.v3-candidate';
+export const RCL_NATIVE_STATE_ROOT_ALGORITHMS = Object.freeze([RCL_NATIVE_STATE_ROOT_ALGORITHM, RCL_SEMANTIC_STATE_ROOT_V2_ALGORITHM, RCL_SEMANTIC_STATE_ROOT_V2, RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE]);
 
 const NATIVE_HEAP_METADATA = new Set([
   '__rclKind',
@@ -59,7 +61,31 @@ export function semanticStateRootForAlgorithm(value, algorithm = RCL_NATIVE_STAT
   if (algorithm === RCL_NATIVE_STATE_ROOT_ALGORITHM) return semanticStateRoot(value);
   if (algorithm === RCL_SEMANTIC_STATE_ROOT_V2_ALGORITHM) return semanticStateRootV2(value);
   if (algorithm === RCL_SEMANTIC_STATE_ROOT_V2) return semanticStateRootV2Stable(value);
+  if (algorithm === RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE) {
+    // Apply the existing input validation before copying; cloning alone would
+    // evaluate accessors and could conceal forbidden values.
+    semanticStateCanonicalV2Stable(value);
+    const projection = projectAstLiterals(value);
+    return createHash('sha256').update(RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE).update('\0')
+      .update(semanticStateCanonicalV2Stable(projection), 'utf8').digest('hex');
+  }
   throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_ALGORITHM_MISMATCH', 'Unsupported semantic state root algorithm', { algorithm });
+}
+
+// AST public JSON does not carry native literal spelling. A caller that relies
+// on v2 as a complete representation can explicitly reject this projection.
+function containsProjectedAst(value, rawRequired = false) {
+  const pending = [value], seen = new WeakSet();
+  while (pending.length) {
+    const item = pending.pop();
+    if (!item || typeof item !== 'object' || seen.has(item)) continue;
+    seen.add(item);
+    if (rawRequired) {
+      if (isProjectedAstLiteral(item) && typeof item.literalText !== 'string') return true;
+    } else if (!Array.isArray(item) && item.kind === 'FacetDecl' && item.value?.kind === 'LiteralExpr') return true;
+    for (const child of Object.values(item)) if (child && typeof child === 'object') pending.push(child);
+  }
+  return false;
 }
 
 export function verifyNativeSemanticStateRoot(payload, options = {}) {
@@ -78,14 +104,21 @@ export function verifyNativeSemanticStateRoot(payload, options = {}) {
   if (options.expectedAlgorithm !== undefined && selectedAlgorithm !== options.expectedAlgorithm) {
     throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_ALGORITHM_MISMATCH', 'Native VM did not emit the requested root algorithm', { expected: options.expectedAlgorithm, actual: selectedAlgorithm });
   }
-  if (selectedAlgorithm === RCL_SEMANTIC_STATE_ROOT_V2 && (!payload.state || typeof payload.state !== 'object' || Array.isArray(payload.state))) {
+  if ([RCL_SEMANTIC_STATE_ROOT_V2, RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE].includes(selectedAlgorithm) && (!payload.state || typeof payload.state !== 'object' || Array.isArray(payload.state))) {
     throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_PAYLOAD', 'v2 native state must be an explicit object');
   }
-  const computedStateRoot = semanticStateRootForAlgorithm(payload.state ?? {}, selectedAlgorithm);
+  let computedStateRoot;
+  try { computedStateRoot = semanticStateRootForAlgorithm(payload.state ?? {}, selectedAlgorithm); }
+  catch (error) {
+    if (selectedAlgorithm === RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE) {
+      throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_V3_INVALID', error.message);
+    }
+    throw error;
+  }
   if (nativeStateRoot !== null && nativeStateRoot !== computedStateRoot) {
     throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_MISMATCH', `Native state root ${nativeStateRoot} does not match semantic state root ${computedStateRoot}`, { nativeStateRoot, computedStateRoot });
   }
-  if (selectedAlgorithm === RCL_SEMANTIC_STATE_ROOT_V2) {
+  if ([RCL_SEMANTIC_STATE_ROOT_V2, RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE].includes(selectedAlgorithm)) {
     for (const key of ['history', 'projections']) {
       if (payload[key] === undefined) continue;
       if (!Array.isArray(payload[key])) throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_PAYLOAD', 'Native ' + key + ' must be an array');
@@ -99,6 +132,11 @@ export function verifyNativeSemanticStateRoot(payload, options = {}) {
   }
   if (options.requireNativeRoot === true && nativeStateRoot === null) {
     throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_MISSING', 'Native VM did not emit a semantic state root', { expectedAlgorithm: RCL_NATIVE_STATE_ROOT_ALGORITHM });
+  }
+  if (options.rejectProjectedAst === true
+      && containsProjectedAst([payload.state, payload.history, payload.projections], selectedAlgorithm === RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE)) {
+    throw new RCLSemanticStateRootError('RCL_NATIVE_STATE_ROOT_AST_PROJECTION_LOSSY',
+      'AstNode literal spelling is not bound by the selected state projection');
   }
   return {
     ...payload,

@@ -1,9 +1,10 @@
+import { isIdentifierStart, isIdentifierPart } from './identifier-profile.mjs';
 import { compileReality } from './compiler.mjs';
 import { createHash } from 'node:crypto';
 import { RCLRuntimeError } from './errors.mjs';
 import { canonicalReality, realityRoot, RCL_REFERENCE_STATE_ROOT_ALGORITHM } from './canonical.mjs';
-import { semanticStateRootForAlgorithm } from './semantic-state-root.mjs';
-import { RCL_SESSION_FORMAT, validateSessionProgram, normalizeSessionCommand, sessionResult } from './session-contract.mjs';
+import { semanticStateRootForAlgorithm, RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE } from './semantic-state-root.mjs';
+import { RCL_SESSION_FORMAT, validateSessionProgram, normalizeSessionCommand, captureScalarSessionCheckpoint, sessionResult } from './session-contract.mjs';
 import {
   applyBinary,
   quantity,
@@ -32,7 +33,7 @@ import {
   experimentResult, isExperimentResult, bodyState, isBodyState, spiritState, isSpiritState,
   valuesEquivalent, multiplyEnergy,
 } from './final-foundation.mjs';
-import { span, token, facetAst, parseState, symbolValue, semanticFacet, irStore, isSpan, isToken, isAstNode, isParseState, isSymbolValue, isSemanticNode, isIrNode } from './compiler-primitives.mjs';
+import { span, token, facetAst, astLiteralText, cloneRuntimeValue, projectAstLiterals, parseState, symbolValue, semanticFacet, irStore, isSpan, isToken, isAstNode, isParseState, isSymbolValue, isSemanticNode, isIrNode } from './compiler-primitives.mjs';
 
 const MAX_RECKON_DEPTH = 4096;
 
@@ -324,19 +325,19 @@ function _evalCore(expr, context) {
         const sequence = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
         const value = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });
         if (!Array.isArray(sequence)) throw new RCLRuntimeError('RCL_EXPECTED_SEQUENCE', 'sequence_append() expects Sequence');
-        return Object.freeze([...sequence, structuredClone(value)]);
+        return Object.freeze([...sequence, cloneRuntimeValue(value)]);
       }
       if (expr.name === 'sequence_get') {
         const sequence = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
         const index = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });
         if (!Array.isArray(sequence) || !Number.isInteger(index) || index < 0 || index >= sequence.length) throw new RCLRuntimeError('RCL_SEQUENCE_RANGE', 'sequence_get() index out of range');
-        return structuredClone(sequence[index]);
+        return cloneRuntimeValue(sequence[index]);
       }
       if (expr.name === 'sequence_concat') {
         const left = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
         const right = evaluateExpression(expr.args[1], { ...context, depth: depth + 1 });
         if (!Array.isArray(left) || !Array.isArray(right)) throw new RCLRuntimeError('RCL_EXPECTED_SEQUENCE', 'sequence_concat() expects two Sequences');
-        return Object.freeze([...left.map(item => structuredClone(item)), ...right.map(item => structuredClone(item))]);
+        return Object.freeze([...left.map(item => cloneRuntimeValue(item)), ...right.map(item => cloneRuntimeValue(item))]);
       }
       if (['bytes_u8', 'bytes_u16le', 'bytes_u32le', 'bytes_i32le', 'bytes_f64le'].includes(expr.name)) {
         const value = evaluateExpression(expr.args[0], { ...context, depth: depth + 1 });
@@ -389,8 +390,8 @@ function _evalCore(expr, context) {
         const ch = String(evaluateExpression(expr.args[0], { ...context, depth: depth + 1 }));
         if (expr.name === 'is_whitespace') return /^\s$/u.test(ch);
         if (expr.name === 'is_digit') return /^[0-9]$/.test(ch);
-        if (expr.name === 'is_identifier_start') return /^[_\p{L}]$/u.test(ch);
-        return /^[_\p{L}\p{N}]$/u.test(ch);
+        if (expr.name === 'is_identifier_start') return isIdentifierStart(ch);
+        return isIdentifierPart(ch);
       }
       if (expr.name === 'make_span') return span(
         evaluateExpression(expr.args[0], { ...context, depth: depth + 1 }),
@@ -438,7 +439,7 @@ function _evalCore(expr, context) {
         if (expr.name === 'ast_path') return value.path;
         if (expr.name === 'ast_value_type') return value.valueType;
         if (expr.name === 'ast_literal_kind') return value.value.valueType;
-        if (expr.name === 'ast_literal_text') return String(value.value.value);
+        if (expr.name === 'ast_literal_text') return astLiteralText(value);
         return value.span;
       }
       if (expr.name === 'make_symbol') return symbolValue(
@@ -457,7 +458,7 @@ function _evalCore(expr, context) {
         const code = String(evaluateExpression(expr.args[1], { ...context, depth: depth + 1 }));
         const detail = String(evaluateExpression(expr.args[2], { ...context, depth: depth + 1 }));
         const sourceSpan = evaluateExpression(expr.args[3], { ...context, depth: depth + 1 });
-        if (!condition) throw new RCLRuntimeError(code, `${detail} at ${sourceSpan?.line ?? '?'}:${sourceSpan?.column ?? '?'}`);
+        if (!condition) throw new RCLRuntimeError(code, `${detail} at ${sourceSpan?.line ?? '?'}:${sourceSpan?.column ?? '?'}`, { diagnostic: { format: 'rcl.semantic-diagnostic.v1', code, span: { offset: sourceSpan?.offset, line: sourceSpan?.line, column: sourceSpan?.column, length: sourceSpan?.length } } });
         return true;
       }
       if (expr.name === 'make_semantic_facet') return semanticFacet(
@@ -536,7 +537,7 @@ function _evalCore(expr, context) {
         : null;
       if (cacheKey && acceleration.cache.has(cacheKey)) {
         fn.__rclMetrics.cacheHits += 1;
-        return structuredClone(acceleration.cache.get(cacheKey));
+        return cloneRuntimeValue(acceleration.cache.get(cacheKey));
       }
       fn.__rclMetrics.evaluations += 1;
       const childLocals = new Map();
@@ -560,7 +561,7 @@ function evaluateExpression(expr, context) {
     result = _evalCore(result.expr, result.context);
   }
   if (pendingCaches) {
-    for (const pc of pendingCaches) pc.acceleration.cache.set(pc.cacheKey, structuredClone(result));
+    for (const pc of pendingCaches) pc.acceleration.cache.set(pc.cacheKey, cloneRuntimeValue(result));
   }
   return result;
 }
@@ -592,10 +593,10 @@ async function invokeHost(call, state, functions, adapters, rule, mode) {
     args,
     rule: rule.name,
     actor: actorFor(rule),
-    authorityNeeds: structuredClone(rule.needs ?? []),
-    witnesses: structuredClone(rule.witnesses ?? []),
+    authorityNeeds: cloneRuntimeValue(rule.needs ?? []),
+    witnesses: cloneRuntimeValue(rule.witnesses ?? []),
     mode,
-    state: structuredClone(state),
+    state: cloneRuntimeValue(state),
   };
   let result;
   if (mode === 'foresee') {
@@ -636,7 +637,7 @@ function evaluateChanges(changes, before, functions, locals = new Map(), sourceP
 }
 
 function applyProposed(before, changes) {
-  const proposed = structuredClone(before);
+  const proposed = cloneRuntimeValue(before);
   for (const change of changes) proposed[change.target] = change.after;
   return proposed;
 }
@@ -668,14 +669,14 @@ function domainRecord(runtime, kind, name, before, proposed, changes, extra = {}
 }
 
 function recordHistory(runtime, record) {
-  if (runtime.currentSpacetime) record.spacetime = structuredClone(runtime.currentSpacetime);
+  if (runtime.currentSpacetime) record.spacetime = cloneRuntimeValue(runtime.currentSpacetime);
   runtime.history.push(record);
   return record;
 }
 
 async function executeRule(rule, mode, runtime) {
   const { program, state, functions, hostAdapters } = runtime;
-  const before = structuredClone(state);
+  const before = cloneRuntimeValue(state);
   const beforeRoot = runtime.stateRoot(before);
   const condition = evaluateExpression(rule.when, { state: before, locals: new Map(), functions });
   if (!condition) {
@@ -721,7 +722,7 @@ async function executeRule(rule, mode, runtime) {
 }
 
 function reflectMeta(domain, runtime) {
-  const before = structuredClone(runtime.state);
+  const before = cloneRuntimeValue(runtime.state);
   const changes = evaluateChanges(domain.revisions, before, runtime.functions, new Map(), 'meta:revise');
   const proposed = applyProposed(before, changes);
   verifyPreserves(domain.preserves, proposed, runtime.functions, new Map(), 'RCL_META_BOUND_BROKEN', `Meta reality '${domain.name}'`);
@@ -740,7 +741,7 @@ function advancePhysical(law, directive, runtime) {
   const dt = evaluateExpression(directive.dt, { state: runtime.state, locals: new Map(), functions: runtime.functions });
   const records = [];
   for (let index = 0; index < count; index += 1) {
-    const before = structuredClone(runtime.state);
+    const before = cloneRuntimeValue(runtime.state);
     const locals = new Map([[law.step.name, dt]]);
     const active = evaluateExpression(law.when, { state: before, locals, functions: runtime.functions });
     if (!active) continue;
@@ -757,7 +758,7 @@ function advancePhysical(law, directive, runtime) {
 }
 
 function observePerception(perception, runtime) {
-  const before = structuredClone(runtime.state);
+  const before = cloneRuntimeValue(runtime.state);
   const changes = perception.channels.map(channel => ({
     target: channel.path,
     before: before[channel.path],
@@ -779,7 +780,7 @@ function propagateNeural(neural, directive, runtime) {
   const records = [];
   for (let step = 0; step < count; step += 1) {
     for (const pathway of neural.pathways) {
-      const before = structuredClone(runtime.state);
+      const before = cloneRuntimeValue(runtime.state);
       if (!evaluateExpression(pathway.when, { state: before, locals: new Map(), functions: runtime.functions })) continue;
       const changes = evaluateChanges(pathway.changes, before, runtime.functions, new Map(), 'neural');
       const proposed = applyProposed(before, changes);
@@ -810,7 +811,7 @@ function liveLife(living, directive, runtime) {
   for (let step = 0; step < count; step += 1) {
     const senseChanges = updateSenses(living, runtime);
     for (const cycle of living.cycles) {
-      const before = structuredClone(runtime.state);
+      const before = cloneRuntimeValue(runtime.state);
       if (!evaluateExpression(cycle.when, { state: before, locals: new Map(), functions: runtime.functions })) continue;
       const changes = [...senseChanges, ...evaluateChanges(cycle.changes, before, runtime.functions, new Map(), 'living')];
       const proposed = applyProposed(before, changes.filter(change => change.source !== 'living:sense'));
@@ -829,7 +830,7 @@ function inheritGenetic(genetic, directive, runtime) {
   const count = evaluateCount(directive.count, runtime, 'Inherit');
   const records = [];
   for (let generation = 0; generation < count; generation += 1) {
-    const before = structuredClone(runtime.state);
+    const before = cloneRuntimeValue(runtime.state);
     const mutationChanges = genetic.mutations.map(mutation => {
       const delta = evaluateExpression(mutation.expression, { state: before, locals: new Map(), functions: runtime.functions });
       return {
@@ -873,9 +874,9 @@ function evaluateMeasurementDecl(decl, state, functions) {
 }
 
 function quantifyDomain(domain, runtime) {
-  const before = structuredClone(runtime.state);
+  const before = cloneRuntimeValue(runtime.state);
   const measureChanges = [];
-  const measured = structuredClone(before);
+  const measured = cloneRuntimeValue(before);
   for (const decl of domain.measures) {
     const value = evaluateMeasurementDecl(decl, before, runtime.functions);
     const change = { target: decl.path, before: before[decl.path], after: value, source: 'quantitative:measure' };
@@ -933,8 +934,8 @@ function evaluateKnowledgeSpec(spec, state, functions, options = {}) {
 }
 
 function learnKnowledge(domain, runtime) {
-  const before = structuredClone(runtime.state);
-  const working = structuredClone(before);
+  const before = cloneRuntimeValue(runtime.state);
+  const working = cloneRuntimeValue(before);
   const changes = [];
 
   for (const claim of domain.claims) {
@@ -1023,8 +1024,8 @@ function dependencyConfidenceAny(paths, state) {
 }
 
 function interpretNaturalLanguage(domain, runtime) {
-  const before = structuredClone(runtime.state);
-  const working = structuredClone(before);
+  const before = cloneRuntimeValue(runtime.state);
+  const working = cloneRuntimeValue(before);
   const changes = [];
 
   for (const spec of domain.utterances) {
@@ -1066,8 +1067,8 @@ function interpretNaturalLanguage(domain, runtime) {
 }
 
 function runUnderstanding(domain, runtime) {
-  const before = structuredClone(runtime.state);
-  const working = structuredClone(before);
+  const before = cloneRuntimeValue(runtime.state);
+  const working = cloneRuntimeValue(before);
   const changes = [];
   const pending = [...domain.hypotheses];
   let passes = 0;
@@ -1117,8 +1118,8 @@ function runUnderstanding(domain, runtime) {
 }
 
 function runCreation(domain, runtime) {
-  const before = structuredClone(runtime.state);
-  const working = structuredClone(before);
+  const before = cloneRuntimeValue(runtime.state);
+  const working = cloneRuntimeValue(before);
   const changes = [];
 
   for (const spec of domain.candidates) {
@@ -1160,7 +1161,7 @@ function runCreation(domain, runtime) {
 
 function energizeEnergy(domain, runtime) {
   if (!domain) throw new RCLRuntimeError('RCL_ENERGY_UNKNOWN', 'Unknown energy reality');
-  const before = structuredClone(runtime.state); const proposed = structuredClone(before); const changes = []; const flows = [];
+  const before = cloneRuntimeValue(runtime.state); const proposed = cloneRuntimeValue(before); const changes = []; const flows = [];
   for (const flow of domain.flows) {
     const source = getPath(proposed, flow.from); const target = getPath(proposed, flow.to);
     const amount = evaluateExpression(flow.amount, { state: proposed, locals: new Map(), functions: runtime.functions });
@@ -1183,7 +1184,7 @@ function energizeEnergy(domain, runtime) {
 
 function constituteElements(domain, runtime) {
   if (!domain) throw new RCLRuntimeError('RCL_ELEMENT_UNKNOWN', 'Unknown element reality');
-  const before = structuredClone(runtime.state); const proposed = structuredClone(before); const changes = [];
+  const before = cloneRuntimeValue(runtime.state); const proposed = cloneRuntimeValue(before); const changes = [];
   for (const spec of domain.species) {
     const value = elementEntity(spec.localName, {
       category: 'species', symbol: spec.symbol,
@@ -1214,7 +1215,7 @@ function constituteElements(domain, runtime) {
 
 function investigateScience(domain, runtime) {
   if (!domain) throw new RCLRuntimeError('RCL_SCIENCE_UNKNOWN', 'Unknown science reality');
-  const before = structuredClone(runtime.state); const working = structuredClone(before); const changes = [];
+  const before = cloneRuntimeValue(runtime.state); const working = cloneRuntimeValue(before); const changes = [];
   const hypothesisSpecs = new Map(domain.hypotheses.map(item => [item.path, item]));
   for (const spec of domain.hypotheses) {
     const value = evaluateExpression(spec.expression, { state: working, locals: new Map(), functions: runtime.functions });
@@ -1248,7 +1249,7 @@ function investigateScience(domain, runtime) {
 
 function embodyReality(domain, runtime) {
   if (!domain) throw new RCLRuntimeError('RCL_BODY_UNKNOWN', 'Unknown embodiment reality');
-  const before = structuredClone(runtime.state); const proposed = structuredClone(before);
+  const before = cloneRuntimeValue(runtime.state); const proposed = cloneRuntimeValue(before);
   const maintained = domain.maintains.map(expr => Boolean(evaluateExpression(expr, { state: proposed, locals: new Map(), functions: runtime.functions })));
   const coherence = maintained.length ? maintained.filter(Boolean).length / maintained.length : 1;
   const value = bodyState(domain.name, { systems: domain.systems.map(item => item.path), organs: domain.organs.map(item => item.path), bindings: domain.bindings, maintained: maintained.every(Boolean), coherence, evidence: domain.evidence });
@@ -1261,7 +1262,7 @@ function embodyReality(domain, runtime) {
 
 function integrateSpirit(domain, runtime) {
   if (!domain) throw new RCLRuntimeError('RCL_SPIRIT_UNKNOWN', 'Unknown spirit reality');
-  const before = structuredClone(runtime.state); const proposed = structuredClone(before);
+  const before = cloneRuntimeValue(runtime.state); const proposed = cloneRuntimeValue(before);
   const makeMap = items => Object.fromEntries(items.map(item => [item.localName, { value: getPath(proposed, item.path), weight: Number(evaluateExpression(item.weight, { state: proposed, locals: new Map(), functions: runtime.functions })) }]));
   const values = makeMap(domain.values); const purposes = makeMap(domain.purposes); const affects = makeMap(domain.affects);
   const weights = [...domain.values, ...domain.purposes, ...domain.affects].map(item => Number(evaluateExpression(item.weight, { state: proposed, locals: new Map(), functions: runtime.functions })));
@@ -1285,10 +1286,10 @@ function synchronizeSpacetime(domain, directive, runtime) {
   if (domain.clocks.length === 0) throw new RCLRuntimeError('RCL_SPACETIME_CLOCK_REQUIRED', `Spacetime '${domain.name}' requires at least one clock`);
 
   for (let step = 0; step < count; step += 1) {
-    const before = structuredClone(runtime.state);
+    const before = cloneRuntimeValue(runtime.state);
     const changes = [];
     const clockDeltas = new Map();
-    const proposed = structuredClone(before);
+    const proposed = cloneRuntimeValue(before);
 
     for (const clock of domain.clocks) {
       const tick = evaluateExpression(clock.tick, { state: before, locals: new Map(), functions: runtime.functions });
@@ -1321,7 +1322,7 @@ function synchronizeSpacetime(domain, directive, runtime) {
     runtime.currentSpacetime = {
       domain: domain.name,
       step: step + 1,
-      clocks: Object.fromEntries(domain.clocks.map(clock => [clock.path, structuredClone(proposed[clock.path])])),
+      clocks: Object.fromEntries(domain.clocks.map(clock => [clock.path, cloneRuntimeValue(proposed[clock.path])])),
       frameRoots: Object.fromEntries(domain.frames.map(frame => [frame.name, realityRoot(frame)])),
       causalRoot: realityRoot(domain.relations),
     };
@@ -1365,7 +1366,7 @@ function activateAcceleration(domain, runtime) {
     cache: fn.__rclAcceleration.cache,
   };
   runtime.accelerationProfiles.set(domain.name, profile);
-  const before = structuredClone(runtime.state);
+  const before = cloneRuntimeValue(runtime.state);
   const record = domainRecord(runtime, 'meta-acceleration', domain.name, before, before, [], {
     profile: { ...profile, cache: undefined },
     authorityClass: 'meta-execution-optimization',
@@ -1392,8 +1393,8 @@ function compressReality(domain, runtime) {
     });
   }
   runtime.compressionCapsules.set(domain.name, capsule);
-  const before = structuredClone(runtime.state);
-  const proposed = structuredClone(before);
+  const before = cloneRuntimeValue(runtime.state);
+  const proposed = cloneRuntimeValue(before);
   const changes = [];
   if (domain.discard) {
     for (const key of capsule.keys) {
@@ -1426,8 +1427,8 @@ function restoreReality(domain, runtime) {
   const capsule = runtime.compressionCapsules.get(domain.name);
   if (!capsule) throw new RCLRuntimeError('RCL_COMPRESSION_CAPSULE_MISSING', `Compression '${domain.name}' has no capsule to restore`);
   const restored = restoreCompressionCapsule(capsule);
-  const before = structuredClone(runtime.state);
-  const proposed = structuredClone(before);
+  const before = cloneRuntimeValue(runtime.state);
+  const proposed = cloneRuntimeValue(before);
   const changes = [];
   for (const [key, value] of Object.entries(restored)) {
     changes.push({ target: key, before: proposed[key] ?? null, after: value, source: 'meta-compression:restore' });
@@ -1477,19 +1478,32 @@ function initializeState(program, functions, providers = {}) {
   return state;
 }
 
-export function createRealitySession(compiledOrSource) {
-  const program = structuredClone(typeof compiledOrSource === 'string' ? compileReality(compiledOrSource) : compiledOrSource);
+export function createRealitySession(compiledOrSource, options = {}) {
+  return openReferenceRealitySession(compiledOrSource, options);
+}
+
+export function createRealitySessionFromScalarCheckpoint(compiledOrSource, checkpoint, options = {}) {
+  return openReferenceRealitySession(compiledOrSource, options, checkpoint ?? null);
+}
+
+function openReferenceRealitySession(compiledOrSource, options, checkpoint) {
+  const stateRootAlgorithm = options.stateRootAlgorithm ?? 'rcl.semantic-state-root.v2';
+  if (!['rcl.semantic-state-root.v2', RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE].includes(stateRootAlgorithm)) {
+    throw new RCLRuntimeError('RCL_SESSION_STATE_ROOT_ALGORITHM_UNSUPPORTED', 'Unsupported session state root algorithm');
+  }
+  const program = cloneRuntimeValue(typeof compiledOrSource === 'string' ? compileReality(compiledOrSource) : compiledOrSource);
   validateSessionProgram(program);
   const functions = new Map(program.reckons.map(fn => [fn.name, fn]));
+  const state = checkpoint === undefined ? initializeState(program, functions) : captureScalarSessionCheckpoint(program, checkpoint, stateRootAlgorithm).state;
   const runtime = {
-    program, functions, state: initializeState(program, functions),
-    stateRootAlgorithm: 'rcl.semantic-state-root.v2',
-    stateRoot: value => semanticStateRootForAlgorithm(value, 'rcl.semantic-state-root.v2'),
+    program, functions, state,
+    stateRootAlgorithm,
+    stateRoot: value => semanticStateRootForAlgorithm(value, stateRootAlgorithm),
     hostAdapters: {}, providers: {}, history: [], projections: [], currentSpacetime: null,
   };
   const snapshot = () => ({
     format: RCL_SESSION_FORMAT, backend: 'reference', program: program.name,
-    programRoot: program.programRoot, state: structuredClone(runtime.state),
+    programRoot: program.programRoot, state: stateRootAlgorithm === RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE ? projectAstLiterals(runtime.state) : cloneRuntimeValue(runtime.state),
     stateRoot: runtime.stateRoot(runtime.state), stateRootAlgorithm: runtime.stateRootAlgorithm,
   });
   // Serial execution prevents overlapping async invocations from sharing a proposal.
@@ -1499,7 +1513,7 @@ export function createRealitySession(compiledOrSource) {
     invoke(input) {
       const command = normalizeSessionCommand(program, input);
       const operation = pending.then(async () => {
-        const before = structuredClone(runtime.state);
+        const before = cloneRuntimeValue(runtime.state);
         const historyLength = runtime.history.length;
         const projectionLength = runtime.projections.length;
         runtime.state = Object.assign(Object.create(null), before, command.inputs);
@@ -1507,7 +1521,7 @@ export function createRealitySession(compiledOrSource) {
           const record = await executeRule(program.rules.find(rule => rule.name === command.rule), command.mode, runtime);
           // Projections and false guards do not commit observations either.
           if (command.mode === 'foresee' || record.status === 'not-triggered') runtime.state = before;
-          return sessionResult(program, command, before, runtime.state, record);
+          return sessionResult(program, command, before, runtime.state, record, stateRootAlgorithm);
         } catch (error) {
           runtime.state = before;
           runtime.history.length = historyLength;
@@ -1591,11 +1605,11 @@ export async function runReality(compiledOrSource, options = {}) {
     program: program.name,
     programRoot: program.programRoot,
     foundation: foundationSummary(program),
-    state: structuredClone(state),
+    state: stateRootAlgorithm === RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE ? projectAstLiterals(state) : cloneRuntimeValue(state),
     stateRoot: runtime.stateRoot(state),
     stateRootAlgorithm,
-    history: runtime.history,
-    projections: runtime.projections,
+    history: stateRootAlgorithm === RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE ? projectAstLiterals(runtime.history) : runtime.history,
+    projections: stateRootAlgorithm === RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE ? projectAstLiterals(runtime.projections) : runtime.projections,
     naturalLanguageReality: buildNaturalLanguageReality(program, state, runtime.history),
     understandingReality: buildUnderstandingReality(program, state, runtime.history),
     creativeReality: buildCreativeReality(program, state, runtime.history),

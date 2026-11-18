@@ -1,4 +1,5 @@
 import { RCLRuntimeError } from './errors.mjs';
+import { astLiteralText, hasAstLiteralText } from './compiler-primitives.mjs';
 
 /**
  * Quantitative Reality kernel.
@@ -149,7 +150,7 @@ function sameQuantity(left, right, operator) {
 }
 
 // Sequence builtins copy their values, so equality cannot depend on array or
-// Span/Token object identity. Other domain objects retain their existing policy.
+// compiler-value object identity. Unrecognized domain objects retain their policy.
 function equalRuntimeValues(left, right) {
   const pending = [[left, right]], compared = new WeakMap();
   while (pending.length) {
@@ -175,6 +176,30 @@ function equalRuntimeValues(left, right) {
     }
     if (a.kind === 'Token' && b.kind === 'Token') {
       if (a.tokenType !== b.tokenType || a.text !== b.text) return false;
+      pending.push([a.span, b.span]);
+      continue;
+    }
+    if (a.kind === 'ParseState' && b.kind === 'ParseState') {
+      if (a.index !== b.index) return false;
+      pending.push([a.nodes, b.nodes]);
+      continue;
+    }
+    if (a.kind === 'FacetDecl' && b.kind === 'FacetDecl'
+        && a.value?.kind === 'LiteralExpr' && b.value?.kind === 'LiteralExpr') {
+      // A public projection or generic clone cannot prove original spelling.
+      if (!hasAstLiteralText(a) || !hasAstLiteralText(b)) return false;
+      if (a.path !== b.path || a.valueType !== b.valueType
+          || a.value.valueType !== b.value.valueType || astLiteralText(a) !== astLiteralText(b)) return false;
+      pending.push([a.span, b.span]);
+      continue;
+    }
+    // These compiler values have explicit value semantics in the native VM.
+    // Compare only their defined fields, never arbitrary object properties.
+    if (a.kind === b.kind && ['Symbol', 'SemanticFacet', 'IRStore'].includes(a.kind)) {
+      const fields = a.kind === 'Symbol' ? ['path', 'valueType', 'slot']
+        : a.kind === 'SemanticFacet' ? ['path', 'valueType', 'literalKind', 'literalText', 'slot']
+          : ['op', 'path', 'valueType', 'literalKind', 'literalText', 'slot'];
+      if (fields.some(field => a[field] !== b[field])) return false;
       pending.push([a.span, b.span]);
       continue;
     }
@@ -242,6 +267,7 @@ export function upperBound(value) {
 }
 
 export const quantityConstructors = {
+  __proto__: null,
   meters: value => quantity('Length', value),
   seconds: value => quantity('Time', value),
   kilograms: value => quantity('Mass', value),
@@ -259,6 +285,7 @@ export const quantityConstructors = {
 };
 
 export const quantityConstructorTypes = {
+  __proto__: null,
   meters: 'Length', seconds: 'Time', kilograms: 'Mass',
   meters_per_second: 'Velocity', meters_per_second2: 'Acceleration',
   newtons: 'Force', joules: 'Energy', celsius: 'Temperature',

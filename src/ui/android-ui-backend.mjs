@@ -1,7 +1,8 @@
 import { nativeUiRoot } from './ui-ir.mjs';
 import { createNativeUiRuntime, runNativeUiSemanticTrace } from './ui-event.mjs';
 import { RCL_NATIVE_UI_ANDROID_FORMAT } from './ui-schema.mjs';
-import { inputKind, inputOptions } from './ui-controls.mjs';
+import { inputKind, inputOptions, UI_EMAIL_PATTERN } from './ui-controls.mjs';
+import { ANDROID_JAVA_EQUAL_HELPER, ANDROID_JAVA_TEXT_HELPER, androidJavaIdentifier as javaIdentifier, androidJavaNumber } from '../android-java-source.mjs';
 
 const ROLE_TO_VIEW = Object.freeze({ container: 'ViewGroup', text: 'TextView', action: 'Button', input: 'EditText' });
 const EVENT_TO_ANDROID = Object.freeze({
@@ -11,15 +12,11 @@ const EVENT_TO_ANDROID = Object.freeze({
 const PACKAGE_PATTERN = /^[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$/u;
 
 function javaString(value) { return JSON.stringify(String(value)); }
-function javaIdentifier(value, fallback = 'node') {
-  const normalized = String(value).replace(/[^A-Za-z0-9_$]/gu, '_');
-  return /^[A-Za-z_$]/u.test(normalized) ? normalized : `${fallback}_${normalized}`;
-}
 function javaLiteral(value) {
   if (value === null) return 'null';
   if (typeof value === 'string') return javaString(value);
   if (typeof value === 'boolean') return value ? 'Boolean.TRUE' : 'Boolean.FALSE';
-  if (typeof value === 'number') return Number.isInteger(value) ? `${value}L` : `${value}d`;
+  if (typeof value === 'number' && Number.isFinite(value)) return androidJavaNumber(value);
   throw new Error(`RCL_UI_ANDROID_LITERAL:${typeof value}`);
 }
 function collectNodes(root, result = []) {
@@ -29,9 +26,37 @@ function collectNodes(root, result = []) {
 }
 function property(node, name) { return node.localProperties.find((item) => item.property === name)?.value; }
 function fieldName(node) { return `view_${javaIdentifier(node.id)}`; }
+export { fieldName as androidViewFieldName };
+
+export function androidLayoutParameterNames(root) {
+  const names = new Map();
+  const unique = new Set();
+  const collisions = new Set();
+  for (const parent of collectNodes(root)) {
+    for (const child of parent.children) {
+      const name = `params_${javaIdentifier(parent.id)}_${javaIdentifier(child.id)}`;
+      if (unique.has(name)) collisions.add(name);
+      unique.add(name);
+      names.set(child.id, name);
+    }
+  }
+  for (const [id, name] of names) {
+    // Keep existing names where unambiguous. The disambiguating prefix
+    // cannot occur in names assembled from encoded Java identifiers.
+    if (collisions.has(name)) names.set(id, `params_$rcl$layout$${javaIdentifier(id)}`);
+  }
+  return names;
+}
 function controlExpr(node, name, event = 'event') {
   const bound = node.bindings.find((item) => item.property === name);
   return bound ? `rclTruthy(${emitJavaExpr(bound.expression, 'state', event)})` : property(node, name) === true ? 'true' : 'false';
+}
+function javaNodeVisibility(node, routesByTarget) {
+  const conditions = [];
+  if (routesByTarget.has(node.id)) conditions.push(`${javaString(routesByTarget.get(node.id))}.equals(currentRoute)`);
+  if (node.bindings.some((binding) => binding.property === 'visible')) conditions.push(controlExpr(node, 'visible'));
+  else if (property(node, 'visible') === false) conditions.push('false');
+  return conditions.join(' && ');
 }
 function viewType(node) {
   if (node.role === 'container') return node.layout.mode === 'overlay' ? 'FrameLayout' : node.layout.mode === 'grid' ? 'GridLayout' : 'LinearLayout';
@@ -48,13 +73,24 @@ function emitJavaExpr(expr, snapshot = 'snapshot', event = 'event') {
   }
   if (expr.kind === 'unary') return `rclUnary(${javaString(expr.operator)}, ${emitJavaExpr(expr.expression, snapshot, event)})`;
   if (expr.kind === 'binary') return `rclBinary(${javaString(expr.operator)}, ${emitJavaExpr(expr.left, snapshot, event)}, ${emitJavaExpr(expr.right, snapshot, event)})`;
-  if (expr.kind === 'choose') return `rclChoose(${emitJavaExpr(expr.args[0], snapshot, event)}, ${emitJavaExpr(expr.args[1], snapshot, event)}, ${emitJavaExpr(expr.args[2], snapshot, event)})`;
+  if (expr.kind === 'choose') {
+    const [condition, whenTrue, whenFalse] = expr.args.map((arg) => emitJavaExpr(arg, snapshot, event));
+    return `(rclTruthy(${condition}) ? (Object) (${whenTrue}) : (Object) (${whenFalse}))`;
+  }
   throw new Error(`RCL_UI_ANDROID_EXPRESSION:${expr.kind}`);
+}
+
+function javaPixel(value, property) {
+  const pixels = Math.round(value);
+  if (!Number.isInteger(pixels) || pixels < 0 || pixels > 2_147_483_647) {
+    throw new Error(`RCL_UI_ANDROID_PIXEL_RANGE:${property}`);
+  }
+  return String(pixels);
 }
 
 function javaDimension(size) {
   if (size.mode === 'fill') return 'ViewGroup.LayoutParams.MATCH_PARENT';
-  if (size.mode === 'fixed') return String(Math.round(size.value));
+  if (size.mode === 'fixed') return javaPixel(size.value, 'dimension');
   return 'ViewGroup.LayoutParams.WRAP_CONTENT';
 }
 
@@ -62,11 +98,15 @@ function applyStyle(node, variable, lines, indent) {
   const style = node.resolvedStyle.values;
   if (style.foreground && node.role !== 'container' && !['slider','select','radio','date'].includes(inputKind(node))) lines.push(`${indent}${variable}.setTextColor(Color.parseColor(${javaString(style.foreground)}));`);
   if (style.background) lines.push(`${indent}${variable}.setBackgroundColor(Color.parseColor(${javaString(style.background)}));`);
-  if (typeof style.font_size === 'number' && node.role !== 'container' && !['slider','select','radio','date'].includes(inputKind(node))) lines.push(`${indent}${variable}.setTextSize(${style.font_size}f);`);
+  if (typeof style.font_size === 'number' && node.role !== 'container' && !['slider','select','radio','date'].includes(inputKind(node))) {
+    const size = Math.fround(style.font_size);
+    if (!Number.isFinite(size)) throw new Error(`RCL_UI_ANDROID_FONT_SIZE_RANGE:${node.id}`);
+    lines.push(`${indent}${variable}.setTextSize(${size}f);`);
+  }
   if (node.accessibility.label) lines.push(`${indent}${variable}.setContentDescription(${javaString(node.accessibility.label)});`);
 }
 
-function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
+function emitNode(node, lines, fieldNodeIds, layoutParameterNames, indent = '    ') {
   const variable = fieldName(node);
   const fieldBacked = fieldNodeIds.has(node.id);
   const type = viewType(node);
@@ -75,7 +115,8 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
     if (type === 'LinearLayout') lines.push(`${indent}${variable}.setOrientation(LinearLayout.${node.layout.mode === 'horizontal' ? 'HORIZONTAL' : 'VERTICAL'});`);
     if (type === 'GridLayout') lines.push(`${indent}${variable}.setColumnCount(${node.layout.columns});`);
     if (property(node,'modal') === true) lines.push(`${indent}${variable}.setBackgroundColor(Color.argb(239, 17, 24, 39));`, `${indent}${variable}.setElevation(24f);`, `${indent}${variable}.setClickable(true);`, `${indent}${variable}.setFocusable(true);`, `${indent}${variable}.setContentDescription(${javaString(node.accessibility.label ?? node.id)});`);
-    lines.push(`${indent}${variable}.setPadding(${node.layout.padding}, ${node.layout.padding}, ${node.layout.padding}, ${node.layout.padding});`);
+    const padding = javaPixel(node.layout.padding, 'padding');
+    lines.push(`${indent}${variable}.setPadding(${padding}, ${padding}, ${padding}, ${padding});`);
     const gravity = { start: 'Gravity.START', center: 'Gravity.CENTER', end: 'Gravity.END', stretch: 'Gravity.FILL' }[node.layout.alignment];
     if (type === 'LinearLayout') lines.push(`${indent}${variable}.setGravity(${gravity});`);
   }
@@ -137,13 +178,13 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
   }
   applyStyle(node, variable, lines, indent);
   for (const child of node.children) {
-    const childVariable = emitNode(child, lines, fieldNodeIds, indent);
-    const paramsName = `params_${javaIdentifier(node.id)}_${javaIdentifier(child.id)}`;
+    const childVariable = emitNode(child, lines, fieldNodeIds, layoutParameterNames, indent);
+    const paramsName = layoutParameterNames.get(child.id);
     const width = javaDimension(child.layout.width);
     const height = javaDimension(child.layout.height);
     if (type === 'LinearLayout') {
       lines.push(`${indent}LinearLayout.LayoutParams ${paramsName} = new LinearLayout.LayoutParams(${width}, ${height});`);
-      if (node.layout.gap > 0) lines.push(`${indent}${paramsName}.setMargins(0, ${node.layout.gap}, 0, 0);`);
+      if (node.layout.gap > 0) lines.push(`${indent}${paramsName}.setMargins(0, ${javaPixel(node.layout.gap, 'gap')}, 0, 0);`);
     } else if (type === 'FrameLayout') { lines.push(`${indent}FrameLayout.LayoutParams ${paramsName} = new FrameLayout.LayoutParams(${property(child,'modal') === true ? 'ViewGroup.LayoutParams.MATCH_PARENT' : width}, ${property(child,'modal') === true ? 'ViewGroup.LayoutParams.MATCH_PARENT' : height});`); if (property(child,'modal') === true) lines.push(`${indent}${paramsName}.gravity = Gravity.CENTER;`); }
     else lines.push(`${indent}GridLayout.LayoutParams ${paramsName} = new GridLayout.LayoutParams(); ${paramsName}.width = ${width}; ${paramsName}.height = ${height};`);
     lines.push(`${indent}${variable}.addView(${childVariable}, ${paramsName});`);
@@ -152,7 +193,10 @@ function emitNode(node, lines, fieldNodeIds = new Set(), indent = '    ') {
 }
 
 function emitRuntimeHelpers() {
-  return `  private static Object rclPath(Map<String,Object> snapshot, String path) { if (!snapshot.containsKey(path)) throw new IllegalStateException("RCL_UI_ANDROID_STATE_MISSING:" + path); return snapshot.get(path); }
+  return `${ANDROID_JAVA_TEXT_HELPER}
+${ANDROID_JAVA_EQUAL_HELPER}
+
+  private static Object rclPath(Map<String,Object> snapshot, String path) { if (!snapshot.containsKey(path)) throw new IllegalStateException("RCL_UI_ANDROID_STATE_MISSING:" + path); return snapshot.get(path); }
   private static boolean rclTruthy(Object value) { if (value == null) return false; if (value instanceof Boolean) return (Boolean)value; if (value instanceof Number) return ((Number)value).doubleValue()!=0d; if (value instanceof CharSequence) return ((CharSequence)value).length()>0; return true; }
   private static boolean rclValidDate(String value) {
     try { if (value == null || !value.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) return false; return LocalDate.parse(value).getYear() >= 1; }
@@ -168,21 +212,41 @@ function emitRuntimeHelpers() {
       if (minLength>=0 && length<minLength) return "min_length";
       if (maxLength>=0 && length>maxLength) return "max_length";
     }
-    if ("email".equals(kind) && !String.valueOf(value).matches("[^\\\\s@]+@[^\\\\s@]+\\\\.[^\\\\s@]+")) return "email";
+    if ("email".equals(kind) && !String.valueOf(value).matches(${javaString(UI_EMAIL_PATTERN.source)})) return "email";
     if ("date".equals(kind) && !rclValidDate(String.valueOf(value))) return "date";
     if (("radio".equals(kind) || "select".equals(kind)) && !java.util.Arrays.asList(options.split("\\\\|",-1)).contains(value)) return "option";
     return null;
   }
-  private static Number rclSliderValue(double min,double step,int progress) { double value=min+step*progress; return Math.rint(value)==value ? Long.valueOf((long)value) : Double.valueOf(value); }
-  private static boolean rclTypeMatches(Object value,String type) { if ("Number".equals(type)) return value instanceof Number; if ("Text".equals(type)) return value instanceof String; if ("Truth".equals(type)) return value instanceof Boolean; return false; }
-  private static Object rclChoose(Object condition,Object whenTrue,Object whenFalse) { return rclTruthy(condition)?whenTrue:whenFalse; }
+  private static double rclSliderValue(double min,double step,int progress) { return min + step * progress; }
+  private static boolean rclTypeMatches(Object value,String type) { if ("Number".equals(type)) return value instanceof Number && Double.isFinite(((Number)value).doubleValue()); if ("Text".equals(type)) return value instanceof String; if ("Truth".equals(type)) return value instanceof Boolean; return false; }
   private static Object rclUnary(String operator,Object value) { if ("not".equals(operator)) return !rclTruthy(value); if ("-".equals(operator)&&value instanceof Number) return -((Number)value).doubleValue(); throw new IllegalStateException("RCL_UI_ANDROID_UNARY:"+operator); }
   private static Object rclBinary(String operator,Object left,Object right) {
     if ("and".equals(operator)) return rclTruthy(left)&&rclTruthy(right); if ("or".equals(operator)) return rclTruthy(left)||rclTruthy(right);
-    if ("+".equals(operator)&&(left instanceof CharSequence||right instanceof CharSequence)) return String.valueOf(left)+String.valueOf(right);
-    if ("+".equals(operator)||"-".equals(operator)||"*".equals(operator)||"/".equals(operator)||"%".equals(operator)) { if (!(left instanceof Number)||!(right instanceof Number)) throw new IllegalStateException("RCL_UI_ANDROID_NUMBER_REQUIRED:"+operator); double l=((Number)left).doubleValue(),r=((Number)right).doubleValue(),v; if ("+".equals(operator))v=l+r;else if("-".equals(operator))v=l-r;else if("*".equals(operator))v=l*r;else if("/".equals(operator))v=l/r;else v=l%r;return Math.rint(v)==v?Long.valueOf((long)v):Double.valueOf(v); }
-    if ("==".equals(operator)) return java.util.Objects.equals(left,right); if ("!=".equals(operator)) return !java.util.Objects.equals(left,right);
-    if (left instanceof Number&&right instanceof Number) { double l=((Number)left).doubleValue(),r=((Number)right).doubleValue(); if("<".equals(operator))return l<r;if("<=".equals(operator))return l<=r;if(">".equals(operator))return l>r;if(">=".equals(operator))return l>=r; }
+    if ("+".equals(operator)&&(left instanceof CharSequence||right instanceof CharSequence)) return rclText(left)+rclText(right);
+    if ("==".equals(operator)) return rclEqual(left,right); if ("!=".equals(operator)) return !rclEqual(left,right);
+    if (left instanceof Number && right instanceof Number) {
+      double l = ((Number) left).doubleValue(), r = ((Number) right).doubleValue();
+      switch (operator) {
+        case "+": return l + r;
+        case "-": return l - r;
+        case "*": return l * r;
+        case "/": return l / r;
+        case "%": return l % r;
+        case "<": return l < r;
+        case "<=": return l <= r;
+        case ">": return l > r;
+        case ">=": return l >= r;
+      }
+    }
+    if (left instanceof String && right instanceof String) {
+      int order = ((String) left).compareTo((String) right);
+      switch (operator) {
+        case "<": return order < 0;
+        case "<=": return order <= 0;
+        case ">": return order > 0;
+        case ">=": return order >= 0;
+      }
+    }
     throw new IllegalStateException("RCL_UI_ANDROID_COMPARISON:"+operator);
   }`;
 }
@@ -200,19 +264,19 @@ function emitFormValidation(ui) {
   return lines.join('\n');
 }
 
-function emitModalAndVisibilityGate(ui) {
+function emitModalAndVisibilityGate(ui, routesByTarget) {
   const parents = new Map();
   const walk = (node, parent = null) => { parents.set(node.id, parent); for (const child of node.children) walk(child, node); };
   walk(ui.viewTree);
   const modal = collectNodes(ui.viewTree).find((n) => property(n, 'modal') === true);
+  const modalVisible = modal ? [ui.viewTree, modal].map((node) => javaNodeVisibility(node, routesByTarget)).filter(Boolean).join(' && ') : '';
   const blocks = [];
   for (const node of collectNodes(ui.viewTree)) {
     const chain = [];
     for (let item = node; item; item = parents.get(item.id)) chain.push(item);
-    const invisible = chain.filter((item) => item.bindings.some((b) => b.property === 'visible') || property(item, 'visible') === false)
-      .map((item) => `!(${item.bindings.some((b) => b.property === 'visible') ? controlExpr(item, 'visible') : 'false'})`);
-    if (invisible.length) blocks.push(`    if (${javaString(node.id)}.equals(nodeId) && (${invisible.join(' || ')})) throw new IllegalStateException("RCL_UI_EVENT_HIDDEN:"+nodeId+":"+type);`);
-    if (modal && !chain.some((item) => item.id === modal.id)) blocks.push(`    if (${javaString(node.id)}.equals(nodeId) && (${controlExpr(modal, 'visible')})) throw new IllegalStateException("RCL_UI_MODAL_BLOCKED:"+nodeId+":"+type);`);
+    const visibility = chain.map((item) => javaNodeVisibility(item, routesByTarget)).filter(Boolean).join(' && ');
+    if (visibility) blocks.push(`    if (${javaString(node.id)}.equals(nodeId) && !(${visibility})) throw new IllegalStateException("RCL_UI_EVENT_HIDDEN:"+nodeId+":"+type);`);
+    if (modalVisible && !chain.includes(modal)) blocks.push(`    if (${javaString(node.id)}.equals(nodeId) && (${modalVisible})) throw new IllegalStateException("RCL_UI_MODAL_BLOCKED:"+nodeId+":"+type);`);
   }
   return `  private void assertUiInteractable(String nodeId,String type) {\n    Map<String,Object> event = new LinkedHashMap<>();\n${blocks.join('\n')}\n  }`;
 }
@@ -249,7 +313,12 @@ function emitEventMethods(ui) {
       if (ui.extensionPoints.navigation) lines.push('    String proposedRoute = currentRoute;');
       for (const statement of handler.statements) {
         if (statement.kind === 'navigate') lines.push(`    proposedRoute = ${javaString(statement.route)};`);
-        else lines.push(`    proposed.put(${javaString(statement.target)}, ${emitJavaExpr(statement.expression, 'before', 'event')});`);
+        else {
+          const target = javaString(statement.target);
+          const type = javaString(statement.expression.valueType);
+          const error = javaString(`RCL_UI_EVENT_MUTATION_RUNTIME_TYPE:${statement.target}:${statement.expression.valueType}`);
+          lines.push(`    { Object next = ${emitJavaExpr(statement.expression, 'before', 'event')}; if (!rclTypeMatches(next, ${type})) throw new IllegalStateException(${error}); proposed.put(${target}, next); }`);
+        }
       }
       lines.push('    state.clear(); state.putAll(proposed);');
       if (ui.extensionPoints.navigation) lines.push('    currentRoute = proposedRoute;');
@@ -259,7 +328,21 @@ function emitEventMethods(ui) {
     methods.push(lines.join('\n'));
   }
   return {
-    dispatch: `  private void dispatch(String nodeId,String type,Map<String,Object> event) {\n${dispatch.join('\n')}\n    throw new IllegalArgumentException("RCL_UI_ANDROID_EVENT_UNKNOWN:"+nodeId+":"+type);\n  }`,
+    dispatch: `  private void dispatch(String nodeId, String type, Map<String, Object> event) {
+    try {
+      dispatchEvent(nodeId, type, event);
+    } catch (IllegalStateException failure) {
+      String code = failure.getMessage();
+      if (code == null || !code.startsWith("RCL_UI_EVENT_MUTATION_RUNTIME_TYPE:")) throw failure;
+      Log.w(RCL_UI_LOG_TAG, "rejected " + code);
+      android.widget.Toast.makeText(this, "The action produced an invalid value", android.widget.Toast.LENGTH_SHORT).show();
+      render();
+    }
+  }
+  private void dispatchEvent(String nodeId, String type, Map<String, Object> event) {
+${dispatch.join('\n')}
+    throw new IllegalArgumentException("RCL_UI_ANDROID_EVENT_UNKNOWN:" + nodeId + ":" + type);
+  }`,
     methods: methods.join('\n\n'),
   };
 }
@@ -268,11 +351,12 @@ function emitDerived(ui) {
   return ui.derivedState.map((item) => `  private Object derive_${javaIdentifier(item.id)}(Map<String,Object> snapshot,Map<String,Object> event) { return ${emitJavaExpr(item.expression, 'snapshot', 'event')}; }`).join('\n');
 }
 
-function emitRender(ui) {
+function emitRender(ui, routesByTarget) {
   const lines = ['  private void render() {', '    rendering = true;', '    Map<String,Object> event = new LinkedHashMap<>();'];
   for (const node of collectNodes(ui.viewTree)) {
     const kind = inputKind(node), field=fieldName(node);
-    if (node.bindings.some((b)=>b.property==='visible') || property(node,'visible') === false) lines.push(`    ${field}.setVisibility(${node.bindings.some((b)=>b.property==='visible') ? controlExpr(node,'visible') : 'false'} ? View.VISIBLE : View.GONE);`);
+    const visibility = javaNodeVisibility(node, routesByTarget);
+    if (visibility) lines.push(`    ${field}.setVisibility(${visibility} ? View.VISIBLE : View.GONE);`);
     for (const binding of node.bindings) {
       const value = emitJavaExpr(binding.expression,'state','event');
       if (node.role === 'input' && binding.property === 'value') {
@@ -282,7 +366,7 @@ function emitRender(ui) {
         else if (kind === 'date') lines.push(`    LocalDate parsed_${javaIdentifier(node.id)} = LocalDate.parse(String.valueOf(${value})); if (${field}.getYear()!=parsed_${javaIdentifier(node.id)}.getYear() || ${field}.getMonth()!=parsed_${javaIdentifier(node.id)}.getMonthValue()-1 || ${field}.getDayOfMonth()!=parsed_${javaIdentifier(node.id)}.getDayOfMonth()) ${field}.updateDate(parsed_${javaIdentifier(node.id)}.getYear(),parsed_${javaIdentifier(node.id)}.getMonthValue()-1,parsed_${javaIdentifier(node.id)}.getDayOfMonth());`);
         else if (kind === 'select') lines.push(`    for (int i=0;i<${field}.getCount();i++) { if (String.valueOf(${field}.getItemAtPosition(i)).equals(String.valueOf(${value}))) { if (${field}.getSelectedItemPosition()!=i) ${field}.setSelection(i); break; } }`);
         else lines.push(`    if (!${field}.getText().toString().equals(String.valueOf(${value}))) ${field}.setText(String.valueOf(${value}));`);
-      } else if ((node.role === 'text' && binding.property === 'value') || (node.role === 'action' && binding.property === 'label')) lines.push(`    ${field}.setText(String.valueOf(${value}));`);
+      } else if ((node.role === 'text' && binding.property === 'value') || (node.role === 'action' && binding.property === 'label')) lines.push(`    ${field}.setText(rclText(${value}));`);
       else if (binding.property === 'disabled' && (node.role !== 'input' || !['checkbox','switch','slider','select','radio','date'].includes(kind))) lines.push(`    ${field}.setEnabled(!rclTruthy(${value}));`);
       else if (binding.property === 'read_only' && node.role === 'input' && ['text','email','password','textarea'].includes(kind)) lines.push(`    ${field}.setKeyListener(rclTruthy(${value}) ? null : inputKeyListeners.get(${javaString(node.id)}));`);
     }
@@ -293,21 +377,9 @@ function emitRender(ui) {
     const value=binding?emitJavaExpr(binding.expression,'state','event'):javaLiteral(property(node,'value')??'');
     lines.push(`    if (formAttempted) { String issue=rclFieldError(${value}, ${javaString(inputKind(node))}, ${property(node,'required')===true}, ${property(node,'min_length')??-1}, ${property(node,'max_length')??-1}, ${javaString('')}); ${fieldName(node)}.setError(issue==null?null:issue.replace('_',' ')); }`);
   }
-  if (ui.extensionPoints.navigation) lines.push('    applyNavigation();');
   if (ui.extensionPoints.deviceAdaptation) lines.push('    applyDeviceAdaptation();');
   lines.push('    rendering = false;', '  }');
   return lines.join('\n');
-}
-
-function emitNavigation(ui) {
-  const navigation = ui.extensionPoints.navigation;
-  if (!navigation) return { field: '', method: '' };
-  const lines = ['  private void applyNavigation() {'];
-  for (const route of navigation.routes) {
-    lines.push(`    ${fieldName({ id: route.target })}.setVisibility(${javaString(route.id)}.equals(currentRoute) ? View.VISIBLE : View.GONE);`);
-  }
-  lines.push('  }');
-  return { field: `  private String currentRoute = ${javaString(navigation.initialRoute)};`, method: lines.join('\n') };
 }
 
 function emitDeviceAdaptation(ui) {
@@ -340,13 +412,14 @@ function emitLifecycle(ui) {
     const key = javaString(`rcl.ui.state.${item.id}`);
     if (item.valueType === 'Text') return `    outState.putString(${key}, String.valueOf(state.get(${javaString(item.id)})));`;
     if (item.valueType === 'Truth') return `    outState.putBoolean(${key}, rclTruthy(state.get(${javaString(item.id)})));`;
-    return `    outState.putLong(${key}, ((Number)state.get(${javaString(item.id)})).longValue());`;
+    return `    outState.putDouble(${key}, ((Number)state.get(${javaString(item.id)})).doubleValue());`;
   }).join('\n');
   const restore = ui.state.filter((item) => ui.lifecycle.restore.includes(item.id)).map((item) => {
     const key = javaString(`rcl.ui.state.${item.id}`);
-    if (item.valueType === 'Text') return `    if (savedState.containsKey(${key})) state.put(${javaString(item.id)}, savedState.getString(${key}));`;
-    if (item.valueType === 'Truth') return `    if (savedState.containsKey(${key})) state.put(${javaString(item.id)}, savedState.getBoolean(${key}));`;
-    return `    if (savedState.containsKey(${key})) state.put(${javaString(item.id)}, savedState.getLong(${key}));`;
+    const id = javaString(item.id);
+    const type = javaString(item.valueType);
+    const error = javaString(`RCL_UI_RESTORE_TYPE:${item.id}:${item.valueType}`);
+    return `    if (savedState.containsKey(${key})) { Object value = savedState.get(${key}); if (!rclTypeMatches(value, ${type})) throw new IllegalArgumentException(${error}); restored.put(${id}, value); }`;
   }).join('\n');
   return { init, save, restore };
 }
@@ -385,15 +458,15 @@ export function lowerNativeUiToAndroid(ui, target = {}) {
 export function emitNativeUiAndroidActivity(manifest) {
   if (manifest.schema !== RCL_NATIVE_UI_ANDROID_FORMAT) throw new Error('RCL_UI_ANDROID_MANIFEST_FORMAT');
   const ui = manifest.ui;
-  const navigationTargetIds = new Set(ui.extensionPoints.navigation?.routes.map((route) => route.target) ?? []);
-  const fieldNodes = collectNodes(ui.viewTree).filter((node) => node.bindings.length > 0 || property(node,'visible') === false || property(node,'modal') === true || navigationTargetIds.has(node.id) || node.adaptiveLayouts.length > 0);
+  const navigation = ui.extensionPoints.navigation;
+  const routesByTarget = new Map((navigation?.routes ?? []).map((route) => [route.target, route.id]));
+  const fieldNodes = collectNodes(ui.viewTree).filter((node) => node.bindings.length > 0 || property(node,'visible') === false || property(node,'modal') === true || routesByTarget.has(node.id) || node.adaptiveLayouts.length > 0);
   const fieldNodeIds = new Set(fieldNodes.map((node) => node.id));
   const fields = fieldNodes.map((node) => `  private ${viewType(node)} ${fieldName(node)};`).join('\n');
   const uiLines = [];
-  const root = emitNode(ui.viewTree, uiLines, fieldNodeIds);
+  const root = emitNode(ui.viewTree, uiLines, fieldNodeIds, androidLayoutParameterNames(ui.viewTree));
   const events = emitEventMethods(ui);
   const lifecycle = emitLifecycle(ui);
-  const navigation = emitNavigation(ui);
   const adaptation = emitDeviceAdaptation(ui);
   return `package ${manifest.application.applicationId};
 
@@ -436,7 +509,7 @@ public final class ${manifest.application.activity} extends Activity {
   private final List<String> lifecycleTrace = new ArrayList<>();
   private boolean rendering = false;
   private boolean formAttempted = false;
-${navigation.field}
+${navigation ? `  private String currentRoute = ${javaString(navigation.initialRoute)};` : ''}
 ${adaptation.field}
 ${fields}
 
@@ -449,16 +522,20 @@ ${fields}
   private void buildUi() {\n${uiLines.join('\n')}\n    setContentView(${root});\n  }
 
 ${emitRuntimeHelpers()}
-${emitModalAndVisibilityGate(ui)}
+${emitModalAndVisibilityGate(ui, routesByTarget)}
 ${emitDerived(ui)}
 ${events.dispatch}
 ${emitFormValidation(ui)}
 ${events.methods}
-${emitRender(ui)}
-${navigation.method}
+${emitRender(ui, routesByTarget)}
 ${adaptation.method}
 
-  private void restoreState(Bundle savedState) { if (savedState == null) return;\n${lifecycle.restore}\n  }
+  private void restoreState(Bundle savedState) {
+    if (savedState == null) return;
+    Map<String, Object> restored = new LinkedHashMap<>();
+${lifecycle.restore}
+    state.putAll(restored);
+  }
   @Override protected void onSaveInstanceState(Bundle outState) { super.onSaveInstanceState(outState);\n${lifecycle.save}\n  }
 }
 `;
