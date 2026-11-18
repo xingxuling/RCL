@@ -17,12 +17,16 @@ try {
       c0ToC1: {
         status: result.native.c0ToC1.status,
         bytes: result.native.c0ToC1.bytes,
+        executedInstructions: result.native.c0ToC1.executedInstructions,
+        instructionBudget: result.native.c0ToC1.instructionBudget,
         peakStackDepth: result.native.c0ToC1.peakStackDepth,
         peakCallFrames: result.native.c0ToC1.peakCallFrames,
       },
       c1ToC2: {
         status: result.native.c1ToC2.status,
         bytes: result.native.c1ToC2.bytes,
+        executedInstructions: result.native.c1ToC2.executedInstructions,
+        instructionBudget: result.native.c1ToC2.instructionBudget,
         peakStackDepth: result.native.c1ToC2.peakStackDepth,
         peakCallFrames: result.native.c1ToC2.peakCallFrames,
       },

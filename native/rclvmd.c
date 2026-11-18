@@ -101,11 +101,12 @@ static char *wire_text(const uint8_t *data, size_t length, size_t *offset, size_
   return text;
 }
 
-static int run_session_step(RclVmInstance *vm, char *line, char **json, char *error, size_t capacity) {
-  char *mode = strtok(line + 5, " ");
-  char *rule = strtok(NULL, " ");
+static int run_session_command(RclVmInstance *vm, char *line, int restore, char **json, char *error, size_t capacity) {
+  char *mode_or_root = strtok(line + (restore ? 8 : 5), " ");
+  char *rule = restore ? NULL : strtok(NULL, " ");
   char *hex = strtok(NULL, " ");
-  if (!mode || (strcmp(mode, "0") && strcmp(mode, "1")) || !rule || !hex || strtok(NULL, " ")) goto invalid;
+  if (!mode_or_root || !hex || strtok(NULL, " ")
+      || (!restore && ((!rule) || (strcmp(mode_or_root, "0") && strcmp(mode_or_root, "1"))))) goto invalid;
   size_t hex_length = strlen(hex);
   if (hex_length < 16 || hex_length % 2 || hex_length / 2 > MAX_SESSION_WIRE) goto invalid;
   size_t length = hex_length / 2;
@@ -138,7 +139,9 @@ static int run_session_step(RclVmInstance *vm, char *line, char **json, char *er
     } else valid = 0;
   }
   int result = 0;
-  if (valid && offset == length) result = rclvm_instance_session_step(vm, rule, mode[0] == '1', inputs, count, json, error, capacity);
+  if (valid && offset == length) result = restore
+    ? rclvm_instance_session_restore_scalars(vm, mode_or_root, inputs, count, json, error, capacity)
+    : rclvm_instance_session_step(vm, rule, mode_or_root[0] == '1', inputs, count, json, error, capacity);
   else snprintf(error, capacity, "RCL_SESSION_PROTOCOL_INVALID");
   for (uint32_t i = 0; i < count; i++) { free((void *)inputs[i].path); free((void *)inputs[i].text); }
   free(inputs); free(data); return result;
@@ -147,15 +150,18 @@ invalid:
 }
 
 int main(int argc, char **argv) {
-  if (argc != 2 && argc != 3) { fprintf(stderr, "Usage: rclvmd <program.rbc> [writer-lock-path]\n"); return 2; }
-  if (argc == 3 && !acquire_writer_lock(argv[2])) { fprintf(stderr, "RCL_SESSION_WRITER_BUSY_OR_LOCK_INVALID\n"); return 1; }
+  int allow_restore = argc >= 3 && strcmp(argv[argc - 1], "--restore-scalar-checkpoint") == 0;
+  int positional = argc - allow_restore;
+  if (positional != 2 && positional != 3) { fprintf(stderr, "Usage: rclvmd <program.rbc> [writer-lock-path] [--restore-scalar-checkpoint]\n"); return 2; }
+  if (positional == 3 && !acquire_writer_lock(argv[2])) { fprintf(stderr, "RCL_SESSION_WRITER_BUSY_OR_LOCK_INVALID\n"); return 1; }
   RclVmInstance *vm = rclvm_instance_create();
   char error[512] = {0};
   if (!vm || !rclvm_instance_load_file(vm, argv[1], error, sizeof(error))) {
     fprintf(stderr, "{\"status\":\"error\",\"message\":\"%s\"}\n", error);
     rclvm_instance_destroy(vm); release_writer_lock(); return 1;
   }
-  printf("{\"status\":\"ready\",\"vm\":\"%s\"}\n", rclvm_version()); fflush(stdout);
+  printf("{\"status\":\"ready\",\"vm\":\"%s\"%s}\n", rclvm_version(),
+    allow_restore ? ",\"scalarCheckpointRestore\":true" : ""); fflush(stdout);
   size_t line_capacity = MAX_SESSION_WIRE * 2u + 4096u;
   char *line = (char *)malloc(line_capacity);
   if (!line) { rclvm_instance_destroy(vm); release_writer_lock(); return 1; }
@@ -167,10 +173,14 @@ int main(int argc, char **argv) {
     line[strcspn(line, "\r\n")] = '\0';
     if (strcmp(line, "QUIT") == 0) break;
     if (strcmp(line, "RESET") == 0) { rclvm_instance_reset(vm, 1); puts("{\"status\":\"reset\"}"); fflush(stdout); continue; }
-    if (strcmp(line, "RUN") == 0 || strcmp(line, "RUN_RESET") == 0 || strcmp(line, "INIT") == 0 || strncmp(line, "STEP ", 5) == 0) {
+    int step = strncmp(line, "STEP ", 5) == 0;
+    int restore = allow_restore && strncmp(line, "RESTORE ", 8) == 0;
+    int scalar_evidence = strcmp(line, "SCALAR_EVIDENCE") == 0;
+    if (strcmp(line, "RUN") == 0 || strcmp(line, "RUN_RESET") == 0 || strcmp(line, "INIT") == 0 || step || restore || scalar_evidence) {
       char *json = NULL; error[0] = '\0'; double start = now_ms();
       int ok = strcmp(line, "INIT") == 0 ? rclvm_instance_session_initialize(vm, &json, error, sizeof(error))
-        : strncmp(line, "STEP ", 5) == 0 ? run_session_step(vm, line, &json, error, sizeof(error))
+        : step || restore ? run_session_command(vm, line, restore, &json, error, sizeof(error))
+        : scalar_evidence ? rclvm_instance_session_scalar_evidence(vm, &json, error, sizeof(error))
         : rclvm_instance_run(vm, strcmp(line, "RUN_RESET") == 0, &json, error, sizeof(error));
       double elapsed = now_ms() - start;
       if (json) {

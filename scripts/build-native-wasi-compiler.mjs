@@ -14,7 +14,7 @@ const binary=path.join(directory,'rclc.wasm');
 run(['cc','-target','wasm32-wasi','-std=c11','-O2','-DRCLVM_EMBEDDED_ONLY','-D_WASI_EMULATED_GETPID','-I','native/wasi-compat',
   'native/rclvm.c','native/rclc.c','native/wasi-compat/stdio-capture.c',object,'-lwasi-emulated-getpid','-lm','-o',binary]);
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
-const sources=['native/rclvm.c','native/rclvm.h','native/rclc.c','native/semantic_state_v2.h','native/wasi-sha256.zig',
+const sources=['native/rclvm.c','native/rclvm.h','native/rclc.c','native/semantic_state_v2.h','native/identifier_profile.h','native/number_format_ryu.h','native/wasi-sha256.zig',
   'native/wasi-compat/openssl/sha.h','native/wasi-compat/stdio-capture.c','scripts/build-native-wasi-compiler.mjs'];
 const manifest={format:'rcl.native-wasi-compiler-build.v1',status:'BUILT_NOT_RUNTIME_VERIFIED',target:'wasm32-wasi',
   zigVersion:spawnSync(zig,['version'],{encoding:'utf8',windowsHide:true}).stdout.trim(),

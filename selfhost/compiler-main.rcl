@@ -33,8 +33,9 @@
   facet compiler.program : Sequence = k337_validated_program(parse_program(compiler.tokens))
   facet compiler.canonical : Text = canonical_program(compiler.program)
   facet compiler.root : Text = program_root(compiler.program)
-  facet compiler.strings : Sequence = build_string_pool(compiler.program, compiler.root)
-  facet compiler.numbers : Sequence = build_number_pool(compiler.program)
-  facet compiler.instructions : Sequence = build_instructions(compiler.program, compiler.strings, compiler.numbers)
+  facet compiler.emission_program : Sequence = initializer_program(compiler.program)
+  facet compiler.strings : Sequence = build_string_pool(compiler.emission_program, compiler.root)
+  facet compiler.numbers : Sequence = build_number_pool(compiler.emission_program)
+  facet compiler.instructions : Sequence = build_instructions(compiler.emission_program, compiler.strings, compiler.numbers)
   facet compiler.output : Sequence = encode_rbc(compiler.program, compiler.root, compiler.strings, compiler.numbers, compiler.instructions)
 }

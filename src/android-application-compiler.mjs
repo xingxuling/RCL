@@ -10,6 +10,7 @@ import {
   traceNativeUiAndroidApplication,
 } from './ui/android-ui-backend.mjs';
 import { RCL_NATIVE_UI_ANDROID_FORMAT } from './ui/ui-schema.mjs';
+import { ANDROID_JAVA_EQUAL_HELPER, ANDROID_JAVA_TEXT_HELPER, androidJavaIdentifier as javaIdentifier, androidJavaNumber } from './android-java-source.mjs';
 
 export const RCL_ANDROID_APPLICATION_COMPILER_VERSION = '0.1.0';
 export const RCL_ANDROID_APPLICATION_FORMAT = 'rcl.android-application.v0.1';
@@ -43,20 +44,11 @@ function xmlAttribute(value) {
     .replaceAll('>', '&gt;');
 }
 
-function javaIdentifier(value, fallback = 'node') {
-  const normalized = String(value).replace(/[^A-Za-z0-9_$]/gu, '_');
-  const candidate = /^[A-Za-z_$]/u.test(normalized) ? normalized : `${fallback}_${normalized}`;
-  return JAVA_IDENTIFIER.test(candidate) ? candidate : `${fallback}_node`;
-}
-
 function javaLiteral(value) {
   if (value === null) return 'null';
   if (typeof value === 'string') return javaString(value);
   if (typeof value === 'boolean') return value ? 'Boolean.TRUE' : 'Boolean.FALSE';
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    if (Number.isInteger(value)) return `${value}L`;
-    return `${value}d`;
-  }
+  if (typeof value === 'number' && Number.isFinite(value)) return androidJavaNumber(value);
   throw new Error(`RCL_ANDROID_UNSUPPORTED_LITERAL:${typeof value}`);
 }
 
@@ -195,7 +187,10 @@ function emitJavaExpr(expr, snapshotName) {
   if (expr.kind === 'path') return `rclPath(${snapshotName}, ${javaString(expr.path)})`;
   if (expr.kind === 'unary') return `rclUnary(${javaString(expr.operator)}, ${emitJavaExpr(expr.expression, snapshotName)})`;
   if (expr.kind === 'binary') return `rclBinary(${javaString(expr.operator)}, ${emitJavaExpr(expr.left, snapshotName)}, ${emitJavaExpr(expr.right, snapshotName)})`;
-  if (expr.kind === 'choose') return `rclChoose(${emitJavaExpr(expr.args[0], snapshotName)}, ${emitJavaExpr(expr.args[1], snapshotName)}, ${emitJavaExpr(expr.args[2], snapshotName)})`;
+  if (expr.kind === 'choose') {
+    const [condition, whenTrue, whenFalse] = expr.args.map((arg) => emitJavaExpr(arg, snapshotName));
+    return `(rclTruthy(${condition}) ? (Object) (${whenTrue}) : (Object) (${whenFalse}))`;
+  }
   throw new Error(`RCL_ANDROID_JAVA_EXPRESSION:${expr.kind}`);
 }
 
@@ -244,7 +239,7 @@ function emitUiNode(node, lines, indent) {
 
 function emitRuleMethod(rule) {
   const lines = [];
-  const method = `realize_${javaIdentifier(rule.name, 'rule')}`;
+  const method = `realize_${javaIdentifier(rule.name)}`;
   lines.push(`  private void ${method}() {`);
   lines.push('    final Map<String, Object> before = new LinkedHashMap<>(state);');
   if (rule.when) lines.push(`    if (!rclTruthy(${emitJavaExpr(rule.when, 'before')})) return;`);
@@ -260,7 +255,10 @@ function emitRuleMethod(rule) {
 }
 
 function emitJavaRuntimeHelpers() {
-  return `  private static Object rclPath(Map<String, Object> snapshot, String path) {
+  return `${ANDROID_JAVA_TEXT_HELPER}
+${ANDROID_JAVA_EQUAL_HELPER}
+
+  private static Object rclPath(Map<String, Object> snapshot, String path) {
     if (!snapshot.containsKey(path)) throw new IllegalStateException("RCL_ANDROID_STATE_MISSING:" + path);
     return snapshot.get(path);
   }
@@ -273,10 +271,6 @@ function emitJavaRuntimeHelpers() {
     return true;
   }
 
-  private static Object rclChoose(Object condition, Object whenTrue, Object whenFalse) {
-    return rclTruthy(condition) ? whenTrue : whenFalse;
-  }
-
   private static Object rclUnary(String operator, Object value) {
     if ("not".equals(operator)) return !rclTruthy(value);
     if ("-".equals(operator) && value instanceof Number) return -((Number) value).doubleValue();
@@ -286,7 +280,7 @@ function emitJavaRuntimeHelpers() {
   private static Object rclBinary(String operator, Object left, Object right) {
     if ("and".equals(operator)) return rclTruthy(left) && rclTruthy(right);
     if ("or".equals(operator)) return rclTruthy(left) || rclTruthy(right);
-    if ("+".equals(operator) && (left instanceof CharSequence || right instanceof CharSequence)) return String.valueOf(left) + String.valueOf(right);
+    if ("+".equals(operator) && (left instanceof CharSequence || right instanceof CharSequence)) return rclText(left) + rclText(right);
     if ("+".equals(operator) || "-".equals(operator) || "*".equals(operator) || "/".equals(operator) || "%".equals(operator)) {
       if (!(left instanceof Number) || !(right instanceof Number)) throw new IllegalStateException("RCL_ANDROID_NUMBER_REQUIRED:" + operator);
       double l = ((Number) left).doubleValue();
@@ -297,11 +291,10 @@ function emitJavaRuntimeHelpers() {
       else if ("*".equals(operator)) result = l * r;
       else if ("/".equals(operator)) result = l / r;
       else result = l % r;
-      if (Math.rint(result) == result) return Long.valueOf((long) result);
       return Double.valueOf(result);
     }
-    if ("==".equals(operator)) return java.util.Objects.equals(left, right);
-    if ("!=".equals(operator)) return !java.util.Objects.equals(left, right);
+    if ("==".equals(operator)) return rclEqual(left, right);
+    if ("!=".equals(operator)) return !rclEqual(left, right);
     if (left instanceof Number && right instanceof Number) {
       double l = ((Number) left).doubleValue();
       double r = ((Number) right).doubleValue();
@@ -337,15 +330,15 @@ function emitStateLifecycle(manifest) {
   const save = manifest.facets.map((facet) => {
     const key = javaString(`rcl.state.${facet.path}`);
     if (facet.valueType === 'Text') return `    outState.putString(${key}, String.valueOf(state.get(${javaString(facet.path)})));`;
-    if (facet.valueType === 'Boolean') return `    outState.putBoolean(${key}, rclTruthy(state.get(${javaString(facet.path)})));`;
-    return `    outState.putLong(${key}, ((Number) state.get(${javaString(facet.path)})).longValue());`;
+    if (facet.valueType === 'Boolean' || facet.valueType === 'Truth') return `    outState.putBoolean(${key}, rclTruthy(state.get(${javaString(facet.path)})));`;
+    return `    outState.putDouble(${key}, ((Number) state.get(${javaString(facet.path)})).doubleValue());`;
   }).join('\n');
   const restore = manifest.lifecycle.restoreState ? manifest.facets.map((facet) => {
     const key = javaString(`rcl.state.${facet.path}`);
     const pathLiteral = javaString(facet.path);
     if (facet.valueType === 'Text') return `    if (savedState.containsKey(${key})) state.put(${pathLiteral}, savedState.getString(${key}));`;
-    if (facet.valueType === 'Boolean') return `    if (savedState.containsKey(${key})) state.put(${pathLiteral}, savedState.getBoolean(${key}));`;
-    return `    if (savedState.containsKey(${key})) state.put(${pathLiteral}, savedState.getLong(${key}));`;
+    if (facet.valueType === 'Boolean' || facet.valueType === 'Truth') return `    if (savedState.containsKey(${key})) state.put(${pathLiteral}, savedState.getBoolean(${key}));`;
+    return `    if (savedState.containsKey(${key})) { Object value = savedState.get(${key}); if (value instanceof Number) state.put(${pathLiteral}, value); }`;
   }).join('\n') : '';
   return { init, save, restore };
 }
@@ -356,8 +349,8 @@ function emitRender(manifest, boundNodes) {
     const field = nodeFieldName(node);
     const pathName = node.textState ?? node.valueState;
     const next = node.text !== undefined
-      ? `String.valueOf(${javaString(node.text)}) + String.valueOf(rclPath(state, ${javaString(pathName)}))`
-      : `String.valueOf(rclPath(state, ${javaString(pathName)}))`;
+      ? `${javaString(node.text)} + rclText(rclPath(state, ${javaString(pathName)}))`
+      : `rclText(rclPath(state, ${javaString(pathName)}))`;
     if (node.type === 'input') lines.push(`    if (!${field}.getText().toString().equals(${next})) ${field}.setText(${next});`);
     else lines.push(`    ${field}.setText(${next});`);
   }
@@ -372,7 +365,7 @@ export function emitNativeAndroidActivity(manifest) {
   const lifecycle = emitStateLifecycle(manifest);
   const uiLines = [];
   const rootVariable = emitUiNode(manifest.screen, uiLines, '    ');
-  const dispatch = manifest.rules.map((rule) => `    if (${javaString(rule.name)}.equals(name)) { realize_${javaIdentifier(rule.name, 'rule')}(); return; }`).join('\n');
+  const dispatch = manifest.rules.map((rule) => `    if (${javaString(rule.name)}.equals(name)) { realize_${javaIdentifier(rule.name)}(); return; }`).join('\n');
   const ruleMethods = manifest.rules.map(emitRuleMethod).join('\n\n');
   const fields = boundNodes.map((node) => `  private ${node.type === 'input' ? 'EditText' : 'TextView'} ${nodeFieldName(node)};`).join('\n');
   const source = `package ${app.applicationId};
@@ -418,7 +411,7 @@ ${uiLines.join('\n')}
   private void observe(String path, Object value) {
     if (!state.containsKey(path)) throw new IllegalStateException("RCL_ANDROID_OBSERVE_UNKNOWN:" + path);
     Object before = state.put(path, value);
-    history.add("observed:" + path + ":" + String.valueOf(before) + "→" + String.valueOf(value));
+    history.add("observed:" + path + ":" + rclText(before) + "→" + rclText(value));
     render();
   }
 

@@ -15,7 +15,7 @@ const semanticRoot = state => semanticStateRootForAlgorithm(state, 'rcl.semantic
 const matches = (state, expected) => Object.entries(expected).every(([name, value]) => JSON.stringify(state[name]) === JSON.stringify(value));
 const requiredSourceFiles = ['src/portable-native-vm.mjs', 'scripts/run-k400-portable-profiles.mjs', 'scripts/k400-portable-profile-definitions.mjs',
   'scripts/run-native-wasi.mjs', 'scripts/build-native-linux.mjs', 'native/rclvm.c', 'native/rclvm.h', 'native/rclc.c',
-  'native/semantic_state_v2.h', 'native/wasi-sha256.zig', 'native/wasi-compat/openssl/sha.h', 'native/wasi-compat/stdio-capture.c'];
+  'native/semantic_state_v2.h','native/identifier_profile.h', 'native/wasi-sha256.zig', 'native/wasi-compat/openssl/sha.h', 'native/wasi-compat/stdio-capture.c'];
 
 export function verifyPortableProfileReceipt(id, records) {
   const profile = PORTABLE_PROFILES.find(profile => profile.id === id); assert.ok(profile);
