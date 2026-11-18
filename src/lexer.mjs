@@ -1,20 +1,32 @@
+import { isIdentifierStart, isIdentifierPart } from './identifier-profile.mjs';
 import { RCLSyntaxError } from './errors.mjs';
+
+// Raw source coordinates are tooling metadata, outside serialized token values.
+const tokenSourceRanges = new WeakMap();
+export function getTokenSourceRange(token) { return tokenSourceRanges.get(token) ?? null; }
 
 const TWO_CHAR = new Set(['<-', '->', '==', '!=', '<=', '>=']);
 const ONE_CHAR = new Set(['{', '}', '(', ')', ':', ',', '.', '=', '+', '-', '*', '/', '%', '<', '>']);
 
 function isDigit(ch) { return ch >= '0' && ch <= '9'; }
-function isIdStart(ch) { return Boolean(ch) && (/[_\p{L}]/u).test(ch); }
-function isIdPart(ch) { return Boolean(ch) && (/[_\p{L}\p{N}]/u).test(ch); }
+const isIdStart = isIdentifierStart;
+const isIdPart = isIdentifierPart;
 
-export function lexReality(source) {
+export function lexReality(source, { sourceRanges = false } = {}) {
   const tokens = [];
   let i = 0;
   let line = 1;
   let column = 1;
 
-  const push = (type, value, startLine = line, startColumn = column) => {
-    tokens.push({ type, value, line: startLine, column: startColumn });
+  const push = (type, value, startLine, startColumn, startOffset) => {
+    const token = { type, value, line: startLine, column: startColumn };
+    if (sourceRanges) tokenSourceRanges.set(token, Object.freeze({
+      start: Object.freeze({ line: startLine - 1, character: startColumn - 1 }),
+      end: Object.freeze({ line: line - 1, character: column - 1 }),
+      offset: startOffset,
+      length: i - startOffset,
+    }));
+    tokens.push(token);
   };
 
   const advance = () => {
@@ -34,6 +46,7 @@ export function lexReality(source) {
       continue;
     }
 
+    const startOffset = i;
     const startLine = line;
     const startColumn = column;
 
@@ -52,7 +65,7 @@ export function lexReality(source) {
         } else raw += current;
       }
       if (!closed) throw new RCLSyntaxError('Unterminated text literal', { line: startLine, column: startColumn, value: raw });
-      push('STRING', raw, startLine, startColumn);
+      push('STRING', raw, startLine, startColumn, startOffset);
       continue;
     }
 
@@ -64,33 +77,44 @@ export function lexReality(source) {
         if (dots > 1) break;
         raw += advance();
       }
-      push('NUMBER', raw, startLine, startColumn);
+      if (source[i] === 'e' || source[i] === 'E') {
+        const sign = source[i + 1] === '+' || source[i + 1] === '-';
+        if (isDigit(source[i + (sign ? 2 : 1)])) {
+          raw += advance();
+          if (sign) raw += advance();
+          while (isDigit(source[i])) raw += advance();
+        }
+      }
+      if (!Number.isFinite(Number(raw))) {
+        throw new RCLSyntaxError('Number literal must be finite', { line: startLine, column: startColumn, value: raw });
+      }
+      push('NUMBER', raw, startLine, startColumn, startOffset);
       continue;
     }
 
     if (isIdStart(ch)) {
       let raw = '';
       while (i < source.length && isIdPart(source[i])) raw += advance();
-      push('IDENT', raw, startLine, startColumn);
+      push('IDENT', raw, startLine, startColumn, startOffset);
       continue;
     }
 
     const pair = source.slice(i, i + 2);
     if (TWO_CHAR.has(pair)) {
       advance(); advance();
-      push('SYMBOL', pair, startLine, startColumn);
+      push('SYMBOL', pair, startLine, startColumn, startOffset);
       continue;
     }
 
     if (ONE_CHAR.has(ch)) {
       advance();
-      push('SYMBOL', ch, startLine, startColumn);
+      push('SYMBOL', ch, startLine, startColumn, startOffset);
       continue;
     }
 
     throw new RCLSyntaxError(`Unexpected character ${JSON.stringify(ch)}`, { line: startLine, column: startColumn, value: ch });
   }
 
-  tokens.push({ type: 'EOF', value: '<eof>', line, column });
+  push('EOF', '<eof>', line, column, i);
   return tokens;
 }

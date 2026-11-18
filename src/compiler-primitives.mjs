@@ -1,5 +1,63 @@
 /** RCL compiler-construction primitives shared by the reference runtime. */
 
+// Source spelling participates in native AstNode equality and accessors, but
+// the established public AST projection contains only the parsed value. Keep
+// the spelling privately while values move through the reference VM.
+const astLiteralTexts = new WeakMap();
+
+export function hasAstLiteralText(node) {
+  return astLiteralTexts.has(node);
+}
+
+export function astLiteralText(node) {
+  return astLiteralTexts.get(node) ?? String(node.value.value);
+}
+
+// Native Sequence operations copy values. Carry the private AST spelling
+// through the reference runtime's equivalent structured copies as well.
+export function cloneRuntimeValue(value) {
+  const copy = structuredClone(value);
+  const pending = [[value, copy]], visited = new WeakSet();
+  while (pending.length) {
+    const [original, cloned] = pending.pop();
+    if (!original || typeof original !== 'object' || !cloned || typeof cloned !== 'object' || visited.has(original)) continue;
+    visited.add(original);
+    if (astLiteralTexts.has(original)) astLiteralTexts.set(cloned, astLiteralTexts.get(original));
+    for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(original))) {
+      // structuredClone has already evaluated enumerable accessors; don't call
+      // them a second time while copying private metadata.
+      if (!descriptor.enumerable || !('value' in descriptor)) continue;
+      const child = descriptor.value;
+      if (child && typeof child === 'object' && Object.hasOwn(cloned, key)) pending.push([child, cloned[key]]);
+    }
+  }
+  return copy;
+}
+
+export function isProjectedAstLiteral(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+    && value.kind === 'FacetDecl' && value.value?.kind === 'LiteralExpr'
+    && !(value.__rclKind === 'Record' && typeof value.__rclType === 'string');
+}
+
+// Candidate v3 projection: unlike the historical public representation,
+// literal spelling is explicit and survives JSON interchange. A generic
+// projected AST without spelling must not be silently upgraded.
+export function projectAstLiterals(value) {
+  const copy = cloneRuntimeValue(value), pending = [[copy, 0]], visited = new WeakSet();
+  while (pending.length) {
+    const [item, depth] = pending.pop();
+    if (!item || typeof item !== 'object' || visited.has(item)) continue;
+    visited.add(item);
+    if ((depth > 0 || hasAstLiteralText(item)) && isProjectedAstLiteral(item)) {
+      if (hasAstLiteralText(item)) item.literalText = astLiteralText(item);
+      else if (typeof item.literalText !== 'string') throw new TypeError('RCL_AST_LITERAL_SPELLING_UNAVAILABLE');
+    }
+    for (const child of Object.values(item)) if (child && typeof child === 'object') pending.push([child, depth + 1]);
+  }
+  return copy;
+}
+
 export function span(offset, line, column, length) {
   for (const [name, value] of Object.entries({ offset, line, column, length })) {
     if (!Number.isInteger(value) || value < 0 || (name !== 'offset' && name !== 'length' && value < 1)) {
@@ -29,11 +87,13 @@ export function facetAst(path, valueType, literalKind, literalText, sourceSpan) 
     value = literalText === 'true';
   } else if (literalKind === 'Text') value = literalText;
   else throw new TypeError(`Unsupported literal kind '${literalKind}'`);
-  return Object.freeze({
+  const node = {
     kind: 'FacetDecl', path, valueType,
     value: Object.freeze({ kind: 'LiteralExpr', value, valueType: literalKind }),
     span: sourceSpan,
-  });
+  };
+  astLiteralTexts.set(node, literalText);
+  return Object.freeze(node);
 }
 
 export function parseState(index, nodes) {

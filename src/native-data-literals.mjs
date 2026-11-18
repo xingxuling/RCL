@@ -1,6 +1,16 @@
+// RCL recognizes a smaller escape set than JSON. Other scalar characters are literal.
+const textEscapes = { '"': '\\"', '\\': '\\\\', '\n': '\\n', '\r': '\\r', '\t': '\\t' };
+function textLiteral(value) {
+  if (/[\u0000\uD800-\uDFFF]/u.test(value)) {
+    const code = 'RCL_NATIVE_DATA_TEXT_UNREPRESENTABLE';
+    throw Object.assign(new Error(code), { code });
+  }
+  return '"' + value.replace(/["\\\n\r\t]/gu, (character) => textEscapes[character]) + '"';
+}
+
 // Exact finite binary64 data expressions and balanced RCL sequence literals.
 export function nativeDataLiteral(value){
-  if(typeof value==='string')return JSON.stringify(value);
+  if(typeof value==='string')return textLiteral(value);
   if(typeof value==='boolean')return String(value);
   if(typeof value==='number'){
     if(!Number.isFinite(value))throw new Error('RCL_NATIVE_DATA_NONFINITE');if(value===0)return Object.is(value,-0)?'-0':'0';

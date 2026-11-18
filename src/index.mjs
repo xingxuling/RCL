@@ -18,11 +18,14 @@ export { createJobContextTarget } from './job-context-targets.mjs';
 export { createPhaseContextTarget } from './phase-context-targets.mjs';
 export { compileRealitySessionNative } from './session-compiler.mjs';
 export { openDurableRealitySession, verifyDurableRealitySession, verifyDurableRealitySessionBackup, RCL_DURABLE_SESSION_VERSION, RCL_SESSION_JOURNAL_FORMAT, RCL_SESSION_BACKUP_FORMAT, RCL_SESSION_HISTORY_FORMAT } from './durable-session.mjs';
+export { RCL_SESSION_CHECKPOINT_FORMAT, RCL_SESSION_CHECKPOINT_BACKUP_FORMAT, RCL_SESSION_CHECKPOINT_HISTORY_FORMAT } from './durable-session.mjs';
+export { RCL_SESSION_CHECKPOINT_CHAIN_FORMAT, RCL_SESSION_CHECKPOINT_CHAIN_BACKUP_FORMAT, RCL_SESSION_CHECKPOINT_CHAIN_HISTORY_FORMAT } from './durable-session.mjs';
+export { RCL_SESSION_JOURNAL_V3_CANDIDATE_FORMAT, RCL_SESSION_COMMAND_IDENTITY_V3_CANDIDATE_FORMAT, RCL_SESSION_BACKUP_V3_CANDIDATE_FORMAT, RCL_SESSION_HISTORY_V3_CANDIDATE_FORMAT } from './durable-session.mjs';
 export { verifyDurableRealitySessionHistoryPage, verifyDurableRealitySessionHistoryPages, RCL_SESSION_HISTORY_VERIFICATION_FORMAT, RCL_SESSION_COMMAND_IDENTITY_FORMAT } from './durable-session.mjs';
 export { compileRealitySessionBytecode, RCL_BYTECODE_SESSION_FEATURE_VERSION } from './bytecode.mjs';
 export { RCL_SESSION_VERSION, RCL_SESSION_FORMAT, RCL_SESSION_COMMAND_FORMAT, RCL_SESSION_RESULT_FORMAT } from './session-contract.mjs';
 export { RCL_REFERENCE_STATE_ROOT_ALGORITHM } from './canonical.mjs';
-export { semanticStateRootForAlgorithm, RCL_DEFAULT_NATIVE_STATE_ROOT_ALGORITHM } from './semantic-state-root.mjs';
+export { semanticStateRootForAlgorithm, RCL_DEFAULT_NATIVE_STATE_ROOT_ALGORITHM, RCL_SEMANTIC_STATE_ROOT_V3_CANDIDATE } from './semantic-state-root.mjs';
 export {
   RCL_SEMANTIC_STATE_ROOT_V2,
   semanticStateCanonicalV2Stable,
