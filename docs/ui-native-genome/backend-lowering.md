@@ -26,4 +26,6 @@ Existing K02/K03 companion-spec paths remain intact when no native UI declaratio
 
 The portable native event runtime lowers UI-local state changes to ordinary RCL. The native authority check runs before the source-declared visibility, modal, disabled, read-only, form and typed input checks. The checks use pre-event state. A denial carries the original handler span and leaves the last committed state, revision and success ledger intact. Scoped forms read only their declared container. The loopback API returns the native denial code.
 
-The delegate accepts finite Number, Truth and Unicode scalar Text without NUL. Navigation, device adaptation and events that invoke a Reality transaction remain outside this delegate's supported slice.
+The delegate accepts finite Number, Truth and Unicode scalar Text without NUL. A route change and its local state updates commit in the same native transaction. The route contributes to the state root, and the routed browser bridge also submits the last verified revision. Inactive route targets stay hidden and a route-bound modal only blocks the background while it is visible on the current route.
+
+Device adaptation and events that invoke a Reality transaction remain outside this delegate's supported slice.

@@ -144,3 +144,42 @@ test('native event admission blocks hidden handlers and active modal background 
     assert.deepEqual(runtime.snapshot().state, {dialogOpen: false, count: 1, confirmation: 'Confirmed'});
   } finally { await runtime.dispose(); }
 });
+
+test('native navigation seals the route with state, and commits both under the same authorization', async () => {
+  const routed = readFileSync(new URL('./fixtures/native-ui-routed-modal.rcl', import.meta.url), 'utf8');
+  const bridge = await createNativeUiWebBridge(routed);
+  const {runtime} = bridge;
+  try {
+    const initial = runtime.snapshot();
+    assert.deepEqual(initial.navigation, {currentRoute: 'home', target: 'Home'});
+    await assertNativeDenial(runtime, event('ReturnHome'), 'RCL_UI_EVENT_HIDDEN', routed);
+    const opened = await runtime.dispatch(event('OpenDialog'));
+    const dialog = runtime.snapshot();
+    assert.deepEqual(dialog.state, initial.state);
+    assert.notEqual(dialog.stateRoot, initial.stateRoot);
+    assert.equal(opened.beforeRoute, 'home');
+    assert.equal(opened.afterRoute, 'dialog');
+    assert.deepEqual(opened.nativeResult.history[0].authority.needs.map(({capability}) => capability), ['ui.mutate', 'ui.navigate']);
+    await assertNativeDenial(runtime, event('ShowHome'), 'RCL_UI_MODAL_BLOCKED', routed);
+    await assert.rejects(runtime.dispatch(event('ReturnHome'), {authorized: false}), /RCL_AUTHORITY_DENIED/u);
+    assert.deepEqual(runtime.snapshot(), dialog);
+    const closed = await runtime.dispatch(event('ReturnHome'));
+    assert.equal(closed.projection.navigation.currentRoute, 'home');
+    assert.equal(closed.projection.state.homeVisible, false);
+    await assertNativeDenial(runtime, event('OpenDialog'), 'RCL_UI_EVENT_HIDDEN', routed);
+    await runtime.dispatch(event('ShowHome'));
+    assert.equal(runtime.snapshot().stateRoot, initial.stateRoot);
+    const response = await fetch(bridge.url + '/api/event', {
+      method: 'POST',
+      headers: {'content-type': 'application/json', 'x-rcl-ui-token': bridge.token},
+      body: JSON.stringify({event: event('OpenDialog'), expectedStateRoot: initial.stateRoot, expectedRevision: initial.revision}),
+    });
+    assert.equal(response.status, 409);
+    assert.deepEqual(await response.json(), {code: 'RCL_UI_NATIVE_STALE_STATE'});
+    assert.equal(runtime.snapshot().revision, 3);
+    const script = bridge.html.match(/<script>([\s\S]*?)<\/script>/u)[1];
+    assert.doesNotThrow(() => new Function(script));
+    assert.match(script, /expectedRevision: snapshot\.revision/u);
+    assert.doesNotMatch(script, /homeVisible/u);
+  } finally { await bridge.dispose(); }
+});
