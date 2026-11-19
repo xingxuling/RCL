@@ -1,4 +1,4 @@
-import { lexReality } from './lexer.mjs';
+import { lexReality, getTokenSourceRange } from './lexer.mjs';
 import { RCLSyntaxError } from './errors.mjs';
 
 const BINARY_PRECEDENCE = new Map([
@@ -12,8 +12,8 @@ class Parser {
   tokenRange(start, end) {
     const first = this.tokens[start], last = this.tokens[Math.max(start, end - 1)];
     return {
-      start: { line: first.line - 1, character: first.column - 1 },
-      end: { line: last.line - 1, character: last.column - 1 + String(last.value).length },
+      start: getTokenSourceRange(first)?.start ?? { line: first.line - 1, character: first.column - 1 },
+      end: getTokenSourceRange(last)?.end ?? { line: last.line - 1, character: last.column - 1 + String(last.value).length },
     };
   }
   located(node, start, end = this.index) {
@@ -23,8 +23,10 @@ class Parser {
     return node;
   }
   current() { return this.tokens[this.index]; }
-  at(value) { return this.current().value === value; }
+  at(value) { return this.current().type !== 'STRING' && this.current().value === value; }
   atType(type) { return this.current().type === type; }
+  atSymbol(value) { return this.current().type === 'SYMBOL' && this.current().value === value; }
+  expectSymbol(value) { if (!this.atSymbol(value)) throw new RCLSyntaxError(`Expected '${value}'`, this.current()); return this.advance(); }
   advance() { const token = this.current(); if (token.type !== 'EOF') this.index += 1; return token; }
   expect(value, message = `Expected '${value}'`) { if (!this.at(value)) throw new RCLSyntaxError(message, this.current()); return this.advance(); }
   expectType(type, message = `Expected ${type}`) { if (!this.atType(type)) throw new RCLSyntaxError(message, this.current()); return this.advance(); }
@@ -895,6 +897,7 @@ class Parser {
     };
     this.expect('{');
     while (!this.at('}')) {
+      if (!this.atType('IDENT')) throw new RCLSyntaxError('Expected UI layout clause', this.current());
       const keyword = this.current().value;
       if (keyword === 'width' || keyword === 'height') node[keyword] = this.parseUISize(keyword);
       else if (keyword === 'gap' || keyword === 'padding') { this.advance(); node[keyword] = this.parseExpression(); }
@@ -1011,6 +1014,7 @@ class Parser {
     };
     this.expect('{');
     while (!this.at('}')) {
+      if (!this.atType('IDENT')) throw new RCLSyntaxError('Expected UI node clause', this.current());
       const keyword = this.current().value;
       if (['view', 'text', 'action', 'input'].includes(keyword)) node.children.push(this.parseUIViewNode());
       else if (keyword === 'role') { this.advance(); node.role = this.expectType('IDENT', 'Expected canonical UI role').value; }
@@ -1062,6 +1066,7 @@ class Parser {
     };
     this.expect('{');
     while (!this.at('}')) {
+      if (!this.atType('IDENT')) throw new RCLSyntaxError('Expected UI declaration clause', this.current());
       const keyword = this.current().value;
       if (keyword === 'state') node.states.push(this.parseUIState(false));
       else if (keyword === 'derived') node.derivedStates.push(this.parseUIState(true));
@@ -1090,6 +1095,7 @@ class Parser {
     const operation = { name, inputs: [], outputs: [], effects: [], lowersTo: [] };
     this.expect('{');
     while (!this.at('}')) {
+      if (!this.atType('IDENT')) throw new RCLSyntaxError('Expected dialect clause', this.current());
       const keyword = this.current().value;
       if (keyword === 'input') { this.advance(); operation.inputs.push(this.parseType()); }
       else if (keyword === 'output') { this.advance(); operation.outputs.push(this.parseType()); }
@@ -1110,6 +1116,7 @@ class Parser {
     };
     this.expect('{');
     while (!this.at('}')) {
+      if (!this.atType('IDENT')) throw new RCLSyntaxError('Expected dialect clause', this.current());
       const keyword = this.current().value;
       if (keyword === 'version') { this.advance(); node.version = this.expectType('STRING', 'Expected dialect version string').value; }
       else if (keyword === 'layer') { this.advance(); node.layer = this.expectType('IDENT', 'Expected dialect layer').value; }
@@ -1133,6 +1140,7 @@ class Parser {
     };
     this.expect('{');
     while (!this.at('}')) {
+      if (!this.atType('IDENT')) throw new RCLSyntaxError('Expected metadata clause', this.current());
       const keyword = this.current().value;
       if (keyword === 'deterministic') { this.advance(); node.deterministic = this.parseBooleanLiteral('Expected true or false after deterministic'); }
       else if (keyword === 'replay') { this.advance(); node.replay = this.expectType('STRING', 'Expected replay mode text').value; }
@@ -1154,6 +1162,7 @@ class Parser {
     };
     this.expect('{');
     while (!this.at('}')) {
+      if (!this.atType('IDENT')) throw new RCLSyntaxError('Expected capability policy clause', this.current());
       const keyword = this.current().value;
       if (keyword === 'allow_effect') { this.advance(); node.allowedEffects.push(...this.parseNameList('Expected effect name')); }
       else if (keyword === 'deny_effect') { this.advance(); node.deniedEffects.push(...this.parseNameList('Expected effect name')); }
@@ -1165,7 +1174,8 @@ class Parser {
         this.advance();
         node.requireDeterministicReplay = this.at('true') || this.at('false') ? this.parseBooleanLiteral('Expected true or false') : true;
       } else if (keyword === 'budget') {
-        this.advance(); const key = this.expectType('IDENT', 'Expected budget key').value; node.budget[key] = this.parseNumberLiteral('Expected budget number');
+        this.advance(); const key = this.expectType('IDENT', 'Expected budget key').value;
+        Object.defineProperty(node.budget, key, { value: this.parseNumberLiteral('Expected budget number'), enumerable: true, configurable: true, writable: true });
       } else throw new RCLSyntaxError(`Unknown capability policy clause '${keyword}'`, this.current());
     }
     this.expect('}');
@@ -1178,6 +1188,7 @@ class Parser {
     const node = { kind: 'StoreDecl', name, branches: [], commits: [] };
     this.expect('{');
     while (!this.at('}')) {
+      if (!this.atType('IDENT')) throw new RCLSyntaxError('Expected metadata clause', this.current());
       const keyword = this.current().value;
       if (keyword === 'branch') { this.advance(); node.branches.push(this.expectType('IDENT', 'Expected branch name').value); }
       else if (keyword === 'commit') { this.advance(); node.commits.push(this.expectType('STRING', 'Expected commit message').value); }
@@ -1196,6 +1207,7 @@ class Parser {
     this.expect(ruleKind === 'Emergence' ? 'emergence' : 'resonance'); const name = this.expectType('IDENT', 'Expected rule name').value;
     const rule = { kind: ruleKind, name, cause: null, from: null, into: null, when: null, needs: [], preserves: [], alters: [], calls: [], witnesses: [] }; this.expect('{');
     while (!this.at('}')) {
+      if (!this.atType('IDENT')) throw new RCLSyntaxError('Expected rule clause', this.current());
       const keyword = this.current().value;
       if (keyword === 'cause') { this.advance(); rule.cause = this.expectType('IDENT', 'Expected causing subject').value; }
       else if (keyword === 'from') { this.advance(); rule.from = this.expectType('IDENT', 'Expected source subject').value; }
@@ -1223,13 +1235,14 @@ class Parser {
   }
 
   parseExpression(minPrecedence = 0) {
+    const start = this.index;
     let left = this.parsePrefix();
     while (true) {
-      const operator = this.current().value; const precedence = BINARY_PRECEDENCE.get(operator);
+      const token = this.current(); const operator = token.value; const precedence = token.type === 'IDENT' || token.type === 'SYMBOL' ? BINARY_PRECEDENCE.get(operator) : undefined;
       if (precedence === undefined || precedence < minPrecedence) break;
       this.advance(); const right = this.parseExpression(precedence + 1); left = { kind: 'BinaryExpr', operator, left, right };
     }
-    return left;
+    return this.located(left, start);
   }
 
   parseMatchExpression() {
@@ -1271,17 +1284,17 @@ class Parser {
   parsePrefix() {
     const start = this.index;
     const node = this.parsePrefixNode();
-    return node.kind === 'PathExpr' ? this.located(node, start) : node;
+    return this.located(node, start);
   }
 
   parsePrefixNode() {
     const token = this.current();
-    if (token.value === 'not' || token.value === '-') { this.advance(); return { kind: 'UnaryExpr', operator: token.value, expression: this.parseExpression(7) }; }
-    if (token.value === 'match') return this.parseMatchExpression();
+    if ((token.type === 'IDENT' && token.value === 'not') || (token.type === 'SYMBOL' && token.value === '-')) { this.advance(); return { kind: 'UnaryExpr', operator: token.value, expression: this.parseExpression(7) }; }
+    if (token.type === 'IDENT' && token.value === 'match') return this.parseMatchExpression();
     if (token.type === 'NUMBER') { this.advance(); return { kind: 'LiteralExpr', value: Number(token.value), valueType: 'Number' }; }
     if (token.type === 'STRING') { this.advance(); return { kind: 'LiteralExpr', value: token.value, valueType: 'Text' }; }
     if (token.value === 'true' || token.value === 'false') { this.advance(); return { kind: 'LiteralExpr', value: token.value === 'true', valueType: 'Truth' }; }
-    if (token.value === '(') { this.advance(); const expression = this.parseExpression(); this.expect(')'); return expression; }
+    if (token.value === '(') { this.advance(); const expression = this.parseExpression(); this.expectSymbol(')'); return expression; }
     if (token.value === '{') {
       const start = this.advance();
       const fields = [];
@@ -1297,10 +1310,10 @@ class Parser {
     }
     if (token.type === 'IDENT') {
       const name = this.parsePath();
-      if (this.at('(')) {
+      if (this.atSymbol('(')) {
         this.advance(); const args = [];
-        if (!this.at(')')) do { args.push(this.parseExpression()); if (!this.at(',')) break; this.advance(); } while (!this.at(')'));
-        this.expect(')'); return { kind: 'CallExpr', name, args };
+        if (!this.atSymbol(')')) do { args.push(this.parseExpression()); if (!this.atSymbol(',')) break; this.advance(); } while (!this.atSymbol(')'));
+        this.expectSymbol(')'); return { kind: 'CallExpr', name, args };
       }
       return { kind: 'PathExpr', path: name };
     }
@@ -1314,7 +1327,7 @@ export function parseReality(source) { return new Parser(lexReality(source)).par
 // program roots, bytecode or serialized language data.
 export function parseRealityWithLocations(source) {
   const locations = new WeakMap(), typeLocations = new WeakMap();
-  const tokens = lexReality(source);
+  const tokens = lexReality(source, { sourceRanges: true });
   const ast = new Parser(tokens, locations, typeLocations).parseProgram();
   return { ast, locations, typeLocations, tokens };
 }

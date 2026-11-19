@@ -2033,6 +2033,8 @@ try {
     }
   }
 } catch (error) {
-  console.error(error.stack ?? String(error));
+  const diagnostic = error.diagnostic ?? error.details?.diagnostic;
+  if (diagnostic) console.error(JSON.stringify({ ok: false, status: 'error', code: error.code, message: error.message, diagnostic }, null, 2));
+  else console.error(error.stack ?? String(error));
   process.exit(1);
 }

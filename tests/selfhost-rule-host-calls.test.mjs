@@ -97,5 +97,56 @@ test('direct native session compiler rejects rule effects even though general lo
   const read = name => fs.readFileSync(new URL('../selfhost/' + name, import.meta.url), 'utf8');
   const artifact = path.join(directory, 'session-compiler.rbc'); fs.writeFileSync(artifact, compileRealityToBytecode(read('compiler-core.rcl') + '\n' + read('session-compiler-core.rcl') + '\n' + read('session-compiler-main.rcl')));
   const text = source({ directive: '' }); assert.throws(() => compileRealitySessionBytecode(text), /RCL_SESSION_EXTERNAL_EFFECT_UNSUPPORTED/);
-  assert.throws(() => native(text, artifact), /RCL_SESSION_EXTERNAL_EFFECT_UNSUPPORTED/);
+  const offset = text.indexOf('call echo.text');
+  const before = text.slice(0, offset).split('\n');
+  assert.throws(() => native(text, artifact), error => {
+    assert.equal(error.diagnostic?.code, 'RCL_SESSION_EXTERNAL_EFFECT_UNSUPPORTED');
+    assert.deepEqual(error.diagnostic.span, { offset, line: before.length, column: before.at(-1).length + 1, length: 4 });
+    return true;
+  });
+});
+
+
+test('host declarations require recognized offer clauses and signature delimiters', () => {
+  const original = source();
+  for (const declaration of [
+    'host "echo" { offers text -> Text }',
+    'host echo "{" offers text -> Text }',
+    'host echo { mystery text -> Text }',
+    'host echo { "offers" text -> Text }',
+    'host echo { offers text wrong Text }',
+    'host echo { offers text "->" Text }',
+  ]) {
+    const text = original.replace('host echo { offers text -> Text }', declaration);
+    assert.throws(() => compileRealityToBytecode(text), declaration);
+    const output = path.join(directory, 'output.rbc'), retained = Buffer.from('retained-host-output');
+    fs.writeFileSync(output, retained);
+    assert.throws(() => native(text), declaration);
+    assert.deepEqual(fs.readFileSync(output), retained);
+  }
+  assert.deepEqual(native(original), compileRealityToBytecode(original));
+});
+
+
+test('alter assignments require a real arrow and preserve failed output', () => {
+  for (const delimiter of ['wrong', '"<-"']) {
+    const text = source({ effects: `alter count ${delimiter} 1 call echo.text("{}") -> reply` });
+    assert.throws(() => compileRealityToBytecode(text));
+    const output = path.join(directory, 'output.rbc'), retained = Buffer.from('retained-alter-output'); fs.writeFileSync(output, retained);
+    assert.throws(() => native(text)); assert.deepEqual(fs.readFileSync(output), retained);
+  }
+  const valid = source({ effects: 'alter count <- 1 call echo.text("{}") -> reply' });
+  assert.deepEqual(native(valid), compileRealityToBytecode(valid));
+});
+
+
+test('realize and foresee directives require identifier rule names', () => {
+  const original = fs.readFileSync(new URL('../examples/selfhost-core/emergence-multi.rcl', import.meta.url), 'utf8');
+  for (const keyword of ['realize', 'foresee']) {
+    const text = original.replace(`${keyword} promote`, `${keyword} "promote"`);
+    assert.throws(() => compileRealityToBytecode(text));
+    const output = path.join(directory, 'output.rbc'), retained = Buffer.from('retained-directive-output'); fs.writeFileSync(output, retained);
+    assert.throws(() => native(text)); assert.deepEqual(fs.readFileSync(output), retained);
+  }
+  assert.deepEqual(native(original), compileRealityToBytecode(original));
 });

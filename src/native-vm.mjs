@@ -4,7 +4,8 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { compileRealityToBytecode } from './bytecode.mjs';
-import { defaultNativeVmPath, materializeNativeVm } from './native-vm-materialization.mjs';
+import { defaultNativeExecutablePath, defaultNativeVmPath, materializeNativeVm } from './native-vm-materialization.mjs';
+import { nativeLinuxArtifactBinding } from './native-linux-build-contract.mjs';
 import {
   createNativeVmExecutionAttestation,
   verifyNativeVmExecutionAttestation,
@@ -27,7 +28,7 @@ export {
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 export const DEFAULT_NATIVE_VM_PATH = defaultNativeVmPath(ROOT);
-export const DEFAULT_NATIVE_COMPILER_PATH = path.join(ROOT, 'native', process.platform === 'win32' ? 'rclc.exe' : 'rclc');
+export const DEFAULT_NATIVE_COMPILER_PATH = defaultNativeExecutablePath(ROOT, 'rclc');
 
 export class RCLNativeVMError extends Error {
   constructor(payload, details = {}) {
@@ -35,6 +36,7 @@ export class RCLNativeVMError extends Error {
     this.name = 'RCLNativeVMError';
     this.code = payload?.code ?? 'RCL_NATIVE_FAILURE';
     this.payload = payload;
+    this.diagnostic = payload?.diagnostic ?? payload?.cause?.diagnostic ?? null;
     this.details = details;
   }
 }
@@ -50,6 +52,7 @@ function verifyNativePayload(payload, options) {
     return verifyNativeSemanticStateRoot(payload, {
       requireNativeRoot: options.requireNativeStateRoot === true,
       expectedAlgorithm: options.stateRootAlgorithm,
+      rejectProjectedAst: options.rejectProjectedAst === true,
     });
   } catch (error) {
     if (error instanceof RCLSemanticStateRootError) {
@@ -73,7 +76,7 @@ function bindNativeExecutionAttestation(payload, materialization) {
 
 function resolveRunnableNativeVm(options) {
   try {
-    return materializeNativeVm(ROOT, {
+    const materialization = materializeNativeVm(ROOT, {
       vmPath: options.vmPath,
       buildIfMissing: options.buildIfMissing,
       makePath: options.makePath,
@@ -81,6 +84,11 @@ function resolveRunnableNativeVm(options) {
       maxBuffer: options.buildMaxBuffer,
       buildTimeout: options.buildTimeout,
     });
+    if (process.platform === 'linux' && materialization.vmPath === path.join(ROOT, 'native', 'linux', 'rclvm')) {
+      const binding = nativeLinuxArtifactBinding(ROOT, 'binary');
+      return { ...materialization, sourceRoot: binding.sourceRoot, binarySha256: binding.binarySha256 };
+    }
+    return materialization;
   } catch (error) {
     if (error?.code) {
       throw new RCLNativeVMError({ code: error.code, message: error.message }, error.details ?? {});
@@ -148,6 +156,11 @@ export function runNativeCompiler(compilerBytecodePath, sourcePath, outputPath, 
   for (const [name, value] of Object.entries({ compilerBytecodePath, sourcePath, outputPath })) {
     if (typeof value !== 'string' || value.length === 0) throw new TypeError(`${name} must be a non-empty path`);
   }
+  let nativeCompilerBinding;
+  if (process.platform === 'linux' && compilerPath === path.join(ROOT, 'native', 'linux', 'rclc')) {
+    try { nativeCompilerBinding = nativeLinuxArtifactBinding(ROOT, 'compiler'); }
+    catch (error) { throw new RCLNativeVMError({ code: error.code, message: error.message }); }
+  }
 
   fs.mkdirSync(path.dirname(path.resolve(outputPath)), { recursive: true });
   const env = { ...process.env, ...options.env };
@@ -170,7 +183,7 @@ export function runNativeCompiler(compilerBytecodePath, sourcePath, outputPath, 
     throw new RCLNativeVMError({ code: 'RCL_NATIVE_COMPILER_OUTPUT', message: `Native compiler did not create ${outputPath}` }, { result });
   }
   const payload = parsePayload(result.stdout.trim(), { status: 'ok' });
-  return { ...payload, outputPath, bytecode: fs.readFileSync(outputPath) };
+  return { ...payload, ...(nativeCompilerBinding ? { nativeCompilerBinding } : {}), outputPath, bytecode: fs.readFileSync(outputPath) };
 }
 
 function canonicalJson(value) {

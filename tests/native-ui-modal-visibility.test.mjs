@@ -97,3 +97,26 @@ test('v0.6 generic container visibility blocks descendants without any modal', (
   rt.dispatch('Cancel','activate');
   assert.equal(rt.snapshot().dialogOpen,false);
 });
+
+test('a route-owned modal participates only while its route and binding are visible', () => {
+  const source = fs.readFileSync(new URL('./fixtures/native-ui-routed-modal.rcl', import.meta.url), 'utf8');
+  const runtime = createNativeUiRuntime(compileReality(source).nativeUis[0]);
+  assert.throws(() => runtime.dispatch('ReturnHome', 'activate'), /RCL_UI_EVENT_HIDDEN:ReturnHome/u);
+  assert.equal(runtime.trace.length, 0);
+  const opened = runtime.dispatch('OpenDialog', 'activate');
+  assert.equal(opened.afterRoute, 'dialog');
+  assert.throws(() => runtime.dispatch('ShowHome', 'activate'), /RCL_UI_MODAL_BLOCKED:ShowHome/u);
+  const returned = runtime.dispatch('ReturnHome', 'activate');
+  assert.equal(returned.afterRoute, 'home');
+  assert.equal(returned.afterState.homeVisible, false);
+  assert.throws(() => runtime.dispatch('OpenDialog', 'activate'), /RCL_UI_EVENT_HIDDEN:OpenDialog/u);
+  runtime.dispatch('ShowHome', 'activate');
+  assert.equal(runtime.dispatch('OpenDialog', 'activate').afterRoute, 'dialog');
+  assert.equal(runtime.trace.length, 4);
+
+  const java = emitNativeAndroidActivity(compileRclAndroidApplication(source));
+  assert.match(java, /view_Home\.setVisibility\("home"\.equals\(currentRoute\) && rclTruthy\(rclPath\(state, "homeVisible"\)\)/u);
+  assert.match(java, /view_Dialog\.setVisibility\("dialog"\.equals\(currentRoute\) && rclTruthy\(rclPath\(state, "dialogVisible"\)\)/u);
+  const html = emitStandaloneRclWebHtml(compileRclWebApplication(source));
+  assert.match(html, /nodeVisible\(child, values\)\) return child\.id/u);
+});

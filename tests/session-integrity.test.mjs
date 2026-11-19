@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createNativeRealitySession } from '../src/native-session.mjs';
-import { openDurableRealitySession } from '../src/durable-session.mjs';
+import { openDurableRealitySession, verifyDurableRealitySession } from '../src/durable-session.mjs';
 import { createRealitySession } from '../src/runtime.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -84,6 +84,35 @@ test('unverified native commits poison the durable writer and replay permits a s
     assert.equal((await session.invoke(command)).result.state.value, 1);
     assert.equal((await session.invoke(command)).replayed, true);
   } finally { await session?.close(); fs.rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('journal pins are admitted before replay and remain fixed in the verification receipt', async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-durable-anchor-'));
+  let session;
+  try {
+    session = await openDurableRealitySession(directory, { source });
+    const saved = await session.invoke({ requestId: 'first', expectedRevision: 0, rule: 'increment' });
+    await session.close(); session = null;
+
+    // This real-VM fixture corrupts its reply only after receiving STEP.
+    const native = { daemonPath, env: { RCL_SESSION_FAULT: 'source' } };
+    await assert.rejects(openDurableRealitySession(directory, { native, expectedJournalRoot: '0'.repeat(64) }),
+      error => error.code === 'RCL_SESSION_EXPECTED_HEAD_MISMATCH');
+    await assert.rejects(openDurableRealitySession(directory, { native, expectedJournalRoot: saved.receipt.root }),
+      error => error.code === 'RCL_SESSION_NATIVE_EVIDENCE_INVALID');
+
+    const options = { expectedJournalRoot: saved.receipt.root, verifyReference: false };
+    const verifying = verifyDurableRealitySession(directory, options);
+    delete options.expectedJournalRoot;
+    options.verifyReference = true;
+    const verified = await verifying;
+    assert.equal(verified.externalHistoryAnchorChecked, true);
+    assert.equal(verified.referenceReplayVerified, false);
+    assert.equal(verified.journalRoot, saved.receipt.root);
+  } finally {
+    await session?.close();
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
 });
 
 test('durable commands capture request identity and scalar inputs before entering the queue', async () => {

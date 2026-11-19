@@ -45,8 +45,11 @@ export function buildFacetOccurrences(source, facets, uri) {
       return;
     }
     if (node.kind === 'FacetDecl' && names.has(node.path)) {
-      declarations[node.path] = { range: locations.get(node), typeRange: typeLocations.get(node),
-        typeIdentifierRanges: identifierRanges(typeLocations.get(node)) };
+      // A legal facet can be named __proto__; assignment on an ordinary object
+      // would change its prototype instead of recording an own declaration.
+      Object.defineProperty(declarations, node.path, { enumerable: true, configurable: true, writable: true,
+        value: { range: locations.get(node), typeRange: typeLocations.get(node),
+          typeIdentifierRanges: identifierRanges(typeLocations.get(node)) } });
       occurrence(node.path, node, 'declaration');
       walk(node.value, locals);
       return;

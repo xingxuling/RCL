@@ -109,10 +109,10 @@ test('nested choose expressions receive collision-free bytecode labels', async (
   assert.equal(native.state['result.value'], 3);
 });
 
-test('native LOAD_STATE reports the reference runtime missing-state code and message', () => {
+test('native LOAD_STATE reports a missing facet in a cyclic initializer', () => {
   const source = `reality NativeMissingState {
     facet early.value : Truth = late.value
-    facet late.value : Truth = true
+    facet late.value : Truth = early.value
   }`;
   assert.throws(
     () => runRealityNative(source),
@@ -277,7 +277,8 @@ test('Windows native manifest tracks the exact required prebuilt path set and ha
   const expectedSources = [
     'native/rclvm.c',
     'native/rclvm.h',
-    'native/semantic_state_v2.h',
+    'native/semantic_state_v2.h','native/identifier_profile.h',
+    'native/number_format_ryu.h',
     'native/rclc.c',
     'native/rclvmd.c',
     'native/provider_demo.c',
@@ -315,7 +316,7 @@ test('Windows native manifest tracks the exact required prebuilt path set and ha
 test('Windows rclvm DLL supports an external import-library link and runtime load', { skip: process.platform !== 'win32' }, t => {
   const zig = findZig();
   if (!zig) {
-    t.skip('Zig is unavailable; the checked DLL and import library are covered by the signed prebuilt manifest');
+    t.skip('Zig is unavailable; the checked DLL and import library are covered by the source-bound prebuilt manifest');
     return;
   }
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rclvm-dll-abi-'));
@@ -323,7 +324,34 @@ test('Windows rclvm DLL supports an external import-library link and runtime loa
     const sourcePath = path.join(directory, 'abi-smoke.c');
     const executablePath = path.join(directory, 'abi-smoke.exe');
     const componentVersion = JSON.parse(fs.readFileSync(path.join(ROOT, 'COMPONENT-VERSIONS.json'), 'utf8')).components.nativeVm.version;
-    fs.writeFileSync(sourcePath, `#include <string.h>\n#include "rclvm.h"\nint main(void) {\n  char error[128] = {0};\n  if (!rclvm_version() || strcmp(rclvm_version(), "${componentVersion}") != 0) return 10;\n  if (rclvm_validate_bytecode(NULL, 0, error, sizeof(error)) != 0) return 11;\n  RclVmInstance *vm = rclvm_instance_create();\n  if (!vm) return 12;\n  rclvm_instance_destroy(vm);\n  return 0;\n}\n`);
+    const badPath = path.join(directory, 'bad.rbc'), goodPath = path.join(directory, 'good.rbc');
+    fs.writeFileSync(badPath, compileRealityToBytecode('reality Bad { facet valid : Truth = semantic_assert(false, "RCL_LIFECYCLE", "detail", make_span(13, 2, 4, 7)) }'));
+    fs.writeFileSync(goodPath, compileRealityToBytecode('reality Good { facet valid : Truth = true }'));
+    fs.writeFileSync(sourcePath, `#include <string.h>
+#include "rclvm.h"
+int main(int argc, char **argv) {
+  char error[1024] = {0};
+  if (argc != 3) return 9;
+  if (!rclvm_version() || strcmp(rclvm_version(), "${componentVersion}") != 0) return 10;
+  if (rclvm_validate_bytecode(NULL, 0, error, sizeof(error)) != 0) return 11;
+  RclVmInstance *vm = rclvm_instance_create();
+  if (!vm) return 12;
+  if (rclvm_instance_get_last_error_json(vm) != NULL) return 13;
+  for (int i = 0; i < 10; i++) {
+    if (!rclvm_instance_load_file(vm, argv[1], error, sizeof(error))) return 14;
+    if (rclvm_instance_run(vm, 1, NULL, error, sizeof(error))) return 15;
+    char *snapshot = rclvm_instance_get_last_error_json(vm);
+    if (!snapshot || !strstr(snapshot, "RCL_LIFECYCLE") || !strstr(snapshot, "rcl.semantic-diagnostic.v1")) return 16;
+    rclvm_free_string(snapshot);
+    if (!rclvm_instance_reset(vm, 1) || rclvm_instance_get_last_error_json(vm) != NULL) return 17;
+    if (!rclvm_instance_load_file(vm, argv[2], error, sizeof(error))) return 18;
+    if (!rclvm_instance_run(vm, 1, NULL, error, sizeof(error))) return 19;
+    if (rclvm_instance_get_last_error_json(vm) != NULL) return 20;
+  }
+  rclvm_instance_destroy(vm);
+  return 0;
+}
+`);
     const compile = spawnSync(zig, [
       'cc', '-target', 'x86_64-windows-gnu', '-std=c11', '-DRCLVM_USE_DLL',
       `-I${path.join(ROOT, 'native')}`,
@@ -340,7 +368,7 @@ test('Windows rclvm DLL supports an external import-library link and runtime loa
       },
     });
     assert.equal(compile.status, 0, compile.stderr || compile.stdout);
-    const run = spawnSync(executablePath, [], {
+    const run = spawnSync(executablePath, [badPath, goodPath], {
       encoding: 'utf8',
       timeout: 60_000,
       env: { ...process.env, PATH: `${path.join(ROOT, 'native')};${process.env.PATH ?? ''}` },

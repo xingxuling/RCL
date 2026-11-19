@@ -65,8 +65,26 @@ RCLVM_API int rclvm_instance_load_file(RclVmInstance *instance, const char *path
 RCLVM_API int rclvm_instance_register_provider(RclVmInstance *instance, const RclVmProviderV1 *provider, char *error, size_t error_capacity);
 RCLVM_API int rclvm_instance_run(RclVmInstance *instance, int reset_state, char **result_json, char *error, size_t error_capacity);
 RCLVM_API int rclvm_instance_session_initialize(RclVmInstance *instance, char **result_json, char *error, size_t error_capacity);
+/* Read exact scalar Number sign evidence without advancing the session.
+ * The semantic state root and the source root identify the sampled state. */
+RCLVM_API int rclvm_instance_session_scalar_evidence(RclVmInstance *instance,
+  char **result_json, char *error, size_t error_capacity);
+/* Restore all scalar facets after INIT, before the first STEP. Hosts authenticate
+ * the checkpoint and source separately. The VM checks the staged state root
+ * against the caller's already trusted root before replacing any facet. */
+RCLVM_API int rclvm_instance_session_restore_scalars(RclVmInstance *instance, const char *expected_root,
+  const RclVmInputV1 *facets, size_t facet_count, char **result_json, char *error, size_t error_capacity);
+/* RCP1 evidence carries exact Number bits, Text bytes and nested Sequences.
+ * The restore frame uses the same bounded format and pre-STEP phase. */
+RCLVM_API int rclvm_instance_session_sequence_evidence(RclVmInstance *instance,
+  char **result_json, char *error, size_t error_capacity);
+RCLVM_API int rclvm_instance_session_restore_sequence(RclVmInstance *instance, const char *expected_root,
+  const uint8_t *bytes, size_t length, char **result_json, char *error, size_t error_capacity);
 RCLVM_API int rclvm_instance_session_step(RclVmInstance *instance, const char *rule, int realize,
   const RclVmInputV1 *inputs, size_t input_count, char **result_json, char *error, size_t error_capacity);
+/* Optional error snapshot; free a non-NULL result with rclvm_free_string.
+ * Returns NULL after success/reset or before any error. Does not execute code. */
+RCLVM_API char *rclvm_instance_get_last_error_json(RclVmInstance *instance);
 RCLVM_API int rclvm_instance_reset(RclVmInstance *instance, int clear_state);
 RCLVM_API int rclvm_instance_get_state_text(
   RclVmInstance *instance,

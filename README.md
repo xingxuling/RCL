@@ -100,7 +100,7 @@ The implementation carrying build identity 2.0.0 makes a program callable across
 
 In the original 2.0 counter comparison, 50 calls through the v1.0 daemon's default `RUN` profile each finish at **1**; 50 v2.0 session calls retain state and finish at **50**. Warm native API invocation p95 was about **3 ms**, including IPC and independent root verification, for that source snapshot. This historical measurement excludes durable journal writes and is not a fresh benchmark of later maintenance. See the [verification record](docs/v2.0/verification.json) and [session acceptance](docs/v2.0/acceptance.md).
 
-The durable profile covers local cooperative writers and pure RCL rules. Journals are bounded to 64 MiB / 10,000 accepted commands. Provider effects, distributed exactly-once execution and hardware power-loss recovery are outside that profile. Full details and caller-authentication responsibilities are in the [session contract](docs/v2.0/session-contract.md).
+The durable profile covers local cooperative writers and pure RCL rules. Each journal segment is bounded to 64 MiB / 10,000 accepted commands. The scalar checkpoint candidate retains up to four archived segments and replays the active segment on reopen. Full details and caller-authentication responsibilities are in the [session contract](docs/v2.0/session-contract.md).
 
 **2026-10-12 maintenance, still 2.0.0:** invalid native evidence now closes the session and its durable writer; queued requests capture the caller's original values; the CLI exposes trusted history pins and rejects invalid flags; repeated alterations produce matching native/reference receipts. [The maintenance record](docs/maintenance/session-integrity-2026-10-12.md) binds **61 passing focused checks**, including 37 session checks, to the updated source. No GitHub Actions were run.
 
@@ -222,6 +222,12 @@ node src/reality-hub-cli.mjs session verify ./counter-state --reference
 The first invocation sets the counter to `3`. The identical retry reports `replayed: true` and leaves the journal at revision `1`. For a new command, choose a new `requestId` and the current `expectedRevision`; see the [command example](examples/sessions/increment-command.json).
 
 Session commands require the native daemon and compiler. The verified Windows source includes prebuilt tools bound to their source bytes; rebuild changed native sources with `npm run build:native`. Unix builds use the prerequisites described above; fresh 2.0 Linux execution has not been verified.
+
+An opt-in `--state-root-v3-candidate` session profile preserves AST literal
+spelling in its state root. Use the flag on each native session command for that
+candidate journal. Existing v2 journals remain the default and are not upgraded.
+The [candidate notes](docs/maintenance/semantic-state-root-v3-candidate-2026-11-13.md)
+describe replay, backup, history and evidence limits.
 
 ### 5. Continue learning
 

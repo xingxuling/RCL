@@ -1,9 +1,9 @@
 import {createHash} from 'node:crypto';
 import {compileNativeUiForExecution} from './native-event-lowering.mjs';
 import {collectUiNodes} from './ui-compiler.mjs';
-import {lowerNativeUiToAndroid,emitNativeUiAndroidActivity} from './android-ui-backend.mjs';
+import {androidLayoutParameterNames,androidViewFieldName,lowerNativeUiToAndroid,emitNativeUiAndroidActivity} from './android-ui-backend.mjs';
 const sha=s=>createHash('sha256').update(s).digest('hex');
-const javaId=id=>id.replace(/[^A-Za-z0-9_$]/gu,'_');
+const javaNamePattern=name=>name.replaceAll('$',()=>String.raw`\$`);
 const dp=n=>/^\d+$/u.test(String(n))?'dp('+n+')':String(n);
 /** Native Android Views share the canonical layout; only RCL computes state. */
 export function emitNativeUiAndroidBridge(source,{applicationId='org.rcl.k400.mobile',activity='MainActivity'}={}){
@@ -14,11 +14,12 @@ export function emitNativeUiAndroidBridge(source,{applicationId='org.rcl.k400.mo
   let body=build.replace(/\.setPadding\((\d+), (\d+), (\d+), (\d+)\)/gu,(_m,...v)=>'.setPadding('+v.slice(0,4).map(dp).join(', ')+')')
     .replace(/\.setMargins\((\d+), (\d+), (\d+), (\d+)\)/gu,(_m,...v)=>'.setMargins('+v.slice(0,4).map(dp).join(', ')+')')
     .replace(/new LinearLayout\.LayoutParams\(([^,\n]+), ([^)\n]+)\)/gu,(_m,w,h)=>'new LinearLayout.LayoutParams('+dp(w)+', '+dp(h)+')');
+  const layoutParameterNames=androidLayoutParameterNames(ui.viewTree);
   for(const parent of nodes.filter(n=>n.role==='container'&&n.layout.mode==='horizontal'))for(const child of parent.children.filter(n=>n.layout.width.mode==='fill')){
-    const variable='params_'+javaId(parent.id)+'_'+javaId(child.id),pattern=new RegExp('(LinearLayout\\.LayoutParams '+variable+' = )new LinearLayout\\.LayoutParams\\((?:ViewGroup.LayoutParams.MATCH_PARENT|-1), (.+?)\\);','u');
+    const variable=javaNamePattern(layoutParameterNames.get(child.id)),pattern=new RegExp('(LinearLayout\\.LayoutParams '+variable+' = )new LinearLayout\\.LayoutParams\\((?:ViewGroup.LayoutParams.MATCH_PARENT|-1), (.+?)\\);','u');
     body=body.replace(pattern,(_m,p,h)=>p+'new LinearLayout.LayoutParams(0, '+h+', 1f);');
   }
-  for(const n of nodes){const variable='view_'+javaId(n.id),pattern=new RegExp('('+variable+' = new [A-Za-z]+\\(this\\);)','u');if(!pattern.test(body))throw new Error('RCL_MOBILE_NODE_LAYOUT_MISSING:'+n.id);body=body.replace(pattern,'$1\n    views.put('+JSON.stringify(n.id)+', '+variable+'); '+variable+'.setTag('+JSON.stringify(n.id)+');');}
+  for(const n of nodes){const variable=androidViewFieldName(n),pattern=new RegExp('('+javaNamePattern(variable)+' = new [A-Za-z]+\\(this\\);)','u');if(!pattern.test(body))throw new Error('RCL_MOBILE_NODE_LAYOUT_MISSING:'+n.id);body=body.replace(pattern,(_m,create)=>create+'\n    views.put('+JSON.stringify(n.id)+', '+variable+'); '+variable+'.setTag('+JSON.stringify(n.id)+');');}
   const layoutRoot=sha(JSON.stringify({tree:ui.viewTree,mappings:manifest.nodeMappings}));
   const java=`package ${applicationId};
 import android.app.Activity;

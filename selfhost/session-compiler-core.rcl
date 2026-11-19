@@ -1,7 +1,7 @@
   reckon session_directives(rules : Sequence, index : Number, output : Sequence) -> Sequence =
     choose(index >= length(rules), output,
       session_directives(rules, index + 1,
-        sequence_append(sequence_append(output, make_directive("Realize", rule_name(sequence_get(rules, index)))), make_directive("Foresee", rule_name(sequence_get(rules, index))))))
+        sequence_append(sequence_append(output, make_directive("Realize", rule_name(sequence_get(rules, index)), rule_span(sequence_get(rules, index)))), make_directive("Foresee", rule_name(sequence_get(rules, index)), rule_span(sequence_get(rules, index))))))
 
   reckon session_pool_program(program : Sequence) -> Sequence =
     make_program(program_name(program), program_facets(program), program_reckons(program), program_subjects(program), program_warrants(program), program_rules(program),
@@ -23,9 +23,12 @@
     facet_instruction_count(program_facets(program), 0, 0) + session_input_count(program_facets(program), 0, 0) + 1
       + session_entry_count(session_directives(program_rules(program), 0, empty_sequence()), 0, program, 0)
 
+  reckon build_session_instructions(program : Sequence, strings : Sequence, numbers : Sequence) -> Sequence =
+    build_session_instructions_indexed(program, emission_context(strings, program_reckons(program)), numbers)
+
   reckon emit_session_facet(node : Sequence, program : Sequence, strings : Sequence, numbers : Sequence, start : Number) -> Sequence =
-    append_all(choose(facet_input(node), one_instruction(46, find_text(strings, 0, facet_path(node)), session_input_type(facet_type(node)), 0), empty_sequence()),
-      append_all(one_instruction(5, find_text(strings, 0, facet_path(node)), 0, 0),
+    append_all(choose(facet_input(node), one_instruction(46, emission_string(strings, facet_path(node)), session_input_type(facet_type(node)), 0), empty_sequence()),
+      append_all(one_instruction(5, emission_string(strings, facet_path(node)), 0, 0),
         emit_expression(facet_expression(node), empty_sequence(), program_reckons(program), strings, numbers, session_main_count(program), start)))
 
   reckon emit_session_facets(items : Sequence, index : Number, program : Sequence, strings : Sequence, numbers : Sequence, output : Sequence) -> Sequence =
@@ -38,14 +41,14 @@
       append_all(emit_rule_invocation(find_rule(program_rules(program), 0, directive_name(node)), choose(directive_kind(node) == "Realize", 1, 0),
           program_reckons(program), strings, numbers, session_main_count(program), start + 1 + dynamic_warrant_count(program_warrants(program), 0, 1)),
         append_all(emit_warrant_refresh(program_warrants(program), program_reckons(program), strings, numbers, session_main_count(program), start + 1),
-          one_instruction(45, find_text(strings, 0, directive_name(node)), choose(directive_kind(node) == "Realize", 1, 0), 0))))
+          one_instruction(45, emission_string(strings, directive_name(node)), choose(directive_kind(node) == "Realize", 1, 0), 0))))
 
   reckon emit_session_entries(items : Sequence, index : Number, program : Sequence, strings : Sequence, numbers : Sequence, output : Sequence) -> Sequence =
     choose(index >= length(items), output,
       emit_session_entries(items, index + 1, program, strings, numbers,
         append_all(emit_session_entry(sequence_get(items, index), program, strings, numbers, length(output)), output)))
 
-  reckon build_session_instructions(program : Sequence, strings : Sequence, numbers : Sequence) -> Sequence =
+  reckon build_session_instructions_indexed(program : Sequence, strings : Sequence, numbers : Sequence) -> Sequence =
     append_all(emit_reckons(program_reckons(program), 0, program_reckons(program), strings, numbers, session_main_count(program), session_main_count(program), empty_sequence()),
       emit_session_entries(session_directives(program_rules(program), 0, empty_sequence()), 0, program, strings, numbers,
         append_all(one_instruction(31, 0, 0, 0), emit_session_facets(program_facets(program), 0, program, strings, numbers, empty_sequence()))))
@@ -55,12 +58,13 @@
       choose(semantic_check_at((facet_type(sequence_get(items, index)) == "Number" or facet_type(sequence_get(items, index)) == "Truth" or facet_type(sequence_get(items, index)) == "Text"
           or (facet_type(sequence_get(items, index)) == "Sequence" and not facet_input(sequence_get(items, index)))),
           "RCL_SESSION_FACET_TYPE_UNSUPPORTED", facet_path(sequence_get(items, index)),
-          make_span(0, facet_line(sequence_get(items, index)), facet_column(sequence_get(items, index)), 0)), validate_session_facets(items, index + 1), false))
+          facet_span(sequence_get(items, index))), validate_session_facets(items, index + 1), false))
 
   reckon validate_session_rule_effects(items : Sequence, index : Number) -> Truth =
     choose(index >= length(items), true,
-      choose(semantic_check(length(rule_calls(sequence_get(items, index))) == 0, "RCL_SESSION_EXTERNAL_EFFECT_UNSUPPORTED", rule_name(sequence_get(items, index))),
-        validate_session_rule_effects(items, index + 1), false))
+      choose(length(rule_calls(sequence_get(items, index))) == 0, validate_session_rule_effects(items, index + 1),
+        semantic_check_at(false, "RCL_SESSION_EXTERNAL_EFFECT_UNSUPPORTED", rule_name(sequence_get(items, index)),
+          rule_call_span(sequence_get(rule_calls(sequence_get(items, index)), 0)))))
 
   reckon session_expression_list_pure(items : Sequence, index : Number) -> Truth =
     choose(index >= length(items), true,

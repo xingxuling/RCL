@@ -21,8 +21,9 @@ function programFrom(sourceOrProgram) {
 
 function normalizeCapabilityPolicy(policyDecl) {
   if (!policyDecl) return null;
-  const budget = {};
-  for (const [key, value] of Object.entries(policyDecl.budget ?? {})) budget[BUDGET_KEY_MAP[key] ?? key] = value;
+  const budget = Object.fromEntries(Object.entries(policyDecl.budget ?? {}).map(([key, value]) => [
+    Object.hasOwn(BUDGET_KEY_MAP, key) ? BUDGET_KEY_MAP[key] : key, value,
+  ]));
   return {
     allowedEffects: policyDecl.allowedEffects.length ? [...policyDecl.allowedEffects] : null,
     deniedEffects: [...policyDecl.deniedEffects],

@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "rclvm.h"
+#include "identifier_profile.h"
+#include "number_format_ryu.h"
 
 #define RCL_VM_VERSION "2.0.0"
 #define INITIAL_STACK_CAPACITY 4096
@@ -190,7 +192,7 @@ struct Sequence {
   Value *tail;
 };
 struct Token { char *token_type; char *text; Span span; };
-struct AstNode { char *path; char *value_type; char *literal_kind; char *literal_text; Span span; };
+struct AstNode { char *path; char *value_type; char *literal_kind; char *literal_text; double literal_number; Span span; };
 struct ParseState { int64_t index; Sequence *nodes; };
 struct SymbolValue { char *path; char *value_type; int64_t slot; Span span; };
 struct SemanticNode { char *path; char *value_type; char *literal_kind; char *literal_text; int64_t slot; Span span; };
@@ -318,6 +320,9 @@ typedef struct {
 typedef struct {
   const char *code;
   char message[512];
+  char *diagnostic_code;
+  Span diagnostic_span;
+  int has_diagnostic;
 } VmError;
 
 typedef struct {
@@ -370,6 +375,7 @@ typedef struct {
   size_t capacity;
   int precise_numbers;
   int nonfinite_number;
+  int include_ast_literal_text;
 } StringBuilder;
 
 typedef struct {
@@ -381,12 +387,15 @@ typedef struct {
 } SharedString;
 
 static size_t utf8_decode_at(const char *text, size_t byte_length, size_t offset, uint32_t *codepoint, int *valid);
+static int parse_decimal_number(const char *text, const char **end, double *number);
+static char *canonical_number_text(double value);
 
 static void sb_init(StringBuilder *sb) {
   sb->capacity = 256;
   sb->length = 0;
   sb->precise_numbers = 0;
   sb->nonfinite_number = 0;
+  sb->include_ast_literal_text = 0;
   sb->data = (char *)malloc(sb->capacity);
   if (!sb->data) { fprintf(stderr, "out of memory\n"); exit(2); }
   sb->data[0] = '\0';
@@ -486,10 +495,12 @@ static Value value_token(const char *token_type, const char *text, const Span *s
   if (!v.token) { fprintf(stderr, "out of memory\n"); exit(2); }
   v.token->token_type = xstrdup(token_type); v.token->text = xstrdup(text); v.token->span = *span; return v;
 }
-static Value value_ast(const char *path, const char *value_type, const char *literal_kind, const char *literal_text, const Span *span) {
+static Value value_ast(const char *path, const char *value_type, const char *literal_kind, const char *literal_text, double literal_number, const Span *span) {
   Value v = value_null(); v.type = VALUE_AST; v.ast = (AstNode *)calloc(1, sizeof(AstNode));
   if (!v.ast) { fprintf(stderr, "out of memory\n"); exit(2); }
-  v.ast->path = xstrdup(path); v.ast->value_type = xstrdup(value_type); v.ast->literal_kind = xstrdup(literal_kind); v.ast->literal_text = xstrdup(literal_text); v.ast->span = *span; return v;
+  v.ast->path = xstrdup(path); v.ast->value_type = xstrdup(value_type);
+  v.ast->literal_kind = xstrdup(literal_kind); v.ast->literal_text = xstrdup(literal_text);
+  v.ast->literal_number = literal_number; v.ast->span = *span; return v;
 }
 
 static void value_free(Value *value);
@@ -766,7 +777,7 @@ static Value value_clone(const Value *value) {
     case VALUE_SEQUENCE: { Value v = value_null(); v.type = VALUE_SEQUENCE; v.sequence = sequence_clone(value->sequence); return v; }
     case VALUE_SPAN: return value_span(value->span->offset, value->span->line, value->span->column, value->span->length);
     case VALUE_TOKEN: return value_token(value->token->token_type, value->token->text, &value->token->span);
-    case VALUE_AST: return value_ast(value->ast->path, value->ast->value_type, value->ast->literal_kind, value->ast->literal_text, &value->ast->span);
+    case VALUE_AST: return value_ast(value->ast->path, value->ast->value_type, value->ast->literal_kind, value->ast->literal_text, value->ast->literal_number, &value->ast->span);
     case VALUE_PARSE_STATE: return value_parse_state(value->parse_state->index, value->parse_state->nodes);
     case VALUE_SYMBOL: return value_symbol(value->symbol->path, value->symbol->value_type, value->symbol->slot, &value->symbol->span);
     case VALUE_SEMANTIC: return value_semantic(value->semantic->path, value->semantic->value_type, value->semantic->literal_kind, value->semantic->literal_text, value->semantic->slot, &value->semantic->span);
@@ -789,10 +800,22 @@ static int value_truthy(const Value *value) {
   }
 }
 
+/* Error buffers are byte bounded; retain only a complete UTF-8 prefix. */
+static void trim_error_utf8(char *text) {
+  size_t length = strlen(text), offset = 0;
+  while (offset < length) {
+    uint32_t codepoint; int valid;
+    size_t width = utf8_decode_at(text, length, offset, &codepoint, &valid);
+    if (!width || !valid) { text[offset] = '\0'; return; }
+    offset += width;
+  }
+}
+
 static void vm_fail(VM *vm, const char *code, const char *message) {
   if (vm->error.code) return;
   vm->error.code = code;
   snprintf(vm->error.message, sizeof(vm->error.message), "%s", message);
+  trim_error_utf8(vm->error.message);
 }
 
 static TypedHeapEntry *typed_heap_find(VM *vm, uint64_t object_id) {
@@ -1055,6 +1078,7 @@ static const char *native_state_root_algorithm(void) {
   }
   if (strcmp(algorithm, "rcl.semantic-state-root.v1") == 0) return "rcl.semantic-state-root.v1";
   if (strcmp(algorithm, "rcl.semantic-state-root.v2") == 0) return "rcl.semantic-state-root.v2";
+  if (strcmp(algorithm, "rcl.semantic-state-root.v3-candidate") == 0) return "rcl.semantic-state-root.v3-candidate";
 #ifdef RCL_SEMANTIC_ROOT_V2_CANDIDATE
   if (strcmp(algorithm, "rcl.semantic-state-root.v2-candidate") == 0) return "rcl.semantic-state-root.v2-candidate";
 #endif
@@ -1078,13 +1102,25 @@ static void sequence_json_sb(StringBuilder *sb, const Sequence *sequence) {
   sb_append_char(sb, ']');
 }
 
+static void number_json_sb(StringBuilder *sb, double value) {
+  if (!isfinite(value)) { sb->nonfinite_number = 1; sb_append(sb, "null"); return; }
+  if (value == 0.0) { sb_append(sb, "0"); return; }
+  if (sb->precise_numbers) {
+    char *precise = canonical_number_text(value);
+    if (!precise) { sb->nonfinite_number = 1; sb_append(sb, "null"); return; }
+    sb_append(sb, precise);
+    free(precise);
+  } else {
+    char number[64];
+    snprintf(number, sizeof(number), "%.15g", value);
+    sb_append(sb, number);
+  }
+}
+
 static void value_json_sb(StringBuilder *sb, const Value *value) {
   char number[64];
   switch (value->type) {
-    case VALUE_NUMBER:
-      if (!isfinite(value->number)) { sb->nonfinite_number = 1; sb_append(sb, "null"); break; }
-      if (value->number == 0.0) { sb_append(sb, "0"); break; }
-      snprintf(number, sizeof(number), sb->precise_numbers ? "%.17g" : "%.15g", value->number); sb_append(sb, number); break;
+    case VALUE_NUMBER: number_json_sb(sb, value->number); break;
     case VALUE_BOOL: sb_append(sb, value->boolean ? "true" : "false"); break;
     case VALUE_STRING: json_escape_sb(sb, value->string); break;
     case VALUE_SEQUENCE: sequence_json_sb(sb, value->sequence); break;
@@ -1096,10 +1132,12 @@ static void value_json_sb(StringBuilder *sb, const Value *value) {
       sb_append(sb, "{\"kind\":\"FacetDecl\",\"path\":"); json_escape_sb(sb, value->ast->path);
       sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, value->ast->value_type);
       sb_append(sb, ",\"value\":{\"kind\":\"LiteralExpr\",\"value\":");
-      if (strcmp(value->ast->literal_kind, "Number") == 0) { double n = strtod(value->ast->literal_text, NULL); if (!isfinite(n)) sb->nonfinite_number = 1; snprintf(number, sizeof(number), sb->precise_numbers ? "%.17g" : "%.15g", n); sb_append(sb, number); }
+      if (strcmp(value->ast->literal_kind, "Number") == 0) number_json_sb(sb, value->ast->literal_number);
       else if (strcmp(value->ast->literal_kind, "Truth") == 0) sb_append(sb, strcmp(value->ast->literal_text, "true") == 0 ? "true" : "false");
       else json_escape_sb(sb, value->ast->literal_text);
-      sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, value->ast->literal_kind); sb_append(sb, "},\"span\":"); span_json_sb(sb, &value->ast->span); sb_append_char(sb, '}'); break;
+      sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, value->ast->literal_kind); sb_append(sb, "},\"span\":"); span_json_sb(sb, &value->ast->span);
+      if (sb->include_ast_literal_text) { sb_append(sb, ",\"literalText\":"); json_escape_sb(sb, value->ast->literal_text); }
+      sb_append_char(sb, '}'); break;
     }
     case VALUE_PARSE_STATE:
       sb_append(sb, "{\"kind\":\"ParseState\",\"index\":"); snprintf(number, sizeof(number), "%" PRId64, value->parse_state->index); sb_append(sb, number);
@@ -1188,9 +1226,8 @@ static void semantic_sequence_json_sb(StringBuilder *sb, const Sequence *sequenc
 }
 
 static void semantic_literal_expr_json_sb(StringBuilder *sb, const AstNode *ast) {
-  char number[64];
   sb_append(sb, "{\"kind\":\"LiteralExpr\",\"value\":");
-  if (strcmp(ast->literal_kind, "Number") == 0) { double n = strtod(ast->literal_text, NULL); if (!isfinite(n)) sb->nonfinite_number = 1; snprintf(number, sizeof(number), sb->precise_numbers ? "%.17g" : "%.15g", n); sb_append(sb, number); }
+  if (strcmp(ast->literal_kind, "Number") == 0) number_json_sb(sb, ast->literal_number);
   else if (strcmp(ast->literal_kind, "Truth") == 0) sb_append(sb, strcmp(ast->literal_text, "true") == 0 ? "true" : "false");
   else json_escape_sb(sb, ast->literal_text);
   sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, ast->literal_kind); sb_append_char(sb, '}');
@@ -1205,7 +1242,9 @@ static void semantic_ast_json_sb(StringBuilder *sb, const AstNode *ast) {
   sb_append(sb, "{\"kind\":\"FacetDecl\",\"path\":"); json_escape_sb(sb, ast->path);
   sb_append(sb, ",\"span\":"); semantic_span_json_sb(sb, &ast->span);
   sb_append(sb, ",\"value\":"); semantic_literal_expr_json_sb(sb, ast);
-  sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, ast->value_type); sb_append_char(sb, '}');
+  sb_append(sb, ",\"valueType\":"); json_escape_sb(sb, ast->value_type);
+  if (sb->include_ast_literal_text) { sb_append(sb, ",\"literalText\":"); json_escape_sb(sb, ast->literal_text); }
+  sb_append_char(sb, '}');
 }
 
 static void semantic_parse_state_json_sb(StringBuilder *sb, const ParseState *parse_state) {
@@ -1422,7 +1461,9 @@ cleanup:
 #endif
 }
 
+#define RCL_SEMANTIC_STATE_EXACT_DECIMAL
 #include "semantic_state_v2.h"
+#undef RCL_SEMANTIC_STATE_EXACT_DECIMAL
 
 static int state_root_v2(const State *state, char output[65], const char **error) {
   StringBuilder json, canonical;
@@ -1441,6 +1482,32 @@ static int state_root_v2(const State *state, char output[65], const char **error
     output[64] = '\0';
   }
   free(json.data); free(canonical.data);
+  return ok;
+}
+
+static int state_root_v3_candidate(const State *state, char output[65], const char **error) {
+  StringBuilder json, canonical, domain;
+  sb_init(&json); sb_init(&canonical); sb_init(&domain);
+  json.precise_numbers = 1;
+  json.include_ast_literal_text = 1;
+  semantic_state_json_sb(&json, state);
+  int ok = !json.nonfinite_number;
+  if (!ok) *error = "Finite binary64 state required";
+  if (ok) ok = root_v2_canonical_json(json.data, &canonical, error);
+  unsigned char digest[RCL_SHA256_DIGEST_LENGTH];
+  if (ok) {
+    const char *tag = "rcl.semantic-state-root.v3-candidate";
+    sb_append_n(&domain, tag, strlen(tag) + 1);
+    sb_append_n(&domain, canonical.data, canonical.length);
+    if (!rcl_sha256((const unsigned char *)domain.data, domain.length, digest)) {
+      *error = "SHA256 calculation failed"; ok = 0;
+    }
+  }
+  if (ok) {
+    for (int i = 0; i < RCL_SHA256_DIGEST_LENGTH; i++) snprintf(output + i * 2, 3, "%02x", digest[i]);
+    output[64] = '\0';
+  }
+  free(json.data); free(canonical.data); free(domain.data);
   return ok;
 }
 
@@ -1463,7 +1530,13 @@ static int selected_state_root(VM *vm, const State *state, char output[65]) {
     vm_fail(vm, "RCL_NATIVE_STATE_ROOT_ALGORITHM_MISMATCH", "Semantic state root algorithm was not initialized");
     return 0;
   }
-  if (strcmp(vm->state_root_algorithm, "rcl.semantic-state-root.v2") == 0) {
+  if (strcmp(vm->state_root_algorithm, "rcl.semantic-state-root.v3-candidate") == 0) {
+    const char *error = NULL;
+    if (!state_root_v3_candidate(state, output, &error)) {
+      vm_fail(vm, "RCL_NATIVE_STATE_ROOT_V3_INVALID", error ? error : "Invalid v3 candidate semantic state");
+      return 0;
+    }
+  } else if (strcmp(vm->state_root_algorithm, "rcl.semantic-state-root.v2") == 0) {
     const char *error = NULL;
     if (!state_root_v2(state, output, &error)) {
       vm_fail(vm, "RCL_NATIVE_STATE_ROOT_V2_INVALID", error ? error : "Invalid v2 semantic state");
@@ -1768,72 +1841,29 @@ static void free_string_array(char **items, size_t count) {
   free(items);
 }
 
-static int same_double_bits(double left, double right) {
-  uint64_t left_bits = 0, right_bits = 0;
-  memcpy(&left_bits, &left, sizeof(left_bits));
-  memcpy(&right_bits, &right, sizeof(right_bits));
-  return left_bits == right_bits;
-}
-
-static int shortest_roundtrip_candidate(double value, char *output, size_t output_size) {
-  char candidate[96];
-  for (int precision = 1; precision <= 17; precision++) {
-    int written = snprintf(candidate, sizeof(candidate), "%.*g", precision, value);
-    if (written <= 0 || (size_t)written >= sizeof(candidate)) continue;
-    char *end = NULL;
-    errno = 0;
-    double parsed = strtod(candidate, &end);
-    if (errno == 0 && end && *end == '\0' && same_double_bits(parsed, value)) {
-      if ((size_t)written + 1 > output_size) return 0;
-      memcpy(output, candidate, (size_t)written + 1);
-      return 1;
-    }
-  }
-  int written = snprintf(candidate, sizeof(candidate), "%.17g", value);
-  if (written <= 0 || (size_t)written >= sizeof(candidate) || (size_t)written + 1 > output_size) return 0;
-  memcpy(output, candidate, (size_t)written + 1);
-  return 1;
-}
-
 static char *canonical_number_text(double value) {
   if (isnan(value)) return xstrdup("NaN");
   if (isinf(value)) return xstrdup(signbit(value) ? "-Infinity" : "Infinity");
   if (value == 0.0) return xstrdup("0");
 
-  char candidate[96];
-  if (!shortest_roundtrip_candidate(value, candidate, sizeof(candidate))) return NULL;
+  char candidate[32];
+  int candidate_length = rcl_ryu_double(value, candidate);
+  candidate[candidate_length] = '\0';
 
   const char *cursor = candidate;
   int negative = 0;
   if (*cursor == '-') { negative = 1; cursor++; }
 
-  const char *exponent_marker = strchr(cursor, 'e');
-  if (!exponent_marker) exponent_marker = strchr(cursor, 'E');
-  char digits[96];
+  const char *exponent_marker = strchr(cursor, 'E');
+  if (!exponent_marker) return NULL;
+  char digits[24];
   size_t digit_count = 0;
-  int k = 0;
-
-  if (exponent_marker) {
-    for (const char *item = cursor; item < exponent_marker; item++) {
-      if (*item >= '0' && *item <= '9') digits[digit_count++] = *item;
-    }
-    k = 1 + atoi(exponent_marker + 1);
-  } else {
-    const char *dot = strchr(cursor, '.');
-    size_t integer_digits = dot ? (size_t)(dot - cursor) : strlen(cursor);
-    for (const char *item = cursor; *item; item++) {
-      if (*item >= '0' && *item <= '9') digits[digit_count++] = *item;
-    }
-    k = (int)integer_digits;
-    size_t leading = 0;
-    while (leading < digit_count && digits[leading] == '0') { leading++; k--; }
-    if (leading > 0 && leading < digit_count) {
-      memmove(digits, digits + leading, digit_count - leading);
-      digit_count -= leading;
-    }
+  for (const char *item = cursor; item < exponent_marker; item++) {
+    if (*item != '.') digits[digit_count++] = *item;
   }
-  while (digit_count > 1 && digits[digit_count - 1] == '0') digit_count--;
-  digits[digit_count] = '\0';
+  // Ryu supplies shortest digits in exponent form. Select the reference
+  // language's notation without another rounding step.
+  int k = 1 + atoi(exponent_marker + 1);
 
   char buffer[160];
   size_t offset = 0;
@@ -1933,16 +1963,273 @@ static char *ascii_case(const char *source, int upper) {
   return result;
 }
 
+static int rcl_text_whitespace(uint32_t codepoint) {
+  return (codepoint >= 0x09 && codepoint <= 0x0D) || codepoint == 0x20
+    || codepoint == 0xA0 || codepoint == 0x1680
+    || (codepoint >= 0x2000 && codepoint <= 0x200A)
+    || codepoint == 0x2028 || codepoint == 0x2029 || codepoint == 0x202F
+    || codepoint == 0x205F || codepoint == 0x3000 || codepoint == 0xFEFF;
+}
+
+static size_t whitespace_width_at(const char *source, size_t length, size_t offset) {
+  unsigned char first = (unsigned char)source[offset];
+  if (first < 0x80) return rcl_text_whitespace(first) ? 1 : 0;
+  uint32_t codepoint;
+  int valid;
+  size_t width = utf8_decode_at(source, length, offset, &codepoint, &valid);
+  return valid && rcl_text_whitespace(codepoint) ? width : 0;
+}
+
 static char *trim_copy(const char *source) {
-  const char *start = source;
-  while (*start && isspace((unsigned char)*start)) start++;
-  const char *end = source + strlen(source);
-  while (end > start && isspace((unsigned char)end[-1])) end--;
-  size_t length = (size_t)(end - start);
+  size_t start = 0, end = strlen(source), width;
+  while (start < end && (width = whitespace_width_at(source, end, start)) != 0) start += width;
+  while (end > start) {
+    size_t last = end - 1;
+    while (last > start && ((unsigned char)source[last] & 0xC0) == 0x80) last--;
+    if (whitespace_width_at(source, end, last) != end - last) break;
+    end = last;
+  }
+  size_t length = end - start;
   char *result = (char *)malloc(length + 1);
   if (!result) { fprintf(stderr, "out of memory\n"); exit(2); }
-  memcpy(result, start, length); result[length] = '\0';
+  memcpy(result, source + start, length); result[length] = '\0';
   return result;
+}
+
+static int ascii_decimal_digit(char c) { return c >= '0' && c <= '9'; }
+
+static const char *decimal_spelling_end(const char *text) {
+  const char *cursor = text;
+  if (*cursor == '+' || *cursor == '-') cursor++;
+  const char *digits = cursor;
+  while (ascii_decimal_digit(*cursor)) cursor++;
+  int has_digits = cursor != digits;
+  if (*cursor == '.') {
+    digits = ++cursor;
+    while (ascii_decimal_digit(*cursor)) cursor++;
+    has_digits = has_digits || cursor != digits;
+  }
+  if (!has_digits) return NULL;
+  if (*cursor == 'e' || *cursor == 'E') {
+    cursor++;
+    if (*cursor == '+' || *cursor == '-') cursor++;
+    digits = cursor;
+    while (ascii_decimal_digit(*cursor)) cursor++;
+    if (cursor == digits) return NULL;
+  }
+  return cursor;
+}
+
+static int radix_digit(char c) {
+  if (ascii_decimal_digit(c)) return c - '0';
+  if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+  if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+  return -1;
+}
+
+static int radix_integer_number(const char *digits, int digit_bits, double *number) {
+  if (!*digits) return 0;
+  uint64_t significand = 0;
+  int bit_count = 0, round_bit = 0, sticky_bit = 0;
+  for (; *digits; digits++) {
+    int digit = radix_digit(*digits);
+    if (digit < 0 || digit >= (1 << digit_bits)) return 0;
+    for (int shift = digit_bits - 1; shift >= 0; shift--) {
+      int bit = (digit >> shift) & 1;
+      if (!bit_count && !bit) continue;
+      bit_count++;
+      if (bit_count <= 53) significand = (significand << 1) | (uint64_t)bit;
+      else if (bit_count == 54) round_bit = bit;
+      else sticky_bit |= bit;
+      if (bit_count > 1024) return 0;
+    }
+  }
+  // Round once from the exact integer using the first discarded bit and all
+  // later bits. Rounding at each digit would lose information on large values.
+  if (round_bit && (sticky_bit || (significand & 1))) significand++;
+  *number = bit_count <= 53 ? (double)significand : ldexp((double)significand, bit_count - 53);
+  return isfinite(*number);
+}
+
+// Every binary64 rounding midpoint has fewer than 800 significant decimal
+// digits. Keep that prefix and a sticky bit for any discarded suffix. With
+// -323 <= positions <= 309, the operands after alignment fit in 4096 bits.
+enum { DECIMAL_PREFIX_DIGITS = 800, DECIMAL_INTEGER_WORDS = 128 };
+typedef struct {
+  uint32_t words[DECIMAL_INTEGER_WORDS];
+  size_t used;
+} DecimalInteger;
+
+static void decimal_integer_multiply(DecimalInteger *value, uint32_t factor, uint32_t addend) {
+  uint64_t carry = addend;
+  for (size_t i = 0; i < value->used; i++) {
+    carry += (uint64_t)value->words[i] * factor;
+    value->words[i] = (uint32_t)carry;
+    carry >>= 32;
+  }
+  if (carry) value->words[value->used++] = (uint32_t)carry;
+}
+
+static int decimal_integer_bits(const DecimalInteger *value) {
+  if (!value->used) return 0;
+  int bits = (int)(value->used - 1) * 32;
+  for (uint32_t word = value->words[value->used - 1]; word; word >>= 1) bits++;
+  return bits;
+}
+
+static int decimal_integer_compare(const DecimalInteger *left, const DecimalInteger *right) {
+  if (left->used != right->used) return left->used < right->used ? -1 : 1;
+  for (size_t i = left->used; i > 0; i--) {
+    if (left->words[i - 1] != right->words[i - 1]) return left->words[i - 1] < right->words[i - 1] ? -1 : 1;
+  }
+  return 0;
+}
+
+static void decimal_integer_shift(DecimalInteger *value, int shift) {
+  if (!value->used || !shift) return;
+  size_t words = (size_t)shift / 32;
+  if (words) {
+    memmove(value->words + words, value->words, value->used * sizeof(uint32_t));
+    memset(value->words, 0, words * sizeof(uint32_t));
+    value->used += words;
+  }
+  uint32_t factor = UINT32_C(1) << (shift % 32);
+  if (factor != 1) decimal_integer_multiply(value, factor, 0);
+}
+
+static void decimal_integer_halve(DecimalInteger *value) {
+  uint32_t carry = 0;
+  for (size_t i = value->used; i > 0; i--) {
+    uint32_t next = value->words[i - 1] << 31;
+    value->words[i - 1] = (value->words[i - 1] >> 1) | carry;
+    carry = next;
+  }
+  if (value->used && value->words[value->used - 1] == 0) value->used--;
+}
+
+static void decimal_integer_subtract(DecimalInteger *left, const DecimalInteger *right) {
+  uint64_t borrow = 0;
+  for (size_t i = 0; i < left->used; i++) {
+    uint64_t subtrahend = borrow + (i < right->used ? right->words[i] : 0);
+    uint64_t word = left->words[i];
+    left->words[i] = (uint32_t)(word - subtrahend);
+    borrow = word < subtrahend;
+  }
+  while (left->used && left->words[left->used - 1] == 0) left->used--;
+}
+
+static int decimal_ratio_exponent(const DecimalInteger *numerator, const DecimalInteger *denominator) {
+  int exponent = decimal_integer_bits(numerator) - decimal_integer_bits(denominator);
+  DecimalInteger aligned;
+  if (exponent >= 0) {
+    aligned = *denominator;
+    decimal_integer_shift(&aligned, exponent);
+    return exponent - (decimal_integer_compare(numerator, &aligned) < 0);
+  }
+  aligned = *numerator;
+  decimal_integer_shift(&aligned, -exponent);
+  return exponent - (decimal_integer_compare(&aligned, denominator) < 0);
+}
+
+static double decimal_ratio_round(DecimalInteger *numerator, const DecimalInteger *denominator, int exponent, int sticky) {
+  DecimalInteger divisor = *denominator;
+  int shift = decimal_integer_bits(numerator) - decimal_integer_bits(denominator);
+  uint64_t significand = 0;
+  if (shift >= 0) {
+    decimal_integer_shift(&divisor, shift);
+    for (; shift >= 0; shift--) {
+      significand <<= 1;
+      if (decimal_integer_compare(numerator, &divisor) >= 0) {
+        decimal_integer_subtract(numerator, &divisor);
+        significand |= 1;
+      }
+      decimal_integer_halve(&divisor);
+    }
+  }
+  decimal_integer_shift(numerator, 1);
+  int half = decimal_integer_compare(numerator, denominator);
+  if (half > 0 || (half == 0 && (sticky || (significand & 1)))) significand++;
+  if (exponent == 971 && significand == (UINT64_C(1) << 53)) return INFINITY;
+  return ldexp((double)significand, exponent);
+}
+
+static int64_t decimal_explicit_exponent(const char *text, const char *end) {
+  if (text == end) return 0;
+  text++; // Skip e or E after validation.
+  int negative = *text == '-';
+  if (negative || *text == '+') text++;
+  int64_t magnitude = 0;
+  for (; text != end; text++) {
+    // A Text value cannot contain enough digits to cancel this magnitude.
+    if (magnitude >= INT64_C(1000000000000)) break;
+    magnitude = magnitude * 10 + (*text - '0');
+  }
+  return negative ? -magnitude : magnitude;
+}
+
+static double decimal_number(const char *text, const char *end) {
+  int negative = *text == '-';
+  if (negative || *text == '+') text++;
+  DecimalInteger numerator = { {0}, 0 };
+  size_t retained = 0;
+  int fractional = 0, sticky = 0;
+  int64_t positions = 0;
+  for (; text != end && *text != 'e' && *text != 'E'; text++) {
+    if (*text == '.') { fractional = 1; continue; }
+    uint32_t digit = (uint32_t)(*text - '0');
+    if (fractional) positions--;
+    if (!retained && !digit) continue;
+    positions++;
+    if (retained < DECIMAL_PREFIX_DIGITS) {
+      decimal_integer_multiply(&numerator, 10, digit);
+      retained++;
+    } else if (digit) sticky = 1;
+  }
+  positions += decimal_explicit_exponent(text, end);
+  if (!retained || positions < -323) return negative ? -0.0 : 0.0;
+  if (positions > 309) return negative ? -INFINITY : INFINITY;
+  int power = (int)positions - (int)retained;
+  // Ordinary source integers avoid the division used by fractional literals.
+  if (power == 0 && retained <= 15) {
+    uint64_t scalar = numerator.words[0];
+    if (numerator.used > 1) scalar |= (uint64_t)numerator.words[1] << 32;
+    return negative ? -(double)scalar : (double)scalar;
+  }
+  DecimalInteger denominator = { {1}, 1 };
+  if (power < 0) {
+    for (int i = 0; i < -power; i++) decimal_integer_multiply(&denominator, 5, 0);
+  } else {
+    for (int i = 0; i < power; i++) decimal_integer_multiply(&numerator, 5, 0);
+  }
+  int exponent = power + decimal_ratio_exponent(&numerator, &denominator);
+  if (exponent > 1023) return negative ? -INFINITY : INFINITY;
+  int unit = exponent - 52;
+  if (unit < -1074) unit = -1074;
+  int shift = power - unit;
+  if (shift >= 0) decimal_integer_shift(&numerator, shift);
+  else decimal_integer_shift(&denominator, -shift);
+  double rounded = decimal_ratio_round(&numerator, &denominator, unit, sticky);
+  return negative ? -rounded : rounded;
+}
+
+static int parse_decimal_number(const char *text, const char **end, double *number) {
+  *end = decimal_spelling_end(text);
+  if (!*end) return 0;
+  *number = decimal_number(text, *end);
+  return isfinite(*number);
+}
+
+static int number_from_trimmed_text(const char *text, double *number) {
+  if (!*text) { *number = 0.0; return 1; }
+  if (text[0] == '0') {
+    switch (text[1]) {
+      case 'b': case 'B': return radix_integer_number(text + 2, 1, number);
+      case 'o': case 'O': return radix_integer_number(text + 2, 3, number);
+      case 'x': case 'X': return radix_integer_number(text + 2, 4, number);
+    }
+  }
+  const char *end;
+  return parse_decimal_number(text, &end, number) && *end == '\0';
 }
 
 static size_t utf8_decode_at(const char *text, size_t byte_length, size_t offset, uint32_t *codepoint, int *valid) {
@@ -2102,11 +2389,9 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
     }
     case BUILTIN_NUMBER_FROM_TEXT: {
       if (argc != 1 || args[0].type != VALUE_STRING) { vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "number_from_text expects Text"); break; }
-      char *trimmed = trim_copy(args[0].string), *end = NULL;
-      errno = 0;
-      double number = strtod(trimmed, &end);
-      while (end && *end && isspace((unsigned char)*end)) end++;
-      if (errno || !end || *end != '\0' || !isfinite(number)) vm_fail(vm, "RCL_TEXT_NUMBER_INVALID", "number_from_text could not parse a finite Number");
+      char *trimmed = trim_copy(args[0].string);
+      double number;
+      if (!number_from_trimmed_text(trimmed, &number)) vm_fail(vm, "RCL_TEXT_NUMBER_INVALID", "number_from_text could not parse a finite Number");
       else result = value_number(number);
       free(trimmed);
       break;
@@ -2165,12 +2450,12 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
       uint32_t codepoint = 0;
       int utf8_valid = 0;
       size_t width = utf8_decode_at(args[0].string, byte_length, 0, &codepoint, &utf8_valid);
-      unsigned char ch = codepoint < 0x80 ? (unsigned char)codepoint : 0;
       int matched = 0;
-      if (builtin == BUILTIN_IS_WHITESPACE) matched = ch && isspace(ch);
-      else if (builtin == BUILTIN_IS_DIGIT) matched = ch && isdigit(ch);
-      else if (builtin == BUILTIN_IS_IDENTIFIER_START) matched = width && ((ch && (isalpha(ch) || ch == '_')) || (utf8_valid && codepoint >= 0x80));
-      else matched = width && ((ch && (isalnum(ch) || ch == '_')) || (utf8_valid && codepoint >= 0x80));
+      /* ECMAScript whitespace, shared by scanning and identifier boundaries. */
+      if (builtin == BUILTIN_IS_WHITESPACE) matched = utf8_valid && width == byte_length && width != 0 && rcl_text_whitespace(codepoint);
+      else if (builtin == BUILTIN_IS_DIGIT) matched = utf8_valid && width == byte_length && width == 1 && codepoint >= 0x30 && codepoint <= 0x39;
+      else if (builtin == BUILTIN_IS_IDENTIFIER_START) matched = utf8_valid && width == byte_length && width != 0 && rcl_identifier_start(codepoint);
+      else matched = utf8_valid && width == byte_length && width != 0 && rcl_identifier_part(codepoint);
       result = value_bool(matched); break;
     }
     case BUILTIN_MAKE_SPAN:
@@ -2208,7 +2493,19 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
     case BUILTIN_FACET_AST:
       if (argc != 5 || args[0].type != VALUE_STRING || args[1].type != VALUE_STRING || args[2].type != VALUE_STRING || args[3].type != VALUE_STRING || args[4].type != VALUE_SPAN) vm_fail(vm, "RCL_NATIVE_BUILTIN_TYPE", "facet_ast expects four Text values and Span");
       else if (strcmp(args[2].string, "Number") != 0 && strcmp(args[2].string, "Truth") != 0 && strcmp(args[2].string, "Text") != 0) vm_fail(vm, "RCL_AST_LITERAL_KIND", "facet_ast literal kind must be Number, Truth or Text");
-      else result = value_ast(args[0].string, args[1].string, args[2].string, args[3].string, args[4].span);
+      else {
+        double literal_number = 0.0;
+        int valid = 1;
+        if (strcmp(args[2].string, "Number") == 0) {
+          char *trimmed = trim_copy(args[3].string);
+          valid = number_from_trimmed_text(trimmed, &literal_number);
+          free(trimmed);
+        } else if (strcmp(args[2].string, "Truth") == 0) {
+          valid = strcmp(args[3].string, "true") == 0 || strcmp(args[3].string, "false") == 0;
+        }
+        if (!valid) vm_fail(vm, "RCL_AST_LITERAL_VALUE", "Invalid facet_ast literal value");
+        else result = value_ast(args[0].string, args[1].string, args[2].string, args[3].string, literal_number, args[4].span);
+      }
       break;
     case BUILTIN_AST_KIND:
     case BUILTIN_AST_PATH:
@@ -2260,6 +2557,9 @@ static int execute_builtin(VM *vm, int builtin, int argc) {
         else if (strcmp(args[1].string, "RCL_MODULE_SYMBOL_MISSING") == 0) vm_fail(vm, "RCL_MODULE_SYMBOL_MISSING", detail);
         else if (strcmp(args[1].string, "RCL_MODULE_TYPE_MISMATCH") == 0) vm_fail(vm, "RCL_MODULE_TYPE_MISMATCH", detail);
         else vm_fail(vm, "RCL_SEMANTIC_ASSERT", detail);
+        vm->error.diagnostic_code = xstrdup(args[1].string);
+        vm->error.diagnostic_span = *args[3].span;
+        vm->error.has_diagnostic = 1;
       } else result = value_bool(1);
       break;
     case BUILTIN_MAKE_SEMANTIC_FACET:
@@ -2837,6 +3137,7 @@ static void print_value_json(FILE *out, const Value *value) {
   StringBuilder sb; sb_init(&sb);
   const char *algorithm = native_state_root_algorithm();
   sb.precise_numbers = algorithm && strcmp(algorithm, "rcl.semantic-state-root.v1") != 0;
+  sb.include_ast_literal_text = algorithm && strcmp(algorithm, "rcl.semantic-state-root.v3-candidate") == 0;
   value_json_sb(&sb, value); fputs(sb.data, out); free(sb.data);
 }
 
@@ -2844,6 +3145,7 @@ static void print_state_json(FILE *out, const State *state) {
   StringBuilder sb; sb_init(&sb);
   const char *algorithm = native_state_root_algorithm();
   sb.precise_numbers = algorithm && strcmp(algorithm, "rcl.semantic-state-root.v1") != 0;
+  sb.include_ast_literal_text = algorithm && strcmp(algorithm, "rcl.semantic-state-root.v3-candidate") == 0;
   state_json_sb(&sb, state); fputs(sb.data, out); free(sb.data);
 }
 
@@ -2960,10 +3262,19 @@ static void print_success(VM *vm, FILE *out) {
 
 static void print_error(VmError *error, FILE *out) {
   fputs("{\"status\":\"error\",\"code\":", out); print_json_string(out, error->code ? error->code : "RCL_NATIVE_FAILURE");
-  fputs(",\"message\":", out); print_json_string(out, error->message[0] ? error->message : "Native VM failure"); fputs("}\n", out);
+  fputs(",\"message\":", out); print_json_string(out, error->message[0] ? error->message : "Native VM failure");
+  if (error->has_diagnostic) {
+    fputs(",\"diagnostic\":{\"format\":\"rcl.semantic-diagnostic.v1\",\"code\":", out);
+    print_json_string(out, error->diagnostic_code);
+    fprintf(out, ",\"span\":{\"offset\":%" PRId64 ",\"line\":%" PRId64 ",\"column\":%" PRId64 ",\"length\":%" PRId64 "}}",
+      error->diagnostic_span.offset, error->diagnostic_span.line, error->diagnostic_span.column, error->diagnostic_span.length);
+  }
+  fputs("}\n", out);
 }
 
 static void vm_free(VM *vm) {
+  free(vm->error.diagnostic_code);
+  vm->error.diagnostic_code = NULL;
   for (size_t i = 0; i < vm->stack_count; i++) value_free(&vm->stack[i]);
   free(vm->stack);
   vm->stack = NULL;
@@ -2982,7 +3293,7 @@ static void vm_free(VM *vm) {
   free_program(&vm->program);
 }
 
-struct RclVmInstance { VM vm; int loaded; int session_initialized; };
+struct RclVmInstance { VM vm; int loaded; int session_initialized; int session_before_first_step; };
 
 static void vm_clear_transient(VM *vm, int clear_state) {
   for (size_t i = 0; i < vm->stack_count; i++) value_free(&vm->stack[i]);
@@ -2998,6 +3309,7 @@ static void vm_clear_transient(VM *vm, int clear_state) {
   vm->executed_instructions = 0;
   vm->peak_stack_count = 0;
   vm->peak_frame_count = 0;
+  free(vm->error.diagnostic_code);
   memset(&vm->error, 0, sizeof(vm->error));
   if (clear_state) {
     state_free(&vm->state);
@@ -3044,6 +3356,7 @@ void rclvm_instance_destroy(RclVmInstance *instance) {
 int rclvm_instance_load_file(RclVmInstance *instance, const char *path, char *error, size_t error_capacity) {
   if (!instance || !path) return 0;
   instance->session_initialized = 0;
+  instance->session_before_first_step = 0;
   if (instance->loaded) {
     vm_free(&instance->vm);
     ProviderRegistration saved[MAX_PROVIDERS]; size_t saved_count = instance->vm.provider_count;
@@ -3083,6 +3396,7 @@ int rclvm_instance_run(RclVmInstance *instance, int reset_state, char **result_j
     if (error && error_capacity) snprintf(error, error_capacity, "No RBC program loaded");
     return 0;
   }
+  instance->session_before_first_step = 0;
   vm_clear_transient(&instance->vm, reset_state != 0);
   const char *algorithm = native_state_root_algorithm();
   int ok = algorithm != NULL;
@@ -3093,19 +3407,21 @@ int rclvm_instance_run(RclVmInstance *instance, int reset_state, char **result_j
   }
   if (ok) {
     instance->vm.state_root_algorithm = algorithm;
-    if (strcmp(algorithm, "rcl.semantic-state-root.v2") == 0) {
-      const char *root_error = NULL;
-      ok = state_root_v2(&instance->vm.state, instance->vm.semantic_state_root, &root_error);
-      if (!ok) vm_fail(&instance->vm, "RCL_NATIVE_STATE_ROOT_V2_INVALID", root_error ? root_error : "Invalid semantic state");
-    } else state_root(&instance->vm.state, instance->vm.semantic_state_root);
+    ok = selected_state_root(&instance->vm, &instance->vm.state, instance->vm.semantic_state_root);
   }
   if (result_json) *result_json = capture_vm_output(&instance->vm, ok);
   if (!ok && error && error_capacity) snprintf(error, error_capacity, "%s: %s", instance->vm.error.code ? instance->vm.error.code : "RCL_NATIVE_FAILURE", instance->vm.error.message);
   return ok;
 }
 
+char *rclvm_instance_get_last_error_json(RclVmInstance *instance) {
+  if (!instance || !instance->vm.error.code) return NULL;
+  return capture_vm_output(&instance->vm, 0);
+}
+
 int rclvm_instance_reset(RclVmInstance *instance, int clear_state) {
   if (!instance) return 0;
+  instance->session_before_first_step = 0;
   vm_clear_transient(&instance->vm, clear_state != 0);
   if (clear_state) instance->session_initialized = 0;
   return 1;
@@ -3118,8 +3434,9 @@ int rclvm_instance_session_initialize(RclVmInstance *instance, char **result_jso
     return 0;
   }
   const char *algorithm = native_state_root_algorithm();
-  if (!algorithm || strcmp(algorithm, "rcl.semantic-state-root.v2") != 0) {
-    if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_REQUIRES_STATE_ROOT_V2");
+  if (!algorithm || (strcmp(algorithm, "rcl.semantic-state-root.v2") != 0
+      && strcmp(algorithm, "rcl.semantic-state-root.v3-candidate") != 0)) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_REQUIRES_SUPPORTED_STATE_ROOT");
     return 0;
   }
   for (uint32_t i = 0; i < instance->vm.program.instruction_count; i++) {
@@ -3131,7 +3448,364 @@ int rclvm_instance_session_initialize(RclVmInstance *instance, char **result_jso
   }
   int ok = rclvm_instance_run(instance, 1, result_json, error, error_capacity);
   instance->session_initialized = ok;
+  instance->session_before_first_step = ok;
   return ok;
+}
+
+static int session_text_valid(const char *text, size_t length) {
+  if (!text || length > 1024u * 1024u || memchr(text, 0, length)) return 0;
+  size_t offset = 0;
+  while (offset < length) {
+    uint32_t cp; int valid;
+    size_t width = utf8_decode_at(text, length, offset, &cp, &valid);
+    if (!width || !valid) return 0;
+    offset += width;
+  }
+  return 1;
+}
+
+static int session_scalar_text_valid(const RclVmInputV1 *input) {
+  return session_text_valid(input->text, input->text_length);
+}
+
+static Value session_scalar_value(const RclVmInputV1 *input) {
+  if (input->type == VALUE_NUMBER) return value_number(input->number == 0 ? 0 : input->number);
+  if (input->type == VALUE_BOOL) return value_bool(input->truth);
+  return value_string_n(input->text, input->text_length);
+}
+
+int rclvm_instance_session_scalar_evidence(RclVmInstance *instance, char **result_json, char *error, size_t error_capacity) {
+  if (result_json) *result_json = NULL;
+  if (!instance || !instance->loaded || !instance->session_initialized || !result_json) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID");
+    return 0;
+  }
+  VM *vm = &instance->vm;
+  const char *algorithm = native_state_root_algorithm();
+  if (!algorithm || !vm->state_root_algorithm || strcmp(algorithm, vm->state_root_algorithm) != 0) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_STATE_ROOT_ALGORITHM_CHANGED");
+    return 0;
+  }
+  for (size_t i = 0; i < vm->state.count; i++) {
+    const Value *value = &vm->state.entries[i].value;
+    if (value->type < VALUE_NUMBER || value->type > VALUE_STRING || (value->type == VALUE_NUMBER && !isfinite(value->number))) {
+      if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
+      return 0;
+    }
+  }
+  char root[65];
+  const char *failure = NULL;
+  int ok = strcmp(algorithm, "rcl.semantic-state-root.v3-candidate") == 0
+    ? state_root_v3_candidate(&vm->state, root, &failure) : state_root_v2(&vm->state, root, &failure);
+  if (!ok) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_ROOT_INVALID");
+    return 0;
+  }
+  StringBuilder sb;
+  sb_init(&sb);
+  sb_append(&sb, "{\"status\":\"ok\",\"format\":\"rcl.session-scalar-evidence.v1\",\"sourceRoot\":");
+  json_escape_sb(&sb, vm->program.strings[vm->program.source_root_index]);
+  sb_append(&sb, ",\"stateRootAlgorithm\":"); json_escape_sb(&sb, algorithm);
+  sb_append(&sb, ",\"stateRoot\":"); json_escape_sb(&sb, root);
+  sb_append(&sb, ",\"negativeZeroFacets\":[");
+  int comma = 0;
+  for (size_t i = 0; i < vm->state.count; i++) {
+    const StateEntry *entry = &vm->state.entries[i];
+    if (entry->value.type != VALUE_NUMBER || entry->value.number != 0 || !signbit(entry->value.number)) continue;
+    if (comma) sb_append_char(&sb, ',');
+    json_escape_sb(&sb, entry->key);
+    comma = 1;
+  }
+  sb_append(&sb, "]}");
+  *result_json = sb.data;
+  return 1;
+}
+
+static int checkpoint_error(char *error, size_t capacity, const char *code) {
+  if (error && capacity) snprintf(error, capacity, "%s", code);
+  return 0;
+}
+
+static int checkpoint_phase(const RclVmInstance *instance, const char *expected_root,
+  char *error, size_t capacity) {
+  if (!instance || !instance->loaded || !instance->session_initialized
+      || (expected_root && (!instance->session_before_first_step || strlen(expected_root) != 64))) {
+    return checkpoint_error(error, capacity, "RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID");
+  }
+  const char *algorithm = native_state_root_algorithm();
+  if (!algorithm || !instance->vm.state_root_algorithm || strcmp(algorithm, instance->vm.state_root_algorithm) != 0) {
+    return checkpoint_error(error, capacity, "RCL_SESSION_STATE_ROOT_ALGORITHM_CHANGED");
+  }
+  return 1;
+}
+
+static int checkpoint_install(RclVmInstance *instance, State *staged, const char *expected_root,
+  char **result_json, char *error, size_t error_capacity) {
+  VM *vm = &instance->vm;
+  char staged_root[65];
+  vm_clear_transient(vm, 0);
+  if (!selected_state_root(vm, staged, staged_root) || strcmp(expected_root, staged_root) != 0) {
+    state_free(staged);
+    free(staged);
+    return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_ROOT_MISMATCH");
+  }
+  State before = vm->state;
+  char before_root[65];
+  memcpy(before_root, vm->semantic_state_root, sizeof(before_root));
+  vm->state = *staged;
+  free(staged);
+  memcpy(vm->semantic_state_root, staged_root, sizeof(staged_root));
+  if (result_json) {
+    *result_json = capture_vm_output(vm, 1);
+    if (!*result_json) {
+      state_free(&vm->state);
+      vm->state = before;
+      memcpy(vm->semantic_state_root, before_root, sizeof(before_root));
+      if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_CHECKPOINT_OUTPUT_FAILED");
+      return 0;
+    }
+  }
+  state_free(&before);
+  instance->session_before_first_step = 0;
+  return 1;
+}
+
+int rclvm_instance_session_restore_scalars(RclVmInstance *instance, const char *expected_root,
+  const RclVmInputV1 *facets, size_t facet_count, char **result_json, char *error, size_t error_capacity) {
+  if (result_json) *result_json = NULL;
+  if (!expected_root || (facet_count && !facets)) {
+    return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID");
+  }
+  if (!checkpoint_phase(instance, expected_root, error, error_capacity)) return 0;
+  VM *vm = &instance->vm;
+  if (facet_count != vm->state.count) return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
+  State *staged = (State *)calloc(1, sizeof(State));
+  if (!staged) return checkpoint_error(error, error_capacity, "RCL_NATIVE_OOM");
+  for (size_t i = 0; i < facet_count; i++) {
+    const RclVmInputV1 *input = &facets[i];
+    const StateEntry *current = input->path ? state_find_const(&vm->state, input->path) : NULL;
+    if (!current || (uint32_t)current->value.type != input->type || state_find(staged, input->path)
+        || input->type < VALUE_NUMBER || input->type > VALUE_STRING
+        || (input->type == VALUE_NUMBER && !isfinite(input->number))
+        || (input->type == VALUE_BOOL && input->truth != 0 && input->truth != 1)
+        || (input->type == VALUE_STRING && !session_scalar_text_valid(input))) goto rejected;
+    Value value = input->type == VALUE_NUMBER ? value_number(input->number) : session_scalar_value(input);
+    int stored = state_set(staged, input->path, &value);
+    value_free(&value);
+    if (!stored) goto rejected;
+  }
+  return checkpoint_install(instance, staged, expected_root, result_json, error, error_capacity);
+rejected:
+  state_free(staged);
+  free(staged);
+  return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
+}
+
+#define CHECKPOINT_WIRE_BYTES (2u * 1024u * 1024u)
+#define CHECKPOINT_WIRE_DEPTH 32u
+#define CHECKPOINT_WIRE_VALUES 65536u
+
+static int checkpoint_write(StringBuilder *output, const void *bytes, size_t count) {
+  if (count > CHECKPOINT_WIRE_BYTES - output->length) return 0;
+  sb_append_n(output, (const char *)bytes, count);
+  return 1;
+}
+
+static int checkpoint_write_integer(StringBuilder *output, uint64_t value, unsigned width) {
+  uint8_t bytes[8];
+  for (unsigned index = 0; index < width; index++) bytes[index] = (uint8_t)(value >> (8u * index));
+  return checkpoint_write(output, bytes, width);
+}
+
+static int checkpoint_write_text(StringBuilder *output, const char *text, size_t length) {
+  return session_text_valid(text, length)
+    && checkpoint_write_integer(output, length, 4) && checkpoint_write(output, text, length);
+}
+
+static int checkpoint_write_value(StringBuilder *output, const Value *value, unsigned depth, size_t *count) {
+  if (depth > CHECKPOINT_WIRE_DEPTH || ++*count > CHECKPOINT_WIRE_VALUES
+      || !checkpoint_write_integer(output, value->type, 1)) return 0;
+  switch (value->type) {
+    case VALUE_NUMBER: {
+      uint64_t bits;
+      memcpy(&bits, &value->number, sizeof(bits));
+      return isfinite(value->number) && checkpoint_write_integer(output, bits, 8);
+    }
+    case VALUE_BOOL:
+      return checkpoint_write_integer(output, (unsigned)value->boolean, 1);
+    case VALUE_STRING:
+      return checkpoint_write_text(output, value->string, shared_string_header(value->string)->byte_length);
+    case VALUE_SEQUENCE: {
+      const Sequence *sequence = value->sequence;
+      if (sequence->count > CHECKPOINT_WIRE_VALUES - *count
+          || !checkpoint_write_integer(output, sequence->count, 4)) return 0;
+      for (size_t index = 0; index < sequence->count; index++) {
+        if (!checkpoint_write_value(output, sequence_item(sequence, index), depth + 1, count)) return 0;
+      }
+      return 1;
+    }
+    default: return 0;
+  }
+}
+
+static void checkpoint_sorted_facets(const State *state, const StateEntry **sorted) {
+  for (size_t i = 0; i < state->count; i++) sorted[i] = &state->entries[i];
+  qsort(sorted, state->count, sizeof(*sorted), compare_entry_ptrs);
+}
+
+int rclvm_instance_session_sequence_evidence(RclVmInstance *instance, char **result_json, char *error, size_t error_capacity) {
+  if (!result_json) return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID");
+  *result_json = NULL;
+  if (!checkpoint_phase(instance, NULL, error, error_capacity)) return 0;
+  VM *vm = &instance->vm;
+  const StateEntry *sorted[MAX_STATE];
+  checkpoint_sorted_facets(&vm->state, sorted);
+  StringBuilder wire;
+  sb_init(&wire);
+  checkpoint_write(&wire, "RCP1", 4);
+  checkpoint_write_integer(&wire, vm->state.count, 4);
+  size_t count = 0;
+  for (size_t i = 0; i < vm->state.count; i++) {
+    if (!checkpoint_write_text(&wire, sorted[i]->key, strlen(sorted[i]->key))
+        || !checkpoint_write_value(&wire, &sorted[i]->value, 0, &count)) {
+      free(wire.data);
+      return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
+    }
+  }
+  const char *algorithm = vm->state_root_algorithm, *failure = NULL;
+  char root[65];
+  int rooted = strcmp(algorithm, "rcl.semantic-state-root.v3-candidate") == 0
+    ? state_root_v3_candidate(&vm->state, root, &failure) : state_root_v2(&vm->state, root, &failure);
+  if (!rooted) {
+    free(wire.data);
+    return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_ROOT_INVALID");
+  }
+  StringBuilder json;
+  sb_init(&json);
+  sb_append(&json, "{\"status\":\"ok\",\"format\":\"rcl.session-sequence-evidence.v1\",\"sourceRoot\":");
+  json_escape_sb(&json, vm->program.strings[vm->program.source_root_index]);
+  sb_append(&json, ",\"stateRootAlgorithm\":"); json_escape_sb(&json, algorithm);
+  sb_append(&json, ",\"stateRoot\":"); json_escape_sb(&json, root);
+  sb_append(&json, ",\"stateWireHex\":\"");
+  static const char hex[] = "0123456789abcdef";
+  sb_reserve(&json, wire.length * 2);
+  for (size_t index = 0; index < wire.length; index++) {
+    uint8_t byte = (uint8_t)wire.data[index];
+    json.data[json.length++] = hex[byte >> 4];
+    json.data[json.length++] = hex[byte & 15u];
+  }
+  free(wire.data);
+  sb_append(&json, "\"}");
+  *result_json = json.data;
+  return 1;
+}
+
+typedef struct { const uint8_t *next; size_t remaining, values; } CheckpointReader;
+
+static const uint8_t *checkpoint_read(CheckpointReader *input, size_t count) {
+  if (count > input->remaining) return NULL;
+  const uint8_t *bytes = input->next;
+  input->next += count;
+  input->remaining -= count;
+  return bytes;
+}
+
+static int checkpoint_read_integer(CheckpointReader *input, uint64_t *value, unsigned width) {
+  const uint8_t *bytes = checkpoint_read(input, width);
+  if (!bytes) return 0;
+  *value = 0;
+  for (unsigned index = 0; index < width; index++) *value |= (uint64_t)bytes[index] << (8u * index);
+  return 1;
+}
+
+static const char *checkpoint_read_text(CheckpointReader *input, size_t *length) {
+  uint64_t count;
+  if (!checkpoint_read_integer(input, &count, 4)) return NULL;
+  const char *bytes = (const char *)checkpoint_read(input, (size_t)count);
+  if (!session_text_valid(bytes, (size_t)count)) return NULL;
+  *length = (size_t)count;
+  return bytes;
+}
+
+static int checkpoint_read_value(CheckpointReader *input, Value *value, unsigned depth, ValueType expected_type) {
+  const uint8_t *tag = checkpoint_read(input, 1);
+  if (!tag || depth > CHECKPOINT_WIRE_DEPTH || ++input->values > CHECKPOINT_WIRE_VALUES
+      || (expected_type != VALUE_NULL && *tag != expected_type)) return 0;
+  uint64_t data;
+  switch (*tag) {
+    case VALUE_NUMBER: {
+      if (!checkpoint_read_integer(input, &data, 8)) return 0;
+      double number;
+      memcpy(&number, &data, sizeof(number));
+      if (!isfinite(number)) return 0;
+      *value = value_number(number);
+      return 1;
+    }
+    case VALUE_BOOL:
+      if (!checkpoint_read_integer(input, &data, 1) || data > 1) return 0;
+      *value = value_bool((int)data);
+      return 1;
+    case VALUE_STRING: {
+      size_t length;
+      const char *text = checkpoint_read_text(input, &length);
+      if (!text) return 0;
+      *value = value_string_n(text, length);
+      return 1;
+    }
+    case VALUE_SEQUENCE: {
+      if (!checkpoint_read_integer(input, &data, 4) || data > CHECKPOINT_WIRE_VALUES - input->values
+          || data > input->remaining) return 0;
+      *value = value_sequence_empty();
+      if (data == 0) return 1;
+      value->sequence->items = (Value *)calloc((size_t)data, sizeof(Value));
+      if (!value->sequence->items) { value_free(value); return 0; }
+      for (size_t index = 0; index < (size_t)data; index++) {
+        if (!checkpoint_read_value(input, &value->sequence->items[index], depth + 1, VALUE_NULL)) {
+          value_free(value);
+          return 0;
+        }
+        value->sequence->count++;
+      }
+      return 1;
+    }
+    default: return 0;
+  }
+}
+
+int rclvm_instance_session_restore_sequence(RclVmInstance *instance, const char *expected_root,
+  const uint8_t *bytes, size_t length, char **result_json, char *error, size_t error_capacity) {
+  if (result_json) *result_json = NULL;
+  if (!expected_root) return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_PHASE_OR_ROOT_INVALID");
+  if (!checkpoint_phase(instance, expected_root, error, error_capacity)) return 0;
+  const State *before = &instance->vm.state;
+  if (!bytes || length < 8 || length > CHECKPOINT_WIRE_BYTES || memcmp(bytes, "RCP1", 4) != 0) {
+    return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
+  }
+  CheckpointReader input = { bytes + 4, length - 4, 0 };
+  uint64_t fields;
+  if (!checkpoint_read_integer(&input, &fields, 4) || fields != before->count) {
+    return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
+  }
+  const StateEntry *sorted[MAX_STATE];
+  checkpoint_sorted_facets(before, sorted);
+  State *staged = (State *)calloc(1, sizeof(State));
+  if (!staged) return checkpoint_error(error, error_capacity, "RCL_NATIVE_OOM");
+  for (size_t index = 0; index < before->count; index++) {
+    size_t name_length;
+    const char *name = checkpoint_read_text(&input, &name_length);
+    const StateEntry *field = sorted[index];
+    Value value = value_null();
+    if (!name || name_length != strlen(field->key) || memcmp(name, field->key, name_length) != 0
+        || !checkpoint_read_value(&input, &value, 0, field->value.type)) goto invalid;
+    int stored = state_set(staged, field->key, &value);
+    value_free(&value);
+    if (!stored) goto invalid;
+  }
+  if (input.remaining == 0) return checkpoint_install(instance, staged, expected_root, result_json, error, error_capacity);
+invalid:
+  state_free(staged);
+  free(staged);
+  return checkpoint_error(error, error_capacity, "RCL_SESSION_CHECKPOINT_STATE_INVALID");
 }
 
 int rclvm_instance_session_step(RclVmInstance *instance, const char *rule, int realize,
@@ -3143,8 +3817,13 @@ int rclvm_instance_session_step(RclVmInstance *instance, const char *rule, int r
     return 0;
   }
   VM *vm = &instance->vm;
+  const char *algorithm = native_state_root_algorithm();
+  if (!algorithm || !vm->state_root_algorithm || strcmp(algorithm, vm->state_root_algorithm) != 0) {
+    if (error && error_capacity) snprintf(error, error_capacity, "RCL_SESSION_STATE_ROOT_ALGORITHM_CHANGED");
+    return 0;
+  }
+  instance->session_before_first_step = 0;
   vm_clear_transient(vm, 0);
-  vm->state_root_algorithm = "rcl.semantic-state-root.v2";
   uint32_t entry = UINT32_MAX;
   for (uint32_t i = 0; i < vm->program.instruction_count; i++) {
     Instruction *in = &vm->program.instructions[i];
@@ -3172,17 +3851,8 @@ int rclvm_instance_session_step(RclVmInstance *instance, const char *rule, int r
         || (input->type == 1 && !isfinite(input->number)) || (input->type == 2 && input->truth != 0 && input->truth != 1)) {
       vm_fail(vm, "RCL_SESSION_INPUT_TYPE_MISMATCH", "Observation type differs from its declared type"); break;
     }
-    if (input->type == 3) {
-      if (!input->text || input->text_length > 1024u * 1024u || memchr(input->text, 0, input->text_length)) {
-        vm_fail(vm, "RCL_SESSION_INPUT_TYPE_MISMATCH", "Text must be bounded and contain no NUL"); break;
-      }
-      size_t offset = 0;
-      while (offset < input->text_length) {
-        uint32_t cp; int valid;
-        size_t width = utf8_decode_at(input->text, input->text_length, offset, &cp, &valid);
-        if (!width || !valid) { vm_fail(vm, "RCL_SESSION_INPUT_TYPE_MISMATCH", "Text must contain Unicode scalars"); break; }
-        offset += width;
-      }
+    if (input->type == VALUE_STRING && !session_scalar_text_valid(input)) {
+      vm_fail(vm, "RCL_SESSION_INPUT_TYPE_MISMATCH", "Text must be bounded Unicode scalars and contain no NUL"); break;
     }
   }
   State before = {0};
@@ -3191,15 +3861,13 @@ int rclvm_instance_session_step(RclVmInstance *instance, const char *rule, int r
   if (copied) {
     for (size_t i = 0; i < input_count && !vm->error.code; i++) {
       const RclVmInputV1 *input = &inputs[i];
-      Value value = input->type == 1 ? value_number(input->number == 0 ? 0 : input->number)
-        : input->type == 2 ? value_bool(input->truth) : value_string_n(input->text, input->text_length);
+      Value value = session_scalar_value(input);
       if (!state_set(&vm->state, input->path, &value)) vm_fail(vm, "RCL_NATIVE_STATE_LIMIT", "Cannot apply observation");
       value_free(&value);
     }
     if (!vm->error.code) execute_program_from(vm, entry);
     if (!vm->error.code) {
-      const char *root_error = NULL;
-      if (!state_root_v2(&vm->state, vm->semantic_state_root, &root_error)) vm_fail(vm, "RCL_NATIVE_STATE_ROOT_V2_INVALID", root_error);
+      selected_state_root(vm, &vm->state, vm->semantic_state_root);
     }
     if (vm->error.code || !realize || vm->history_count == 0) {
       state_free(&vm->state); vm->state = before; memset(&before, 0, sizeof(before));
@@ -3208,8 +3876,7 @@ int rclvm_instance_session_step(RclVmInstance *instance, const char *rule, int r
   }
   int ok = vm->error.code == NULL;
   if (ok) {
-    const char *root_error = NULL;
-    if (!state_root_v2(&vm->state, vm->semantic_state_root, &root_error)) { vm_fail(vm, "RCL_NATIVE_STATE_ROOT_V2_INVALID", root_error); ok = 0; }
+    if (!selected_state_root(vm, &vm->state, vm->semantic_state_root)) ok = 0;
   }
   if (result_json) *result_json = capture_vm_output(vm, ok);
   if (!ok && error && error_capacity) snprintf(error, error_capacity, "%s: %s", vm->error.code ? vm->error.code : "RCL_NATIVE_FAILURE", vm->error.message);

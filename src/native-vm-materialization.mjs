@@ -6,7 +6,9 @@ import { spawnSync } from 'node:child_process';
 import {
   RCL_NATIVE_VM_CANONICAL_BUILD_SUPPORT_FORMAT,
   RCL_NATIVE_VM_CANONICAL_HEADER,
+  RCL_NATIVE_VM_CANONICAL_IDENTIFIER_HEADER,
   RCL_NATIVE_VM_CANONICAL_MAKEFILE,
+  RCL_NATIVE_NUMBER_FORMAT_HEADER,
   RCL_NATIVE_VM_CANONICAL_SEMANTIC_V2_HEADER,
   nativeVmCanonicalBuildSupportRoots,
 } from './native-vm-canonical-build-support.mjs';
@@ -55,14 +57,20 @@ function validCachedBinary(vmPath, manifestPath, sourceRoot) {
 function resolveBuildSupport(nativeDir) {
   const repositoryMakefile = readTextIfPresent(path.join(nativeDir, 'Makefile'));
   const repositoryHeader = readTextIfPresent(path.join(nativeDir, 'rclvm.h'));
+  const repositoryIdentifierHeader = readTextIfPresent(path.join(nativeDir, 'identifier_profile.h'));
+  const repositoryNumberFormatHeader = readTextIfPresent(path.join(nativeDir, 'number_format_ryu.h'));
   const repositorySemanticV2Header = readTextIfPresent(path.join(nativeDir, 'semantic_state_v2.h'));
   return {
     makefile: repositoryMakefile ?? RCL_NATIVE_VM_CANONICAL_MAKEFILE,
     header: repositoryHeader ?? RCL_NATIVE_VM_CANONICAL_HEADER,
+    identifierHeader: repositoryIdentifierHeader ?? RCL_NATIVE_VM_CANONICAL_IDENTIFIER_HEADER,
+    numberFormatHeader: repositoryNumberFormatHeader ?? RCL_NATIVE_NUMBER_FORMAT_HEADER,
     semanticV2Header: repositorySemanticV2Header ?? RCL_NATIVE_VM_CANONICAL_SEMANTIC_V2_HEADER,
     provenance: {
       makefile: repositoryMakefile === null ? 'embedded-canonical-support' : 'repository-source',
       header: repositoryHeader === null ? 'embedded-canonical-support' : 'repository-source',
+      identifierHeader: repositoryIdentifierHeader === null ? 'embedded-canonical-support' : 'repository-source',
+      numberFormatHeader: repositoryNumberFormatHeader === null ? 'embedded-canonical-support' : 'repository-source',
       semanticV2Header: repositorySemanticV2Header === null ? 'embedded-canonical-support' : 'repository-source',
     },
   };
@@ -136,8 +144,17 @@ function processEvidence(result) {
   };
 }
 
-export function defaultNativeVmPath(root, platform = process.platform) {
-  return path.join(root, 'native', platform === 'win32' ? 'rclvm.exe' : 'rclvm');
+export function defaultNativeExecutablePath(root, name, platform = process.platform, arch = process.arch) {
+  const primary = path.join(root, 'native', platform === 'win32' ? name + '.exe' : name);
+  if (platform === 'linux' && arch === 'x64' && !fs.existsSync(primary)) {
+    const bundled = path.join(root, 'native', 'linux', name);
+    if (fs.existsSync(bundled)) return bundled;
+  }
+  return primary;
+}
+
+export function defaultNativeVmPath(root, platform = process.platform, arch = process.arch) {
+  return defaultNativeExecutablePath(root, 'rclvm', platform, arch);
 }
 
 export function materializeNativeVm(root, options = {}) {
@@ -146,7 +163,7 @@ export function materializeNativeVm(root, options = {}) {
   const platform = options.platform ?? process.platform;
   const arch = options.arch ?? process.arch;
   const explicitVmPath = options.vmPath ?? null;
-  const vmPath = explicitVmPath ?? defaultNativeVmPath(root, platform);
+  const vmPath = explicitVmPath ?? defaultNativeVmPath(root, platform, arch);
   if (fs.existsSync(vmPath)) {
     return {
       format: RCL_NATIVE_VM_MATERIALIZATION_FORMAT,
@@ -206,6 +223,8 @@ export function materializeNativeVm(root, options = {}) {
     makefileSha256: sha256(support.makefile),
     headerSha256: sha256(support.header),
     semanticV2HeaderSha256: sha256(support.semanticV2Header),
+    identifierHeaderSha256: sha256(support.identifierHeader),
+    numberFormatHeaderSha256: sha256(support.numberFormatHeader),
     buildTool: makePath,
     directCompilerFallback,
     fallbackCompiler,
@@ -238,6 +257,8 @@ export function materializeNativeVm(root, options = {}) {
   fs.writeFileSync(path.join(stageDir, 'Makefile'), support.makefile);
   fs.writeFileSync(path.join(stageDir, 'rclvm.h'), support.header);
   fs.writeFileSync(path.join(stageDir, 'semantic_state_v2.h'), support.semanticV2Header);
+  fs.writeFileSync(path.join(stageDir, 'identifier_profile.h'), support.identifierHeader);
+  fs.writeFileSync(path.join(stageDir, 'number_format_ryu.h'), support.numberFormatHeader);
 
   const spawn = options.spawnSyncImpl ?? spawnSync;
   let buildStrategy = 'makefile';

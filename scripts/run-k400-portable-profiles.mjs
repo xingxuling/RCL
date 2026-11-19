@@ -16,7 +16,7 @@ const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const matches = (state, expected) => Object.entries(expected).every(([name, value]) => equal(state[name], value));
 const sourceBindings = ['src/portable-native-vm.mjs', 'scripts/run-k400-portable-profiles.mjs', 'scripts/k400-portable-profile-definitions.mjs',
   'scripts/run-native-wasi.mjs', 'scripts/build-native-linux.mjs', 'native/rclvm.c', 'native/rclvm.h', 'native/rclc.c',
-  'native/semantic_state_v2.h', 'native/wasi-sha256.zig', 'native/wasi-compat/openssl/sha.h', 'native/wasi-compat/stdio-capture.c'];
+  'native/semantic_state_v2.h','native/identifier_profile.h', 'native/wasi-sha256.zig', 'native/wasi-compat/openssl/sha.h', 'native/wasi-compat/stdio-capture.c'];
 
 export function runPortableProfile(profileId) {
   const definition = PORTABLE_PROFILES.find(profile => profile.id === profileId);

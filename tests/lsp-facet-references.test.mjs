@@ -92,6 +92,18 @@ test('UI-local state does not become a canonical facet reference', () => {
   assert.equal(occurrences.filter(item => item.kind !== 'declaration').length, 0);
 });
 
+test('prototype-named facet declarations are own enumerable and serializable entries', () => {
+  const text = 'reality Names { facet __proto__ : Number = 1 facet constructor : Number = __proto__ }';
+  const { declarations, occurrences } = buildFacetOccurrences(text, [{ path: '__proto__' }, { path: 'constructor' }], 'rcl://names');
+  assert.equal(Object.getPrototypeOf(declarations), Object.prototype);
+  for (const name of ['__proto__', 'constructor']) {
+    assert.equal(Object.hasOwn(declarations, name), true);
+    assert.equal(slice(text, declarations[name].range), name);
+    assert.ok(Object.hasOwn(JSON.parse(JSON.stringify(declarations)), name));
+  }
+  assert.equal(occurrences.filter(item => item.facet === '__proto__' && item.kind === 'reference').length, 1);
+});
+
 test('serialized indexes and CLI query syntax retain references and deterministic query roots', () => {
   const index = build(source), query = parseLspQueryArg('references:x');
   assert.deepEqual(query, { kind: 'references', facet: 'x' });

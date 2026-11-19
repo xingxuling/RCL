@@ -10,19 +10,35 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 const ALGORITHM = 'rcl.semantic-state-root.v2';
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const binding = file => ({ path: path.relative(ROOT, file).replaceAll('\\', '/'), sha256: sha(fs.readFileSync(file)) });
+function nativeErrorPayload(output) {
+  for (const line of (output ?? '').split(/\r?\n/u)) {
+    if (line[0] !== '{') continue;
+    try {
+      const payload = JSON.parse(line);
+      if (payload?.status === 'error' && typeof payload.code === 'string') return payload;
+    } catch {}
+  }
+  return null;
+}
 function invoke(command, args, options = {}) {
   const started = performance.now();
   const result = spawnSync(command, args, { encoding: 'utf8', timeout: options.timeout ?? 30_000,
     maxBuffer: 64 * 1024 * 1024, windowsHide: true, ...options });
   if (result.error || result.status !== 0) {
     const error = new Error(`RCL_PORTABLE_TARGET_COMMAND_FAILED:${result.stderr || result.stdout || result.error?.message}`);
+    const payload = nativeErrorPayload(result.stderr) ?? nativeErrorPayload(result.stdout);
+    if (payload) error.nativeError = payload;
     error.exitCode = result.status; throw error;
   }
   return { stdout: result.stdout, elapsedMs: performance.now() - started };
 }
 function decode(text, expectedSourceRoot) {
   const payload = JSON.parse(text);
-  if (payload.status !== 'ok') throw new Error('RCL_PORTABLE_VM_REJECTED:' + payload.code);
+  if (payload.status !== 'ok') {
+    const error = new Error('RCL_PORTABLE_VM_REJECTED:' + payload.code);
+    error.nativeError = payload;
+    throw error;
+  }
   const result = verifyNativeSemanticStateRoot(payload, { requireNativeRoot: true, expectedAlgorithm: ALGORITHM });
   if (expectedSourceRoot && result.sourceRoot !== expectedSourceRoot) throw new Error('RCL_PORTABLE_SOURCE_ROOT_MISMATCH');
   return result;

@@ -1,0 +1,46 @@
+reality RoutedModal {
+  ui Page {
+    state homeVisible : Truth = true
+    state dialogVisible : Truth = true
+
+    navigation {
+      initial home
+      route home -> Home
+      route dialog -> Dialog
+    }
+
+    view Root {
+      layout overlay { width fill height fill }
+
+      view Home {
+        layout vertical { width fill padding 16 gap 12 }
+        bind visible <- homeVisible
+        text Start { value "Start page" }
+        action OpenDialog {
+          label "Open dialog"
+          on activate { navigate dialog }
+        }
+      }
+
+      view Dialog {
+        property modal = true
+        accessibility_label "Route confirmation"
+        bind visible <- dialogVisible
+        layout vertical { padding 24 align center }
+        text Prompt { value "Confirm route" }
+        action ReturnHome {
+          label "Return home"
+          on activate {
+            set homeVisible <- false
+            navigate home
+          }
+        }
+      }
+
+      action ShowHome {
+        label "Show start page"
+        on activate { set homeVisible <- true }
+      }
+    }
+  }
+}

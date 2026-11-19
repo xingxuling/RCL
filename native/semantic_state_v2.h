@@ -204,9 +204,15 @@ static int root_v2_node(RootV2Parser *parser, StringBuilder *out, unsigned depth
       if (strncmp(parser->cursor, "false", 5) == 0) { parser->cursor += 5; sb_append(out, "[\"truth\",false]"); return 1; }
       break;
     default: {
+#ifdef RCL_SEMANTIC_STATE_EXACT_DECIMAL
+      const char *end;
+      double number;
+      if (!parse_decimal_number(parser->cursor, &end, &number)) break;
+#else
       char *end;
       double number = strtod(parser->cursor, &end);
       if (end == parser->cursor || !isfinite(number)) break;
+#endif
       parser->cursor = end;
       if (number == 0.0) number = 0.0;
       uint64_t bits;

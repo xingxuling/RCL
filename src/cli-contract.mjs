@@ -244,9 +244,13 @@ Persistent governed sessions:
   rcl session history <directory> [--from-revision <n>] [--limit <n>]
   rcl session history-verify <page-or-pages.json> [--expected-root <sha256>]
   rcl session verify <directory> [--reference]
+  rcl session backup <directory> <new-directory>
+  rcl session backup-verify <directory> [--expected-backup-root <sha256>]
   rcl session recover <directory> --repair-incomplete-tail
   rcl session compile <source.rcl> <output.rbc> [--bootstrap]
   Existing sessions: --expected-root <sha256> --minimum-revision <integer>
+  Native sessions: --state-root-v3-candidate (opt-in; v2 remains default)
+                   --reject-projected-ast (reject lossy AST projections)
 
 Editor previews:
   rcl lsp-rename-preview <source.rcl> <facet> <new-leaf> <new-directory>

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -6,13 +7,18 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import {
   RCL_NATIVE_VM_CANONICAL_HEADER,
+  RCL_NATIVE_VM_CANONICAL_IDENTIFIER_HEADER,
   RCL_NATIVE_VM_CANONICAL_MAKEFILE,
+  RCL_NATIVE_NUMBER_FORMAT_HEADER,
 } from '../src/native-vm-canonical-build-support.mjs';
 import {
   defaultNativeVmPath,
   materializeNativeVm,
   RCL_NATIVE_VM_MATERIALIZATION_FORMAT,
 } from '../src/native-vm-materialization.mjs';
+import {
+  nativeLinuxArtifactBinding, RCL_LINUX_BUILD_FORMAT, RCL_LINUX_BUILD_SOURCES, RCL_LINUX_BUILD_TARGET,
+} from '../src/native-linux-build-contract.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
@@ -35,6 +41,48 @@ function fixture({ canonicalSupport = false } = {}) {
 
 function clean(item) { fs.rmSync(item.root, { recursive: true, force: true }); }
 
+test('Linux x64 uses the bundled VM when a locally built VM is absent', () => {
+  const item = fixture();
+  try {
+    const bundled = path.join(item.nativeDir, 'linux', 'rclvm');
+    fs.mkdirSync(path.dirname(bundled));
+    fs.writeFileSync(bundled, 'bundled-linux-x64');
+    assert.equal(defaultNativeVmPath(item.root, 'linux', 'x64'), bundled);
+    assert.equal(defaultNativeVmPath(item.root, 'linux', 'arm64'), item.vmPath);
+    assert.equal(materializeNativeVm(item.root, { platform: 'linux', arch: 'x64', buildIfMissing: false }).vmPath, bundled);
+    fs.writeFileSync(item.vmPath, 'locally-built');
+    assert.equal(defaultNativeVmPath(item.root, 'linux', 'x64'), item.vmPath);
+  } finally { clean(item); }
+});
+
+test('Linux bundle bindings check the exact artifact and all source inputs', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-linux-binding-'));
+  const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+  function write(file, bytes) {
+    const target = path.join(root, file);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, bytes);
+    return { path: file, bytes: Buffer.byteLength(bytes), sha256: sha(bytes) };
+  }
+  try {
+    const sources = RCL_LINUX_BUILD_SOURCES.map(file => write(file, `Source: ${file}\n`));
+    const compiler = write('native/linux/rclc', 'compiler-bytes');
+    write('native/linux/build-manifest.json', JSON.stringify({
+      format: RCL_LINUX_BUILD_FORMAT, target: RCL_LINUX_BUILD_TARGET, staticLibc: true, sources, compiler,
+    }));
+    const binding = nativeLinuxArtifactBinding(root, 'compiler');
+    assert.equal(binding.sourceBound, true);
+    assert.equal(binding.binarySha256, compiler.sha256);
+    write('native/linux/rclc', 'changed-bytes');
+    assert.throws(() => nativeLinuxArtifactBinding(root, 'compiler'), { code: 'RCL_NATIVE_LINUX_SOURCE_BINDING_MISMATCH' });
+    write('native/linux/rclc', 'compiler-bytes');
+    write('native/rclvm.c', 'changed source');
+    assert.throws(() => nativeLinuxArtifactBinding(root, 'compiler'), { code: 'RCL_NATIVE_LINUX_SOURCE_BINDING_MISMATCH' });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 function successfulMockBuild(invocations = []) {
   return (command, args, options) => {
     invocations.push({ command, args, options });
@@ -53,6 +101,7 @@ function missingTool(name = 'make-test') {
 test('embedded canonical build support stays byte-identical to repository Makefile and rclvm.h', () => {
   assert.equal(fs.readFileSync(path.join(ROOT, 'native', 'Makefile'), 'utf8'), RCL_NATIVE_VM_CANONICAL_MAKEFILE);
   assert.equal(fs.readFileSync(path.join(ROOT, 'native', 'rclvm.h'), 'utf8'), RCL_NATIVE_VM_CANONICAL_HEADER);
+  assert.equal(fs.readFileSync(path.join(ROOT, 'native', 'identifier_profile.h'), 'utf8'), RCL_NATIVE_VM_CANONICAL_IDENTIFIER_HEADER);
 });
 
 test('existing canonical binary wins without invoking build', () => {
@@ -112,6 +161,8 @@ test('missing packaged Makefile and header are restored from canonical embedded 
         staged = args[1];
         assert.equal(fs.readFileSync(path.join(staged, 'Makefile'), 'utf8'), RCL_NATIVE_VM_CANONICAL_MAKEFILE);
         assert.equal(fs.readFileSync(path.join(staged, 'rclvm.h'), 'utf8'), RCL_NATIVE_VM_CANONICAL_HEADER);
+        assert.equal(fs.readFileSync(path.join(staged, 'identifier_profile.h'), 'utf8'), RCL_NATIVE_VM_CANONICAL_IDENTIFIER_HEADER);
+        assert.equal(fs.readFileSync(path.join(staged, 'number_format_ryu.h'), 'utf8'), RCL_NATIVE_NUMBER_FORMAT_HEADER);
         fs.writeFileSync(path.join(staged, 'rclvm'), 'fallback-built');
         return { status: 0, stdout: 'ok', stderr: '' };
       },
@@ -119,6 +170,8 @@ test('missing packaged Makefile and header are restored from canonical embedded 
     assert.equal(result.built, true);
     assert.equal(result.supportProvenance.makefile, 'embedded-canonical-support');
     assert.equal(result.supportProvenance.header, 'embedded-canonical-support');
+    assert.equal(result.supportProvenance.identifierHeader, 'embedded-canonical-support');
+    assert.equal(result.supportProvenance.numberFormatHeader, 'embedded-canonical-support');
     assert.equal(fs.readFileSync(result.vmPath, 'utf8'), 'fallback-built');
     assert.ok(staged?.startsWith(item.cacheRoot));
   } finally { clean(item); }
@@ -288,5 +341,26 @@ test('missing implementation source cannot be replaced by support fallback', () 
       error?.code === 'RCL_NATIVE_VM_SOURCE_MISSING'
       && error?.details?.missing?.some(entry => entry.endsWith('rclvm.c'))
       && error?.details?.buildAttempted === false);
+  } finally { clean(item); }
+});
+
+
+test('identifier category header changes invalidate the staged source cache', () => {
+  const item = fixture();
+  try {
+    const invocations = [];
+    const options = { platform: 'linux', cacheRoot: item.cacheRoot, spawnSyncImpl: successfulMockBuild(invocations) };
+    fs.writeFileSync(path.join(item.nativeDir, 'identifier_profile.h'), '#define IDENTIFIER_REVISION 1\n');
+    const first = materializeNativeVm(item.root, options);
+    assert.equal(first.supportProvenance.identifierHeader, 'repository-source');
+    const repeated = materializeNativeVm(item.root, options);
+    assert.equal(repeated.cached, true);
+    fs.writeFileSync(path.join(item.nativeDir, 'identifier_profile.h'), '#define IDENTIFIER_REVISION 2\n');
+    const changed = materializeNativeVm(item.root, options);
+    assert.equal(changed.built, true);
+    assert.notEqual(first.sourceRoot, changed.sourceRoot);
+    assert.notEqual(first.vmPath, changed.vmPath);
+    assert.equal(invocations.length, 2);
+    assert.equal(fs.readFileSync(path.join(path.dirname(changed.vmPath), 'identifier_profile.h'), 'utf8'), '#define IDENTIFIER_REVISION 2\n');
   } finally { clean(item); }
 });

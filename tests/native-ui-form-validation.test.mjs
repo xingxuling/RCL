@@ -51,7 +51,34 @@ test('v0.5 Unicode codepoints and max length / optional email checks',()=>{
  assert.equal(formFieldError(nodes.get('FullName'),'🦊舟'),null);
  assert.equal(formFieldError(nodes.get('FullName'),'X'.repeat(41)),'max_length');
  assert.equal(formFieldError(nodes.get('EmailAddress'),'bob@example.com'),null);
+ assert.equal(formFieldError(nodes.get('EmailAddress'),'sarah@example.com'),null);
+ assert.equal(formFieldError(nodes.get('EmailAddress'),'sarah@example'), 'email');
+ assert.equal(formFieldError(nodes.get('EmailAddress'),'sarah\u2003@example.com'),'email');
  assert.equal(formFieldError(nodes.get('EmailAddress'),' bob@example.com'),'email');
+});
+
+test('declared UI names retain their own state, derived values, controls and form errors', () => {
+ const source = `reality FieldNames { ui Page {
+  state __proto__ : Text = "" state submitted : Truth = false
+  derived constructor : Text = "Saved: " + __proto__
+  view Root {
+   input __proto__ { property required = true bind value <- __proto__ on input(value: Text) { set __proto__ <- value } }
+   action Save { label "Save" property require_valid_form = true on activate { set submitted <- true } }
+   text Status { bind value <- constructor }
+  }
+ } }`;
+ const runtime = createNativeUiRuntime(compileReality(source).nativeUis[0]);
+ const initial = runtime.projection();
+ assert.equal(Object.hasOwn(initial.rendered, '__proto__'), true);
+ assert.equal(Object.hasOwn(initial.derived, 'constructor'), true);
+ assert.equal(Object.hasOwn(initial.validation.fields, '__proto__'), true);
+ assert.throws(() => runtime.dispatch('Save', 'activate'), /RCL_UI_FORM_INVALID:Save:__proto__/u);
+ runtime.dispatch('__proto__', 'input', { value: 'Atlas' });
+ const result = runtime.dispatch('Save', 'activate');
+ assert.equal(Object.hasOwn(result.afterState, '__proto__'), true);
+ assert.equal(result.afterState.__proto__, 'Atlas');
+ assert.equal(result.afterState.submitted, true);
+ assert.equal(result.renderedSemanticState.Status.value, 'Saved: Atlas');
 });
 
 test('v0.5 compile rejects inconsistent validation declarations',()=>{
@@ -71,11 +98,18 @@ test('v0.5 readonly state and malformed events retain previous event gates',()=>
 });
 
 test('v0.5 generated web has validation gate, semantic feedback and script is valid',()=>{
- const web=compileRclWebApplication(SOURCE,{schema:'rcl.native-ui.web-target.v0.1'});
+ const source=SOURCE.replace('RCL Verified Signup', 'RCL </ScRiPt> Verified Signup');
+ const web=compileRclWebApplication(source,{schema:'rcl.native-ui.web-target.v0.1'});
  const html=emitStandaloneRclWebHtml(web);
  assert.match(html,/rclFormValidation/);assert.match(html,/RCL_UI_FORM_INVALID/);
  assert.match(html,/data-rcl-error-for/);assert.match(html,/aria-invalid/);
- const match=html.match(/<script>([\s\S]*?)<\/script>/);assert.ok(match);new vm.Script(match[1]);
+ const match=html.match(/<script>([\s\S]*?)<\/script>/iu);assert.ok(match);new vm.Script(match[1]);
+ const emailPattern=match[1].match(/^const emailPattern = (\/.*\/);$/mu)?.[1];
+ assert.ok(emailPattern);
+ const pattern=new vm.Script(emailPattern).runInNewContext();
+ for(const [address,valid] of [['sarah@example.com',true],['sarah@example',false],['sarah\u2003@example.com',false]]) {
+  assert.equal(pattern.test(address),valid,address);
+ }
 });
 
 test('v0.5 Android generated activity has form validation and safe blocking',()=>{

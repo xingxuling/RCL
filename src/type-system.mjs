@@ -750,6 +750,7 @@ export function checkReality(program, options = {}) {
           return 'Truth';
         }
         if (['lower_text', 'upper_text', 'trim'].includes(expr.name)) {
+          if (expr.args.length !== 1) diagnostics.push(diagnostic('RCL_CALL_ARITY', `${expr.name} expects one argument`, expr));
           const actual = expr.args[0] ? infer(expr.args[0], locals) : 'Unknown';
           if (actual !== 'Text' && actual !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', `${expr.name} expects Text, received ${actual}`, expr));
           return 'Text';
@@ -760,6 +761,7 @@ export function checkReality(program, options = {}) {
           return 'Text';
         }
         if (expr.name === 'number_from_text') {
+          if (expr.args.length !== 1) diagnostics.push(diagnostic('RCL_CALL_ARITY', `${expr.name} expects one argument`, expr));
           const actual = expr.args[0] ? infer(expr.args[0], locals) : 'Unknown';
           if (actual !== 'Text' && actual !== 'Unknown') diagnostics.push(diagnostic('RCL_CALL_TYPE', `number_from_text expects Text, received ${actual}`, expr));
           return 'Number';
@@ -777,10 +779,12 @@ export function checkReality(program, options = {}) {
           return known[0] ?? 'Unknown';
         }
         if (expr.name === 'text') {
+          if (expr.args.length !== 1) diagnostics.push(diagnostic('RCL_CALL_ARITY', `${expr.name} expects one argument`, expr));
           expr.args.forEach(arg => infer(arg, locals));
           return 'Text';
         }
         if (expr.name === 'length') {
+          if (expr.args.length !== 1) diagnostics.push(diagnostic('RCL_CALL_ARITY', `${expr.name} expects one argument`, expr));
           const actual = expr.args[0] ? infer(expr.args[0], locals) : 'Unknown';
           if (!['Text', 'Sequence', 'Unknown'].includes(actual)) diagnostics.push(diagnostic('RCL_CALL_TYPE', `length expects Text or Sequence, received ${actual}`, expr));
           return 'Number';

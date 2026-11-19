@@ -27,8 +27,13 @@ for (const [label, original, needle] of fixtures) for (const newline of ['LF', '
     const column = lines[line].indexOf(needle);
     const input = path.join(directory, 'input.rcl'), output = path.join(directory, 'output.rbc'), retained = Buffer.from('retained-output');
     fs.writeFileSync(input, source); fs.writeFileSync(output, retained);
-    assert.throws(() => runNativeCompiler(artifact, input, output, { outputState: 'compiler.output' }), error =>
-      error.message.includes('RCL_SESSION_FACET_TYPE_UNSUPPORTED') && error.message.includes(`at ${line + 1}:${column + 1}`));
+    assert.throws(() => runNativeCompiler(artifact, input, output, { outputState: 'compiler.output' }), error => {
+      assert.equal(error.diagnostic?.code, 'RCL_SESSION_FACET_TYPE_UNSUPPORTED');
+      assert.deepEqual(error.diagnostic.span, {
+        offset: source.indexOf(needle), line: line + 1, column: column + 1, length: needle.split(' ')[0].length,
+      });
+      return true;
+    });
     assert.deepEqual(fs.readFileSync(output), retained);
   });
 }

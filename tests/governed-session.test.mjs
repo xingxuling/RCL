@@ -88,9 +88,24 @@ test('ordinary native bytecode reevaluates conditional warrants between directiv
 test('native peer death returns a structured failure and close releases process resources', async () => {
   const session = await createNativeRealitySession(source);
   const before = session.snapshot().stateRoot;
+  assert.equal(session.snapshot().native.peerStatus, 'NO_EXIT_OBSERVED');
   process.kill(session.snapshot().native.processId);
   try {
     await assert.rejects(session.invoke({ rule: 'increment', inputs: { 'event.delta': 1 } }), error => /^RCL_SESSION_NATIVE_/u.test(error.code));
     assert.equal(session.snapshot().stateRoot, before);
+    assert.equal(session.snapshot().native.peerStatus, 'CLOSED');
+    assert.equal(session.snapshot().native.snapshotOrigin, 'LAST_VERIFIED_REPLY');
   } finally { await session.close(); }
+});
+
+test('closing a native session drains accepted work and rejects later invocations', async () => {
+  const session = await createNativeRealitySession(source);
+  const accepted = session.invoke({ rule: 'increment', inputs: { 'event.delta': 1 } });
+  const closing = session.close();
+  assert.equal(session.snapshot().native.peerStatus, 'CLOSING');
+  assert.equal(session.close(), closing);
+  await assert.rejects(session.invoke({ rule: 'increment', inputs: { 'event.delta': 2 } }), error => error.code === 'RCL_SESSION_NATIVE_CLOSED');
+  assert.equal((await accepted).status, 'realized');
+  await closing;
+  assert.equal(session.snapshot().native.peerStatus, 'CLOSED');
 });

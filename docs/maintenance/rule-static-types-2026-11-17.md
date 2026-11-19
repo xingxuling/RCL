@@ -1,0 +1,7 @@
+# Rule expression static type admission
+
+The ordinary static checker now also validates emergence/resonance conditions as Truth, alteration results against the target facet type and preserve expressions as Truth. It reuses one helper for names, call/operator typing and expected results across facets, functions and rules. Dynamic Unknown results retain their reference policy.
+
+Eighteen malformed rule-expression variants reject before output in both rule kinds. Four valid realized/projected dynamic-value programs preserve exact bytecode and expected committed/projected state. The direct native session compiler independently rejects six malformed rule variants and retains exact bytes for two valid dynamic-value fixtures. Eighty type/warrant/session/host-call checks and twenty-four final type/structured checks pass. The 233-example audit retains 195 supported byte-identical examples, 38 reference-unsupported and zero failures.
+
+Native C0=C1=C2 is `50db4bc3d3068fef18431254041922fafe665ba749098e6a57c11437249b5fd7` (422,923 bytes), executing 216,584,049 instructions per generation within 300,000,000. The separate repository minimum-headroom gate is not satisfied at this checkpoint; byte identity and staying within the hard execution budget are narrower results. Work is continuing on the observed compiler hot paths without reducing that gate. No Actions, publication or whole-language type-soundness claim.

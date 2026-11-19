@@ -335,7 +335,14 @@ function compileBuiltin(expr, asm, compileExpr) {
     return true;
   }
 
-  const map = {
+  const builtin = Object.hasOwn(nativeBuiltins, expr.name) ? nativeBuiltins[expr.name] : 0;
+  if (!builtin) return false;
+  expr.args.forEach(compileExpr);
+  asm.emit(OPCODES.CALL_BUILTIN, builtin, expr.args.length);
+  return true;
+}
+
+const nativeBuiltins = Object.freeze({
     contains: BUILTINS.CONTAINS,
     starts_with: BUILTINS.STARTS_WITH,
     ends_with: BUILTINS.ENDS_WITH,
@@ -406,12 +413,66 @@ function compileBuiltin(expr, asm, compileExpr) {
     utf8_bytes: BUILTINS.UTF8_BYTES,
     hex_bytes: BUILTINS.HEX_BYTES,
     sha256_text: BUILTINS.SHA256_TEXT,
-  };
-  const builtin = map[expr.name];
-  if (!builtin) return false;
-  expr.args.forEach(compileExpr);
-  asm.emit(OPCODES.CALL_BUILTIN, builtin, expr.args.length);
-  return true;
+});
+
+const effectfulInitializers = new Set(['provider_call', 'typed_ref', 'typed_deref', 'typed_ref_id']);
+
+// Reorder only initializers whose dependencies can be determined without
+// executing code or touching providers. Keep the existing emission order when
+// dependencies are conditional and cyclic, or the program is outside this slice.
+function orderFacetInitializers(facets, functions) {
+  const byPath = new Map(facets.map(facet => [facet.path, facet]));
+  const activeFacets = new Set();
+  const emitted = new Set();
+  const ordered = [];
+  const noLocals = new Set();
+
+  function visitFacet(path) {
+    if (emitted.has(path)) return true;
+    const facet = byPath.get(path);
+    if (!facet || activeFacets.has(path)) return false;
+    activeFacets.add(path);
+    if (!visitExpression(facet.value, noLocals, new Set())) return false;
+    activeFacets.delete(path);
+    emitted.add(path);
+    ordered.push(facet);
+    return true;
+  }
+
+  function visitExpression(expression, locals, visitingFunctions) {
+    if (!expression) return false;
+    const visit = child => visitExpression(child, locals, visitingFunctions);
+    switch (expression.kind) {
+      case 'LiteralExpr': return true;
+      case 'PathExpr': return locals.has(expression.path) || visitFacet(expression.path);
+      case 'UnaryExpr': return visit(expression.expression);
+      case 'BinaryExpr': {
+        const { left, right, operator } = expression;
+        if (left.kind === 'LiteralExpr' && left.valueType === 'Truth'
+            && ((operator === 'and' && !left.value) || (operator === 'or' && left.value))) return true;
+        return visit(left) && visit(right);
+      }
+      case 'CallExpr': {
+        const { name, args } = expression;
+        if (effectfulInitializers.has(name)) return false;
+        const guard = args[0];
+        if (name === 'choose' && guard?.kind === 'LiteralExpr' && guard.valueType === 'Truth') {
+          return visit(args[guard.value ? 1 : 2]);
+        }
+        if (!args.every(visit)) return false;
+        if (name === 'choose' || Object.hasOwn(nativeBuiltins, name) || visitingFunctions.has(name)) return true;
+        const reckon = functions.get(name)?.decl;
+        if (!reckon) return false;
+        visitingFunctions.add(name);
+        const result = visitExpression(reckon.expression, new Set(reckon.params.map(param => param.name)), visitingFunctions);
+        visitingFunctions.delete(name);
+        return result;
+      }
+      default: return false;
+    }
+  }
+
+  return facets.every(facet => visitFacet(facet.path)) ? ordered : facets;
 }
 
 function compileExpression(expr, asm, pool, context = {}) {
@@ -640,7 +701,7 @@ function lowerToBytecode(program, { session = false } = {}) {
     decoded.numbers.forEach(value => pool.number(value));
   }
 
-  for (const facet of program.facets) {
+  for (const facet of orderFacetInitializers(program.facets, functions)) {
     compileExpression(facet.value, asm, pool, mainContext);
     asm.emit(OPCODES.STORE_STATE, pool.string(facet.path));
     if (session && facet.input) asm.emit(OPCODES.INPUT_DECL, pool.string(facet.path), RCL_SESSION_INPUT_TYPES[facet.valueType]);
