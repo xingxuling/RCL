@@ -21,7 +21,8 @@ export function nativeUiExecutionErrorCode(error) {
 export async function createNativeUiEventRuntime(source,{factory=()=>createPortableNativeTarget('windows')}={}){
   const target=await factory(),directory=fs.mkdtempSync(path.join(os.tmpdir(),'rcl-ui-native-')),ledger=[],failures=[];let projection,state,revision=0,busy=false,closed=false;
   async function run(event,authorized=true){
-    const started=performance.now(),lowered=lowerNativeUiEvent(source,{state,event,authorized}),file=path.join(directory,randomUUID()+'.rcl'),artifact=file+'.rbc';fs.writeFileSync(file,lowered.source);
+    const route = projection?.navigation?.currentRoute ?? null;
+    const started=performance.now(),lowered=lowerNativeUiEvent(source,{state,event,authorized,route}),file=path.join(directory,randomUUID()+'.rcl'),artifact=file+'.rbc';fs.writeFileSync(file,lowered.source);
     const compiled=await target.compile(file,artifact);if(!compiled.bytecode.equals(compileRealityToBytecode(lowered.source)))throw fail('RCL_UI_NATIVE_BYTE_PARITY');const sourceRoot=compileReality(lowered.source).programRoot;
     let executed;
     try{executed=await target.execute(artifact,sourceRoot);}catch(error){failures.push({index:failures.length,event:structuredClone(event),authorized,source:lowered.source,sourceHash:sha(lowered.source),sourceRoot,artifactHash:sha(compiled.bytecode),
@@ -30,6 +31,7 @@ export async function createNativeUiEventRuntime(source,{factory=()=>createPorta
     const next=projectNativeUiResult(lowered,executed.result);
     const record={index:ledger.length,event,authorized,uiSourceHash:sha(source),uiRoot:lowered.ui.semanticRoot,source:lowered.source,sourceHash:sha(lowered.source),sourceRoot,artifactHash:sha(compiled.bytecode),
       beforeState:lowered.beforeState,beforeStateRoot:lowered.beforeStateRoot,projection:next,nativeResult:executed.result,compileMs:compiled.ms,executeMs:executed.ms,totalMs:performance.now()-started,
+      ...(next.navigation ? {beforeRoute: lowered.beforeRoute, afterRoute: next.navigation.currentRoute} : {}),
       compilation:compiled,runtime:executed};
     // Keep bytecode/artifact locations out of the durable receipt, not out of execution.
     delete record.compilation.bytecode;delete record.runtime.result;ledger.push(record);state=next.state;projection=next;return record;
@@ -37,8 +39,11 @@ export async function createNativeUiEventRuntime(source,{factory=()=>createPorta
   try{await run(null);}catch(error){await target.dispose();fs.rmSync(directory,{recursive:true,force:true});throw error;}
   return{target,ui:lowerNativeUiEvent(source).ui,
     snapshot:()=>({...structuredClone(projection),revision}),ledger:()=>structuredClone(ledger),failures:()=>structuredClone(failures),
-    async dispatch(event,{expectedStateRoot=null,authorized=true}={}){
-      if(closed)throw fail('RCL_UI_NATIVE_CLOSED');if(busy)throw fail('RCL_UI_NATIVE_BACKPRESSURE');if(expectedStateRoot&&expectedStateRoot!==projection.stateRoot)throw fail('RCL_UI_NATIVE_STALE_STATE');
+    async dispatch(event,{expectedStateRoot=null,expectedRevision=null,authorized=true}={}){
+      if(closed)throw fail('RCL_UI_NATIVE_CLOSED');if(busy)throw fail('RCL_UI_NATIVE_BACKPRESSURE');
+      if ((expectedStateRoot && expectedStateRoot !== projection.stateRoot) || (expectedRevision !== null && expectedRevision !== revision)) {
+        throw fail('RCL_UI_NATIVE_STALE_STATE');
+      }
       if (!event || typeof event !== 'object' || Array.isArray(event)) throw fail('RCL_UI_NATIVE_EVENT_UNKNOWN');
       busy=true;
       try{const record=await run(event,authorized);revision++;return record;}finally{busy=false;}

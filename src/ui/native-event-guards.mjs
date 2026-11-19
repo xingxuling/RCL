@@ -74,19 +74,26 @@ export function lowerNativeUiEventGuards(ui, source, handler, emitExpression) {
   const assert = (condition, code, detail = `${target.id}:${handler.type}`) => {
     tests.push(`semantic_assert(${condition}, ${nativeDataLiteral(code)}, ${nativeDataLiteral(detail)}, ${location})`);
   };
+  const routesByTarget = new Map((ui.extensionPoints.navigation?.routes ?? []).map((route) => [route.target, route.id]));
+  const routeVisible = (node) => routesByTarget.has(node.id)
+    ? 'ui.navigation.route == ' + nativeDataLiteral(routesByTarget.get(node.id)) : 'true';
   const truth = (node, name) => {
     const bound = binding(node, name);
     return bound ? emitExpression(bound) : property(node, name)?.toString();
   };
 
   for (const ancestor of lineage) {
+    const routedVisibility = routeVisible(ancestor);
+    if (routedVisibility !== 'true') assert(routedVisibility, 'RCL_UI_EVENT_HIDDEN');
     const visible = truth(ancestor, 'visible');
     if (visible && visible !== 'true') assert(visible, 'RCL_UI_EVENT_HIDDEN');
   }
   const modal = ui.viewTree.children.find((node) => property(node, 'modal') === true);
   if (modal && !lineage.includes(modal)) {
     const rootVisible = truth(ui.viewTree, 'visible') ?? 'true';
-    assert(`not (${and([rootVisible, truth(modal, 'visible')])})`, 'RCL_UI_MODAL_BLOCKED');
+    const conditions = [rootVisible, truth(modal, 'visible')];
+    if (routesByTarget.has(modal.id)) conditions.push(routeVisible(modal));
+    assert(`not (${and(conditions)})`, 'RCL_UI_MODAL_BLOCKED');
   }
   const disabled = truth(target, 'disabled');
   if (disabled && disabled !== 'false') assert(`not (${disabled})`, 'RCL_UI_EVENT_DISABLED');

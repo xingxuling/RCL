@@ -6,6 +6,7 @@ import {semanticStateRootForAlgorithm} from '../semantic-state-root.mjs';
 import {lowerNativeUiEventGuards} from './native-event-guards.mjs';
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const root=state=>semanticStateRootForAlgorithm(state,'rcl.semantic-state-root.v2');
+const uiStateRoot = (state, route) => root(route === null ? state : { state, route });
 const failure=code=>Object.assign(new Error(code),{code});
 const identifier=value=>{if(!/^[A-Za-z_][A-Za-z0-9_.]*$/u.test(value))throw failure('RCL_UI_NATIVE_IDENTIFIER');return value;};
 const zero=type=>type==='Number'?'0':type==='Truth'?'false':'""';
@@ -18,14 +19,23 @@ export function compileNativeUiForExecution(source){
 }
 
 /** Lower existing UI IR expressions/events to ordinary native RCL constructs. */
-export function lowerNativeUiEvent(source,{state=null,event=null,authorized=true}={}){
+export function lowerNativeUiEvent(source,{state=null,event=null,authorized=true,route=null}={}){
   if(typeof authorized!=='boolean')throw failure('RCL_UI_NATIVE_AUTHORIZATION_TYPE');
   const ui=compileNativeUiForExecution(source),before=state??Object.fromEntries(ui.state.map(s=>[s.id,s.initial]));
-  if(ui.extensionPoints.navigation||ui.extensionPoints.deviceAdaptation)throw failure('RCL_UI_NATIVE_EXTENSION_UNSUPPORTED');
+  if(ui.extensionPoints.deviceAdaptation)throw failure('RCL_UI_NATIVE_EXTENSION_UNSUPPORTED');
+  const navigation = ui.extensionPoints.navigation;
+  const currentRoute = route ?? navigation?.initialRoute ?? null;
+  if (currentRoute !== null && !navigation?.routes.some(({ id }) => id === currentRoute)) {
+    throw failure('RCL_UI_NATIVE_ROUTE_UNKNOWN');
+  }
   if(Object.keys(before).sort().join('|')!==ui.state.map(s=>s.id).sort().join('|'))throw failure('RCL_UI_NATIVE_STATE_SHAPE');
+  const beforeStateRoot = uiStateRoot(before, currentRoute);
   let handler;if(event){handler=ui.eventGraph.events.find(h=>h.nodeId===event.nodeId&&h.type===event.type);if(!handler)throw failure('RCL_UI_NATIVE_EVENT_UNKNOWN');
-    if(handler.authority!=='ui-local'||handler.statements.some(s=>s.kind!=='set-state'))throw failure('RCL_UI_NATIVE_AUTHORITY_UNSUPPORTED');
-    if(new Set(handler.statements.map(s=>s.target)).size!==handler.statements.length)throw failure('RCL_UI_NATIVE_DUPLICATE_SET');}
+    if(handler.authority!=='ui-local'||handler.statements.some(s=>!['set-state', 'navigate'].includes(s.kind)))throw failure('RCL_UI_NATIVE_AUTHORITY_UNSUPPORTED');
+    const sets = handler.statements.filter((statement) => statement.kind === 'set-state');
+    if (new Set(sets.map(({ target }) => target)).size !== sets.length) throw failure('RCL_UI_NATIVE_DUPLICATE_SET');
+  }
+  const routeAlter = handler?.statements.find((statement) => statement.kind === 'navigate');
   const parameters = handler?.parameters ?? [];
   const inputDeclarations = parameters.map((parameter) => {
     if (!event.payload || !Object.hasOwn(event.payload, parameter.id)) throw failure('RCL_UI_NATIVE_INPUT_TYPE');
@@ -55,14 +65,19 @@ export function lowerNativeUiEvent(source,{state=null,event=null,authorized=true
     '  reckon binary_scale(value : Number, exponent : Number) -> Number = choose(exponent == 0, value, choose(exponent > 0, binary_scale(value * 2, exponent - 1), binary_scale(value / 2, exponent + 1)))',
     ...(guards?.definitions ?? []),
     '  facet ui.semantic_root : Text = '+JSON.stringify(ui.semanticRoot),
-    '  facet ui.before_root : Text = '+JSON.stringify(root(before)),
+    '  facet ui.before_root : Text = '+JSON.stringify(beforeStateRoot),
     '  facet event.authorized : Truth = '+String(Boolean(authorized)),
     '  facet event.phase : Number = '+(handler?'0':'1'),...declarations,
-    '  subject handler { warrant ui.mutate on ui.state while event.authorized }',
+    ...(navigation ? ['  facet ui.navigation.route : Text = ' + nativeDataLiteral(currentRoute)] : []),
+    routeAlter ? '  subject handler { warrant ui.mutate on ui.state while event.authorized warrant ui.navigate on ui.navigation while event.authorized }'
+      : '  subject handler { warrant ui.mutate on ui.state while event.authorized }',
     '  subject painter { warrant ui.paint on ui }'];
   if(handler)code.push('  emergence dispatch {','    cause handler','    when event.phase == 0','    needs ui.mutate on ui.state',
+    ...(routeAlter ? ['    needs ui.navigate on ui.navigation'] : []),
     ...(guards.condition ? [`    alter event.phase <- choose(${guards.condition}, 1, 0)`] : []),
-    ...handler.statements.map(s=>'    alter ui.state.'+identifier(s.target)+' <- '+expression(s.expression)),
+    ...handler.statements.map(s => s.kind === 'navigate'
+      ? '    alter ui.navigation.route <- ' + nativeDataLiteral(s.route)
+      : '    alter ui.state.'+identifier(s.target)+' <- '+expression(s.expression)),
     ...(guards.condition ? [] : ['    alter event.phase <- 1']),
     '    witness "ui:source-owned-event"','  }');
   code.push('  emergence paint {','    cause painter','    when event.phase == 1','    needs ui.paint on ui',
@@ -71,10 +86,16 @@ export function lowerNativeUiEvent(source,{state=null,event=null,authorized=true
     '    alter event.phase <- 2','    witness "ui:source-owned-projection"','  }');
   if(handler)code.push('  foresee dispatch','  realize dispatch');
   code.push('  foresee paint','  realize paint','}');
-  return{format:'rcl.native-ui.event-lowering.v1',ui,source:code.join('\n')+'\n',uiSourceHash:sha(source),beforeState:structuredClone(before),beforeStateRoot:root(before),event:structuredClone(event),authorized:Boolean(authorized),renderBindings:rendered.map(({expression,...r})=>r)};
+  return{format:'rcl.native-ui.event-lowering.v1',ui,source:code.join('\n')+'\n',uiSourceHash:sha(source),beforeState:structuredClone(before),beforeStateRoot,event:structuredClone(event),authorized:Boolean(authorized),renderBindings:rendered.map(({expression,...r})=>r),
+    ...(navigation ? {beforeRoute: currentRoute} : {})};
 }
 export function projectNativeUiResult(lowered,result){
   const state=Object.fromEntries(lowered.ui.state.map(s=>[s.id,result.state['ui.state.'+s.id]])),derived=Object.fromEntries(lowered.ui.derivedState.map(d=>[d.id,result.state['ui.derived.'+d.id]])),rendered=Object.fromEntries(collectUiNodes(lowered.ui.viewTree).map(n=>[n.id,{}]));
   for(const b of lowered.renderBindings)(rendered[b.nodeId]??={})[b.property]=result.state[b.path];
-  return{uiRoot:lowered.ui.semanticRoot,state,stateRoot:root(state),derived,rendered};
+  const navigation = lowered.ui.extensionPoints.navigation;
+  const route = navigation ? result.state['ui.navigation.route'] : null;
+  const target = navigation?.routes.find(({ id }) => id === route)?.target;
+  if (navigation && target === undefined) throw failure('RCL_UI_NATIVE_ROUTE_RESULT');
+  return{uiRoot:lowered.ui.semanticRoot,state,stateRoot:uiStateRoot(state, route),derived,rendered,
+    ...(navigation ? {navigation: {currentRoute: route, target}} : {})};
 }
